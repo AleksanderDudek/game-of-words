@@ -1,0 +1,115 @@
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useGameSocket } from "./hooks/useGameSocket/useGameSocket";
+import { JoinScreen } from "./components/JoinScreen/JoinScreen";
+import { LobbyScreen } from "./components/LobbyScreen/LobbyScreen";
+import { CountdownScreen } from "./components/CountdownScreen/CountdownScreen";
+import { GameScreen } from "./components/GameScreen/GameScreen";
+import { GameOverScreen } from "./components/GameOverScreen/GameOverScreen";
+import "./styles/global.scss";
+
+export default function App() {
+  const { session, playerId, connected, events, join, send } = useGameSocket();
+  const [nameInput, setNameInput] = useState("");
+  const [sessionIdInput, setSessionIdInput] = useState("");
+  const [guessInput, setGuessInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const isMyTurn = useMemo(
+    () => session?.round?.currentPlayerId === playerId,
+    [session, playerId]
+  );
+
+  useEffect(() => {
+    if (isMyTurn && session?.state === "playing") {
+      inputRef.current?.focus();
+    }
+  }, [isMyTurn, session?.state]);
+
+  const handleJoin = () => {
+    if (!nameInput.trim()) return;
+    join(nameInput.trim(), sessionIdInput.trim() || undefined);
+  };
+
+  const handleGuess = () => {
+    if (!guessInput.trim() || !isMyTurn) return;
+    send({ type: "guess", word: guessInput.trim() });
+    setGuessInput("");
+  };
+
+  const handleBuyHint = () => {
+    send({ type: "buy_hint" });
+  };
+
+  if (!session) {
+    return (
+      <div className="app">
+        <div className="screen">
+          <JoinScreen
+            connected={connected}
+            nameInput={nameInput}
+            sessionIdInput={sessionIdInput}
+            onNameChange={setNameInput}
+            onSessionIdChange={setSessionIdInput}
+            onJoin={handleJoin}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (session.state === "lobby") {
+    return (
+      <div className="app">
+        <div className="screen">
+          <LobbyScreen
+            session={session}
+            playerId={playerId}
+            onStartGame={() => send({ type: "start_game" })}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (session.state === "countdown") {
+    return (
+      <div className="app">
+        <div className="screen">
+          <CountdownScreen countdownLeft={session.countdownLeft ?? 0} />
+        </div>
+      </div>
+    );
+  }
+
+  if (session.state === "game_over") {
+    return (
+      <div className="app">
+        <div className="screen">
+          <GameOverScreen
+            players={session.players}
+            playerId={playerId}
+            onNewGame={() => window.location.reload()}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // playing | round_end
+  return (
+    <div className="app">
+      <div className="screen">
+        <GameScreen
+          session={session}
+          playerId={playerId}
+          events={events}
+          guessInput={guessInput}
+          onGuessChange={setGuessInput}
+          onGuess={handleGuess}
+          onBuyHint={handleBuyHint}
+          inputRef={inputRef}
+        />
+      </div>
+    </div>
+  );
+}

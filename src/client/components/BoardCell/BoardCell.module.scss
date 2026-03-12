@@ -1,0 +1,61 @@
+.board-cell {
+  position: relative;
+  width: 44px;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  animation: cellAppear 0.3s ease-out both;
+  transition: all 0.3s ease;
+}
+
+.board-cell.fixed {
+  border-color: rgba(74, 222, 128, 0.4);
+  background: var(--green-dim);
+}
+
+.board-cell.swapped {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: var(--red-dim);
+  animation: cellAppear 0.3s ease-out both, glitch 3s infinite;
+}
+
+.board-cell.revealed {
+  border-color: rgba(96, 165, 250, 0.4);
+  background: var(--blue-dim);
+}
+
+.cell-char {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.board-cell.fixed .cell-char { color: var(--green); }
+.board-cell.swapped .cell-char { color: var(--red); }
+.board-cell.revealed .cell-char { color: var(--blue); }
+
+.cell-index {
+  font-size: 9px;
+  color: var(--text-muted);
+  opacity: 0.5;
+  position: absolute;
+  bottom: 2px;
+}
+
+@keyframes cellAppear {
+  from { opacity: 0; transform: translateY(8px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes glitch {
+  0%, 95%, 100% { transform: translate(0); }
+  96% { transform: translate(-1px, 1px); }
+  97% { transform: translate(1px, -1px); }
+  98% { transform: translate(-1px, 0); }
+  99% { transform: translate(1px, 1px); }
+}

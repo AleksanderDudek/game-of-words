@@ -1,0 +1,29 @@
+.countdown-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.countdown-number {
+  font-family: var(--display);
+  font-size: 120px;
+  font-weight: 700;
+  color: var(--green);
+  text-shadow: 0 0 60px rgba(74, 222, 128, 0.4);
+  animation: countPulse 1s ease-in-out infinite;
+}
+
+.countdown-label {
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+@keyframes countPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 0.9; }
+}

@@ -1,0 +1,120 @@
+import styles from "./GameScreen.module.scss";
+import { BoardCell } from "../BoardCell/BoardCell";
+import { TimerBar } from "../TimerBar/TimerBar";
+import { PlayerCard } from "../PlayerCard/PlayerCard";
+import { EventLog } from "../EventLog/EventLog";
+import type { GameScreenProps } from "./GameScreen.costs";
+
+export function GameScreen({
+  session,
+  playerId,
+  events,
+  guessInput,
+  onGuessChange,
+  onGuess,
+  onBuyHint,
+  inputRef,
+}: GameScreenProps) {
+  const round = session.round!;
+  const isMyTurn = round.currentPlayerId === playerId;
+  const me = session.players.find((p) => p.id === playerId);
+  const canAffordHint = (me?.score ?? 0) >= session.config.hintCostPoints;
+
+  const turnIndicatorClass = [
+    styles["turn-indicator"],
+    isMyTurn ? styles["your-turn"] : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className={styles["game-screen"]}>
+      <div className={styles["game-topbar"]}>
+        <div className={styles["session-badge"]}>
+          <span className={styles["session-label"]}>SESSION</span>
+          <span className={styles["session-code"]}>{session.sessionId}</span>
+        </div>
+        <div className={styles["round-badge"]}>
+          ROUND {round.roundNumber}
+          <span className={styles["difficulty-tag"]}>{round.wordLength} letters</span>
+        </div>
+      </div>
+
+      <TimerBar timeLeft={round.timeLeft} total={session.config.sessionDurationSec} />
+
+      <div className={styles["hint-box"]}>
+        <span className={styles["hint-label"]}>HINT</span>
+        <span className={styles["hint-text"]}>{round.hint}</span>
+      </div>
+
+      <div className={styles["board"]}>
+        {round.board.map((cell, i) => (
+          <BoardCell key={i} cell={cell} index={i} />
+        ))}
+      </div>
+
+      <div className={turnIndicatorClass}>
+        {session.state === "round_end" ? (
+          <span className={styles["round-end-msg"]}>Next round starting...</span>
+        ) : isMyTurn ? (
+          <>
+            <span className={styles["turn-text"]}>YOUR TURN</span>
+            <span className={styles["turns-left"]}>
+              {round.turnsRemaining} guess{round.turnsRemaining !== 1 ? "es" : ""} left
+            </span>
+          </>
+        ) : (
+          <span className={styles["turn-text"]}>
+            {session.players.find((p) => p.id === round.currentPlayerId)?.name}&apos;s turn
+          </span>
+        )}
+      </div>
+
+      {session.state === "playing" && (
+        <div className={styles["guess-area"]}>
+          <div className={styles["guess-input-row"]}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={guessInput}
+              onChange={(e) => onGuessChange(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && onGuess()}
+              placeholder={isMyTurn ? "Type your guess..." : "Waiting for your turn..."}
+              disabled={!isMyTurn}
+              className={styles["guess-input"]}
+            />
+            <button
+              className={`btn primary ${styles["guess-btn"]}`}
+              onClick={onGuess}
+              disabled={!isMyTurn || !guessInput.trim()}
+            >
+              GUESS
+            </button>
+          </div>
+          <button
+            className={`btn ${styles["hint-btn"]}`}
+            onClick={onBuyHint}
+            disabled={!canAffordHint}
+            title={`Costs ${session.config.hintCostPoints} points`}
+          >
+            🔓 REVEAL PAIR ({session.config.hintCostPoints} pts)
+          </button>
+        </div>
+      )}
+
+      <div className={styles["bottom-panel"]}>
+        <div className={styles["players-panel"]}>
+          {session.players.map((p) => (
+            <PlayerCard
+              key={p.id}
+              player={p}
+              isCurrent={p.id === round.currentPlayerId}
+              isYou={p.id === playerId}
+            />
+          ))}
+        </div>
+        <EventLog events={events} players={session.players} />
+      </div>
+    </div>
+  );
+}

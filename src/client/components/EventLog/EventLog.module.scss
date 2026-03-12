@@ -1,0 +1,56 @@
+.event-log {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-log::-webkit-scrollbar {
+  width: 4px;
+}
+
+.event-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.event-log::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.log-entry {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.log-entry.correct,
+.log-entry.win {
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+.log-entry.wrong {
+  color: var(--red);
+}
+
+.log-entry.hint {
+  color: var(--blue);
+  background: var(--blue-dim);
+}
+
+.log-entry.turn {
+  color: var(--yellow);
+}
+
+.log-entry.error {
+  color: var(--red);
+  background: var(--red-dim);
+}

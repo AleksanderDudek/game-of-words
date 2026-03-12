@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "${WS_PORT:-8080}:8080"
+    environment:
+      - WS_PORT=8080
+      - MAX_CONCURRENT_SESSIONS=${MAX_CONCURRENT_SESSIONS:-10}
+      - MIN_WORD_LENGTH=${MIN_WORD_LENGTH:-4}
+      - MAX_WORD_LENGTH=${MAX_WORD_LENGTH:-20}
+      - WORDS_PER_DIFFICULTY=${WORDS_PER_DIFFICULTY:-2}
+      - POINTS_PER_CORRECT=${POINTS_PER_CORRECT:-100}
+      - HINT_COST_POINTS=${HINT_COST_POINTS:-30}
+      - TURNS_PER_PLAYER=${TURNS_PER_PLAYER:-3}
+      - SESSION_DURATION_SEC=${SESSION_DURATION_SEC:-45}
+      - LLM_ENDPOINT=${LLM_ENDPOINT:-}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').createConnection({port:8080}).on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  client:
+    build:
+      context: ./client
+      args:
+        VITE_WS_URL: "ws://localhost:${WS_PORT:-8080}"
+    ports:
+      - "${CLIENT_PORT:-3000}:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped

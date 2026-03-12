@@ -1,0 +1,84 @@
+.lobby-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.session-code {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 3px;
+  background: var(--green-dim);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.lobby-title {
+  font-family: var(--display);
+  font-size: 24px;
+  color: var(--text);
+}
+
+.lobby-hint {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.player-list {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lobby-config {
+  width: 100%;
+  max-width: 360px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.config-item span:first-child { color: var(--text-muted); }
+.config-item span:last-child { color: var(--text); font-weight: 500; }
+
+.waiting-dots {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.dots-anim {
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
