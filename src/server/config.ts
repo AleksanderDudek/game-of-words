@@ -40,6 +40,12 @@ export const CONFIG = {
   LLM_ENDPOINT:            envStr("LLM_ENDPOINT", ""),
   LLM_API_KEY:             envStr("LLM_API_KEY", ""),
   LLM_TIMEOUT_MS:          envInt("LLM_TIMEOUT_MS", 5000),
+
+  // ─── Production Security ───
+  ALLOWED_ORIGINS:         envStr("ALLOWED_ORIGINS", ""),   // comma-separated, empty = allow all
+  RATE_LIMIT_MSG_PER_SEC:  envInt("RATE_LIMIT_MSG_PER_SEC", 15),
+  MAX_NAME_LENGTH:         envInt("MAX_NAME_LENGTH", 20),
+  MAX_GUESS_LENGTH:        envInt("MAX_GUESS_LENGTH", 50),
 };
 
 export type GameConfig = typeof CONFIG;

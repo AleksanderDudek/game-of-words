@@ -2,11 +2,15 @@ version: "3.9"
 
 services:
   server:
-    build: ./server
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "${WS_PORT:-8080}:8080"
     environment:
+      - NODE_ENV=production
       - WS_PORT=8080
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
       - MAX_CONCURRENT_SESSIONS=${MAX_CONCURRENT_SESSIONS:-10}
       - MIN_WORD_LENGTH=${MIN_WORD_LENGTH:-4}
       - MAX_WORD_LENGTH=${MAX_WORD_LENGTH:-20}
@@ -26,9 +30,10 @@ services:
 
   client:
     build:
-      context: ./client
+      context: .
+      dockerfile: Dockerfile.client
       args:
-        VITE_WS_URL: "ws://localhost:${WS_PORT:-8080}"
+        VITE_WS_URL: "ws://${DOMAIN:-localhost}:${WS_PORT:-8080}"
     ports:
       - "${CLIENT_PORT:-3000}:80"
     depends_on:

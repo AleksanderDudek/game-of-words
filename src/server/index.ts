@@ -3,12 +3,35 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { WebSocketServer, WebSocket } from "ws";
+import { IncomingMessage } from "http";
 import { CONFIG } from "./config";
 import { GameSession } from "./session";
 import { ClientMessage } from "../shared/types";
 
 const sessions = new Map<string, GameSession>();
 const playerSessions = new Map<WebSocket, { sessionId: string; playerId: string }>();
+
+// ─── Rate limiting (per-connection message counter) ───
+const messageCounts = new Map<WebSocket, { count: number; resetAt: number }>();
+
+function isRateLimited(ws: WebSocket): boolean {
+  const now = Date.now();
+  let entry = messageCounts.get(ws);
+  if (!entry || now >= entry.resetAt) {
+    entry = { count: 0, resetAt: now + 1000 };
+    messageCounts.set(ws, entry);
+  }
+  entry.count++;
+  return entry.count > CONFIG.RATE_LIMIT_MSG_PER_SEC;
+}
+
+// ─── Origin validation ───
+function isOriginAllowed(req: IncomingMessage): boolean {
+  if (!CONFIG.ALLOWED_ORIGINS) return true; // empty = allow all (dev mode)
+  const origin = req.headers.origin ?? "";
+  const allowed = CONFIG.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
+  return allowed.includes(origin);
+}
 
 function findOrCreateSession(): GameSession {
   // Find an open lobby session
@@ -38,7 +61,10 @@ function getSession(sessionId: string): GameSession | undefined {
 }
 
 // ─── Start Server ───
-const wss = new WebSocketServer({ port: CONFIG.WS_PORT });
+const wss = new WebSocketServer({
+  port: CONFIG.WS_PORT,
+  verifyClient: (info: { req: IncomingMessage }) => isOriginAllowed(info.req),
+});
 
 console.log(`
 ╔══════════════════════════════════════════════════╗
@@ -56,12 +82,40 @@ wss.on("connection", (ws: WebSocket) => {
   console.log(`[Server] New WebSocket connection`);
 
   ws.on("message", (raw: Buffer) => {
+    // ─── Rate limiting ───
+    if (isRateLimited(ws)) {
+      ws.send(JSON.stringify({ type: "error", message: "Rate limit exceeded" }));
+      return;
+    }
+
     let msg: ClientMessage;
     try {
       msg = JSON.parse(raw.toString());
     } catch {
       ws.send(JSON.stringify({ type: "error", message: "Invalid JSON" }));
       return;
+    }
+
+    // ─── Input validation ───
+    if (msg.type === "join") {
+      if (!msg.name || typeof msg.name !== "string" || msg.name.trim().length === 0) {
+        ws.send(JSON.stringify({ type: "error", message: "Name is required" }));
+        return;
+      }
+      if (msg.name.length > CONFIG.MAX_NAME_LENGTH) {
+        ws.send(JSON.stringify({ type: "error", message: `Name must be ${CONFIG.MAX_NAME_LENGTH} characters or fewer` }));
+        return;
+      }
+    }
+    if (msg.type === "guess") {
+      if (!msg.word || typeof msg.word !== "string" || msg.word.trim().length === 0) {
+        ws.send(JSON.stringify({ type: "error", message: "Guess cannot be empty" }));
+        return;
+      }
+      if (msg.word.length > CONFIG.MAX_GUESS_LENGTH) {
+        ws.send(JSON.stringify({ type: "error", message: `Guess must be ${CONFIG.MAX_GUESS_LENGTH} characters or fewer` }));
+        return;
+      }
     }
 
     // ─── Handle join ───
@@ -107,6 +161,7 @@ wss.on("connection", (ws: WebSocket) => {
   });
 
   ws.on("close", () => {
+    messageCounts.delete(ws);
     const binding = playerSessions.get(ws);
     if (binding) {
       const session = sessions.get(binding.sessionId);
