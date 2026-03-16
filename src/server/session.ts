@@ -23,13 +23,14 @@ interface ConnectedPlayer extends Player {
 
 export class GameSession {
   id: string;
+  hostId: string = "";
   state: SessionState = "lobby";
   players: Map<string, ConnectedPlayer> = new Map();
   board: LetterCell[] = [];
   hint: string = "";
   originalWord: string = "";
   roundNumber: number = 0;
-  currentPlayerIndex: number = 0;
+  currentPlayerId: string = "";
   turnsRemaining: number = CONFIG.TURNS_PER_PLAYER;
   timeLeft: number = CONFIG.SESSION_DURATION_SEC;
   timerInterval: ReturnType<typeof setInterval> | null = null;
@@ -43,55 +44,76 @@ export class GameSession {
 
   // ─── Player Management ───
 
-  addPlayer(ws: WebSocket, name: string): string {
-    if (this.players.size >= CONFIG.MAX_PLAYERS) {
-      this.sendTo(ws, { type: "error", message: "Session is full" });
-      return "";
+  // Returns new playerId (fresh join) or existing playerId (rejoin).
+  addPlayer(ws: WebSocket, name: string, existingPlayerId?: string): string {
+    // ── Rejoin path: player reconnects with stored credentials ──
+    if (existingPlayerId) {
+      const existing = this.players.get(existingPlayerId);
+      if (existing) {
+        existing.ws = ws;
+        existing.isConnected = true;
+        existing.name = name;
+        this.sendTo(ws, { type: "joined", playerId: existing.id, sessionId: this.id });
+        this.broadcastState();
+        console.log(`[Session ${this.id}] Player "${name}" (${existing.id}) rejoined.`);
+        return existing.id;
+      }
+      // Stored ID not found — fall through to a fresh join
     }
-    if (this.state !== "lobby") {
-      this.sendTo(ws, { type: "error", message: "Game already in progress" });
+
+    // ── Full-session guard (count only connected slots) ──
+    const connectedCount = [...this.players.values()].filter((p) => p.isConnected).length;
+    if (connectedCount >= CONFIG.MAX_PLAYERS) {
+      this.sendTo(ws, { type: "error", message: "Session is full" });
       return "";
     }
 
     const playerId = uuid().slice(0, 8);
+    const isSpectator = this.state !== "lobby"; // joining mid-game → spectator until next round
     const player: ConnectedPlayer = {
       id: playerId,
       name,
       score: 0,
       isConnected: true,
+      isSpectator,
       ws,
     };
     this.players.set(playerId, player);
 
+    if (!this.hostId) this.hostId = playerId; // first player is host
     this.sendTo(ws, { type: "joined", playerId, sessionId: this.id });
+    this.broadcast({ type: "player_joined", playerId, playerName: name, isSpectator });
     this.broadcastState();
-    console.log(`[Session ${this.id}] Player "${name}" (${playerId}) joined. Total: ${this.players.size}`);
+    console.log(`[Session ${this.id}] Player "${name}" (${playerId}) joined as ${isSpectator ? "spectator" : "player"}. Total: ${this.players.size}`);
     return playerId;
   }
 
   removePlayer(playerId: string): void {
     const player = this.players.get(playerId);
-    if (player) {
-      player.isConnected = false;
-      console.log(`[Session ${this.id}] Player "${player.name}" disconnected`);
+    if (!player) return;
 
-      // If all disconnected, clean up
-      const connected = [...this.players.values()].filter((p) => p.isConnected);
-      if (connected.length === 0) {
-        this.cleanup();
-      } else {
-        // If it was current player's turn, advance
-        if (this.state === "playing") {
-          const orderedPlayers = this.getOrderedPlayers();
-          if (
-            orderedPlayers[this.currentPlayerIndex]?.id === playerId
-          ) {
-            this.advanceTurn();
-          }
-        }
-        this.broadcastState();
-      }
+    player.isConnected = false;
+    console.log(`[Session ${this.id}] Player "${player.name}" disconnected`);
+    this.broadcast({ type: "player_left", playerId, playerName: player.name });
+
+    // Pass host to the next connected player if needed
+    if (this.hostId === playerId) {
+      const next = [...this.players.values()].find((p) => p.isConnected && p.id !== playerId);
+      this.hostId = next?.id ?? "";
     }
+
+    const connected = [...this.players.values()].filter((p) => p.isConnected);
+    if (connected.length === 0) {
+      this.cleanup();
+      return;
+    }
+
+    // If the disconnected player held the turn, advance it
+    if ((this.state === "playing" || this.state === "paused") && this.currentPlayerId === playerId) {
+      this.advanceTurn();
+    }
+
+    this.broadcastState();
   }
 
   // ─── Game Flow ───
@@ -99,8 +121,8 @@ export class GameSession {
   async startGame(): Promise<void> {
     if (this.state !== "lobby") return;
 
-    const connected = [...this.players.values()].filter((p) => p.isConnected);
-    if (connected.length < CONFIG.MIN_PLAYERS) {
+    const readyCount = [...this.players.values()].filter((p) => p.isConnected && !p.isSpectator).length;
+    if (readyCount < CONFIG.MIN_PLAYERS) {
       this.broadcast({ type: "error", message: `Need at least ${CONFIG.MIN_PLAYERS} players` });
       return;
     }
@@ -120,10 +142,20 @@ export class GameSession {
     this.currentDifficulty = CONFIG.MIN_WORD_LENGTH;
     this.wordsAtCurrentDifficulty = 0;
     this.roundNumber = 0;
+    const active = this.getActivePlayers();
+    this.currentPlayerId = active[0].id;
     await this.startNewRound();
   }
 
   async startNewRound(): Promise<void> {
+    // Promote any spectators who joined mid-game into the active rotation
+    for (const player of this.players.values()) {
+      if (player.isSpectator && player.isConnected) {
+        player.isSpectator = false;
+        console.log(`[Session ${this.id}] Spectator "${player.name}" is now an active player.`);
+      }
+    }
+
     this.roundNumber++;
     this.turnsRemaining = CONFIG.TURNS_PER_PLAYER;
     this.timeLeft = CONFIG.SESSION_DURATION_SEC;
@@ -157,6 +189,7 @@ export class GameSession {
 
   handleTimeUp(): void {
     if (this.timerInterval) clearInterval(this.timerInterval);
+    this.timerInterval = null;
 
     // Nobody guessed — reveal the word and move on
     this.state = "round_end";
@@ -168,12 +201,13 @@ export class GameSession {
     });
     this.broadcastState();
 
-    // Next round after brief pause
+    // Next round after brief pause — next player's word
     setTimeout(async () => {
       this.progressDifficulty();
       if (this.currentDifficulty > CONFIG.MAX_WORD_LENGTH) {
         this.endGame();
       } else {
+        this.rotatePlayer();
         this.state = "playing";
         await this.startNewRound();
       }
@@ -184,13 +218,9 @@ export class GameSession {
 
   handleGuess(playerId: string, guess: string): void {
     if (this.state !== "playing") return;
-    const orderedPlayers = this.getOrderedPlayers();
-    const currentPlayer = orderedPlayers[this.currentPlayerIndex];
-    if (!currentPlayer || currentPlayer.id !== playerId) {
+    if (this.currentPlayerId !== playerId) {
       const player = this.players.get(playerId);
-      if (player) {
-        this.sendTo(player.ws, { type: "error", message: "Not your turn" });
-      }
+      if (player) this.sendTo(player.ws, { type: "error", message: "Not your turn" });
       return;
     }
 
@@ -206,6 +236,7 @@ export class GameSession {
       player.score += totalPoints;
 
       if (this.timerInterval) clearInterval(this.timerInterval);
+      this.timerInterval = null;
 
       this.broadcast({
         type: "round_won",
@@ -217,12 +248,13 @@ export class GameSession {
       this.state = "round_end";
       this.broadcastState();
 
-      // Next round after brief celebration
+      // Next round after brief celebration — next player's word
       setTimeout(async () => {
         this.progressDifficulty();
         if (this.currentDifficulty > CONFIG.MAX_WORD_LENGTH) {
           this.endGame();
         } else {
+          this.rotatePlayer();
           this.state = "playing";
           await this.startNewRound();
         }
@@ -268,24 +300,106 @@ export class GameSession {
 
   // ─── Turn Management ───
 
+  // Called mid-round when the active player exhausts their guesses (or passes).
+  // Switches to the next player on the SAME word and notifies clients.
   advanceTurn(): void {
-    const orderedPlayers = this.getOrderedPlayers();
-    if (orderedPlayers.length === 0) return;
+    const active = this.getActivePlayers();
+    if (active.length === 0) return;
 
-    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % orderedPlayers.length;
+    const idx = active.findIndex((p) => p.id === this.currentPlayerId);
+    const next = active[(idx + 1) % active.length];
+    this.currentPlayerId = next.id;
     this.turnsRemaining = CONFIG.TURNS_PER_PLAYER;
 
-    const newPlayer = orderedPlayers[this.currentPlayerIndex];
     this.broadcast({
       type: "turn_switched",
-      newPlayerId: newPlayer.id,
+      newPlayerId: next.id,
       turnsRemaining: this.turnsRemaining,
     });
     this.broadcastState();
   }
 
-  getOrderedPlayers(): ConnectedPlayer[] {
-    return [...this.players.values()].filter((p) => p.isConnected);
+  // Called between rounds to silently advance to the next player.
+  private rotatePlayer(): void {
+    const active = this.getActivePlayers();
+    if (active.length === 0) return;
+    const idx = active.findIndex((p) => p.id === this.currentPlayerId);
+    this.currentPlayerId = active[(idx + 1) % active.length].id;
+  }
+
+  getActivePlayers(): ConnectedPlayer[] {
+    return [...this.players.values()].filter((p) => p.isConnected && !p.isSpectator);
+  }
+
+  // ─── Voluntary Actions ───
+
+  handlePassTurn(playerId: string): void {
+    if (this.state !== "playing") return;
+    if (this.currentPlayerId !== playerId) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Not your turn" });
+      return;
+    }
+    console.log(`[Session ${this.id}] Player "${playerId}" passed their turn.`);
+    this.advanceTurn();
+  }
+
+  handlePauseGame(playerId: string): void {
+    if (this.state !== "playing") return;
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    this.state = "paused";
+    this.broadcast({ type: "game_paused", byPlayerId: playerId });
+    this.broadcastState();
+    console.log(`[Session ${this.id}] Game paused by "${playerId}".`);
+  }
+
+  handleResumeGame(playerId: string): void {
+    if (this.state !== "paused") return;
+    this.state = "playing";
+    this.startTimer();
+    this.broadcast({ type: "game_resumed", byPlayerId: playerId });
+    this.broadcastState();
+    console.log(`[Session ${this.id}] Game resumed by "${playerId}".`);
+  }
+
+  handleForfeitGame(playerId: string): void {
+    const player = this.players.get(playerId);
+    if (!player) return;
+
+    console.log(`[Session ${this.id}] Player "${player.name}" forfeited.`);
+    player.isConnected = false;
+    this.broadcast({ type: "player_left", playerId, playerName: player.name });
+
+    if (this.hostId === playerId) {
+      const next = [...this.players.values()].find((p) => p.isConnected && p.id !== playerId);
+      this.hostId = next?.id ?? "";
+    }
+
+    const stillActive = this.getActivePlayers();
+    if (stillActive.length === 0) {
+      this.cleanup();
+      return;
+    }
+
+    if (
+      stillActive.length < CONFIG.MIN_PLAYERS &&
+      this.state !== "lobby" &&
+      this.state !== "game_over"
+    ) {
+      if (this.timerInterval) clearInterval(this.timerInterval);
+      this.timerInterval = null;
+      this.endGame();
+      return;
+    }
+
+    if (this.currentPlayerId === playerId && (this.state === "playing" || this.state === "paused")) {
+      this.advanceTurn();
+    }
+
+    this.broadcastState();
   }
 
   // ─── Difficulty Progression ───
@@ -303,6 +417,7 @@ export class GameSession {
 
   endGame(): void {
     if (this.timerInterval) clearInterval(this.timerInterval);
+    this.timerInterval = null;
     this.state = "game_over";
     this.broadcastState();
     console.log(`[Session ${this.id}] Game over!`);
@@ -310,6 +425,7 @@ export class GameSession {
 
   cleanup(): void {
     if (this.timerInterval) clearInterval(this.timerInterval);
+    this.timerInterval = null;
     console.log(`[Session ${this.id}] Cleaned up`);
   }
 
@@ -317,15 +433,13 @@ export class GameSession {
 
   handleMessage(playerId: string, msg: ClientMessage): void {
     switch (msg.type) {
-      case "start_game":
-        this.startGame();
-        break;
-      case "guess":
-        this.handleGuess(playerId, msg.word);
-        break;
-      case "buy_hint":
-        this.handleBuyHint(playerId);
-        break;
+      case "start_game":   this.startGame(); break;
+      case "guess":        this.handleGuess(playerId, msg.word); break;
+      case "buy_hint":     this.handleBuyHint(playerId); break;
+      case "pass_turn":    this.handlePassTurn(playerId); break;
+      case "pause_game":   this.handlePauseGame(playerId); break;
+      case "resume_game":  this.handleResumeGame(playerId); break;
+      case "forfeit_game": this.handleForfeitGame(playerId); break;
       case "ping": {
         const player = this.players.get(playerId);
         if (player) this.sendTo(player.ws, { type: "pong" });
@@ -337,11 +451,8 @@ export class GameSession {
   // ─── Networking ───
 
   getSnapshot(): SessionSnapshot {
-    const orderedPlayers = this.getOrderedPlayers();
-    const currentPlayer = orderedPlayers[this.currentPlayerIndex];
-
     const round: RoundState | null =
-      this.state === "playing" || this.state === "round_end"
+      this.state === "playing" || this.state === "round_end" || this.state === "paused"
         ? {
             roundNumber: this.roundNumber,
             board: this.board.map((c) => ({
@@ -352,7 +463,7 @@ export class GameSession {
             hint: this.hint,
             difficulty: this.currentDifficulty,
             timeLeft: this.timeLeft,
-            currentPlayerId: currentPlayer?.id ?? "",
+            currentPlayerId: this.currentPlayerId,
             turnsRemaining: this.turnsRemaining,
             wordLength: this.originalWord.length,
           }
@@ -360,6 +471,7 @@ export class GameSession {
 
     return {
       sessionId: this.id,
+      hostId: this.hostId,
       state: this.state,
       players: [...this.players.values()].map(({ ws, ...rest }) => rest),
       round,
@@ -370,6 +482,8 @@ export class GameSession {
         sessionDurationSec: CONFIG.SESSION_DURATION_SEC,
         minWordLength: CONFIG.MIN_WORD_LENGTH,
         maxWordLength: CONFIG.MAX_WORD_LENGTH,
+        minPlayers: CONFIG.MIN_PLAYERS,
+        maxPlayers: CONFIG.MAX_PLAYERS,
       },
       countdownLeft: this.countdownLeft,
     };

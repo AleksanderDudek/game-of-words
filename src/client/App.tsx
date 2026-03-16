@@ -8,11 +8,13 @@ import { GameOverScreen } from "./components/GameOverScreen/GameOverScreen";
 import "./styles/global.scss";
 
 export default function App() {
-  const { session, playerId, connected, events, join, send } = useGameSocket();
+  const { session, playerId, connected, events, join, send, forfeitGame } = useGameSocket();
   const [nameInput, setNameInput] = useState("");
   const [sessionIdInput, setSessionIdInput] = useState("");
   const [guessInput, setGuessInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isHost = session?.hostId === playerId;
 
   const isMyTurn = useMemo(
     () => session?.round?.currentPlayerId === playerId,
@@ -39,6 +41,10 @@ export default function App() {
   const handleBuyHint = () => {
     send({ type: "buy_hint" });
   };
+
+  const handlePassTurn = () => send({ type: "pass_turn" });
+  const handlePauseGame = () => send({ type: "pause_game" });
+  const handleResumeGame = () => send({ type: "resume_game" });
 
   if (!session) {
     return (
@@ -95,7 +101,7 @@ export default function App() {
     );
   }
 
-  // playing | round_end
+  // playing | round_end | paused
   return (
     <div className="app">
       <div className="screen">
@@ -107,6 +113,11 @@ export default function App() {
           onGuessChange={setGuessInput}
           onGuess={handleGuess}
           onBuyHint={handleBuyHint}
+          onPassTurn={handlePassTurn}
+          onPauseGame={handlePauseGame}
+          onResumeGame={handleResumeGame}
+          onForfeitGame={forfeitGame}
+          isHost={isHost}
           inputRef={inputRef}
         />
       </div>

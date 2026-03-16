@@ -3,7 +3,10 @@ import { PlayerCard } from "../PlayerCard/PlayerCard";
 import type { LobbyScreenProps } from "./LobbyScreen.costs";
 
 export function LobbyScreen({ session, playerId, onStartGame }: LobbyScreenProps) {
-  const canStart = session.players.length >= 2;
+  const minPlayers = session.config.minPlayers ?? 2;
+  const activeCount = session.players.filter((p) => !p.isSpectator).length;
+  const canStart = activeCount >= minPlayers;
+  const spectatorCount = session.players.filter((p) => p.isSpectator).length;
 
   return (
     <div className={styles["lobby-screen"]}>
@@ -13,16 +16,26 @@ export function LobbyScreen({ session, playerId, onStartGame }: LobbyScreenProps
       </div>
 
       <h2 className={styles["lobby-title"]}>Waiting for players...</h2>
-      <p className={styles["lobby-hint"]}>Share the session code with friends to join</p>
+      <p className={styles["lobby-hint"]}>
+        Share the session code with friends to join
+        {spectatorCount > 0 && ` • ${spectatorCount} spectator${spectatorCount !== 1 ? "s" : ""} watching`}
+      </p>
 
       <div className={styles["player-list"]}>
         {session.players.map((p) => (
-          <PlayerCard
-            key={p.id}
-            player={p}
-            isCurrent={false}
-            isYou={p.id === playerId}
-          />
+          <div key={p.id} className={styles["player-row"]}>
+            <PlayerCard
+              player={p}
+              isCurrent={false}
+              isYou={p.id === playerId}
+            />
+            {p.id === session.hostId && (
+              <span className={styles["host-badge"]}>HOST</span>
+            )}
+            {p.isSpectator && (
+              <span className={styles["spectator-badge"]}>SPECTATOR</span>
+            )}
+          </div>
         ))}
       </div>
 
@@ -53,7 +66,7 @@ export function LobbyScreen({ session, playerId, onStartGame }: LobbyScreenProps
         </button>
       ) : (
         <div className={styles["waiting-dots"]}>
-          Need at least 2 players
+          Need at least {minPlayers} players
           <span className={styles["dots-anim"]}>...</span>
         </div>
       )}

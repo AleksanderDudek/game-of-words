@@ -13,6 +13,10 @@ export function GameScreen({
   onGuessChange,
   onGuess,
   onBuyHint,
+  onPassTurn,
+  onPauseGame,
+  onResumeGame,
+  onForfeitGame,
   inputRef,
 }: GameScreenProps) {
   const round = session.round!;
@@ -54,7 +58,9 @@ export function GameScreen({
       </div>
 
       <div className={turnIndicatorClass}>
-        {session.state === "round_end" ? (
+        {session.state === "paused" ? (
+          <span className={styles["paused-text"]}>⏸ GAME PAUSED</span>
+        ) : session.state === "round_end" ? (
           <span className={styles["round-end-msg"]}>Next round starting...</span>
         ) : isMyTurn ? (
           <>
@@ -99,6 +105,31 @@ export function GameScreen({
           >
             🔓 REVEAL PAIR ({session.config.hintCostPoints} pts)
           </button>
+        </div>
+      )}
+
+      {(session.state === "playing" || session.state === "paused") && (
+        <div className={styles["action-bar"]}>
+          {session.state === "playing" && isMyTurn && onPassTurn && (
+            <button className="btn" onClick={onPassTurn}>
+              ↷ PASS TURN
+            </button>
+          )}
+          {session.state === "playing" && onPauseGame && (
+            <button className="btn" onClick={onPauseGame}>
+              ⏸ PAUSE
+            </button>
+          )}
+          {session.state === "paused" && onResumeGame && (
+            <button className="btn primary" onClick={onResumeGame}>
+              ▶ RESUME
+            </button>
+          )}
+          {onForfeitGame && (
+            <button className={`btn ${styles["forfeit-btn"]}`} onClick={onForfeitGame}>
+              ✕ LEAVE GAME
+            </button>
+          )}
         </div>
       )}
 

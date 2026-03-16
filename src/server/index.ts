@@ -79,7 +79,7 @@ wss.on("connection", (ws: WebSocket) => {
           session = findOrCreateSession();
         }
 
-        const playerId = session.addPlayer(ws, msg.name);
+        const playerId = session.addPlayer(ws, msg.name, msg.playerId);
         if (playerId) {
           playerSessions.set(ws, { sessionId: session.id, playerId });
         }
