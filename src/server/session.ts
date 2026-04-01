@@ -7,12 +7,18 @@ import WebSocket from "ws";
 import { CONFIG } from "./config";
 import {
   Player,
+  PlayerId,
+  SessionId,
   SessionState,
   SessionSnapshot,
   RoundState,
   LetterCell,
+  GameConfig,
   ServerMessage,
   ClientMessage,
+  toPlayerId,
+  toSessionId,
+  assertNever,
 } from "../shared/types";
 import { buildBoard, revealNextPair, checkGuess, boardToString, remainingPairs } from "../shared/board";
 import { generateWord } from "./wordgen";
@@ -22,15 +28,15 @@ interface ConnectedPlayer extends Player {
 }
 
 export class GameSession {
-  id: string;
-  hostId: string = "";
+  id: SessionId;
+  hostId: PlayerId = "" as PlayerId;
   state: SessionState = "lobby";
-  players: Map<string, ConnectedPlayer> = new Map();
+  players: Map<PlayerId, ConnectedPlayer> = new Map();
   board: LetterCell[] = [];
   hint: string = "";
   originalWord: string = "";
   roundNumber: number = 0;
-  currentPlayerId: string = "";
+  currentPlayerId: PlayerId = "" as PlayerId;
   turnsRemaining: number = CONFIG.TURNS_PER_PLAYER;
   timeLeft: number = CONFIG.SESSION_DURATION_SEC;
   timerInterval: ReturnType<typeof setInterval> | null = null;
@@ -39,16 +45,16 @@ export class GameSession {
   wordsAtCurrentDifficulty: number = 0;
 
   constructor() {
-    this.id = uuid().slice(0, 8);
+    this.id = toSessionId(uuid().slice(0, 8));
   }
 
   // ─── Player Management ───
 
   // Returns new playerId (fresh join) or existing playerId (rejoin).
-  addPlayer(ws: WebSocket, name: string, existingPlayerId?: string): string {
+  addPlayer(ws: WebSocket, name: string, existingPlayerId?: string): PlayerId | "" {
     // ── Rejoin path: player reconnects with stored credentials ──
     if (existingPlayerId) {
-      const existing = this.players.get(existingPlayerId);
+      const existing = this.players.get(toPlayerId(existingPlayerId));
       if (existing) {
         existing.ws = ws;
         existing.isConnected = true;
@@ -68,7 +74,7 @@ export class GameSession {
       return "";
     }
 
-    const playerId = uuid().slice(0, 8);
+    const playerId = toPlayerId(uuid().slice(0, 8));
     const isSpectator = this.state !== "lobby"; // joining mid-game → spectator until next round
     const player: ConnectedPlayer = {
       id: playerId,
@@ -88,7 +94,7 @@ export class GameSession {
     return playerId;
   }
 
-  removePlayer(playerId: string): void {
+  removePlayer(playerId: PlayerId): void {
     const player = this.players.get(playerId);
     if (!player) return;
 
@@ -99,7 +105,7 @@ export class GameSession {
     // Pass host to the next connected player if needed
     if (this.hostId === playerId) {
       const next = [...this.players.values()].find((p) => p.isConnected && p.id !== playerId);
-      this.hostId = next?.id ?? "";
+      this.hostId = next?.id ?? ("" as PlayerId);
     }
 
     const connected = [...this.players.values()].filter((p) => p.isConnected);
@@ -216,7 +222,7 @@ export class GameSession {
 
   // ─── Player Actions ───
 
-  handleGuess(playerId: string, guess: string): void {
+  handleGuess(playerId: PlayerId, guess: string): void {
     if (this.state !== "playing") return;
     if (this.currentPlayerId !== playerId) {
       const player = this.players.get(playerId);
@@ -269,7 +275,7 @@ export class GameSession {
     }
   }
 
-  handleBuyHint(playerId: string): void {
+  handleBuyHint(playerId: PlayerId): void {
     if (this.state !== "playing") return;
     const player = this.players.get(playerId);
     if (!player) return;
@@ -333,7 +339,7 @@ export class GameSession {
 
   // ─── Voluntary Actions ───
 
-  handlePassTurn(playerId: string): void {
+  handlePassTurn(playerId: PlayerId): void {
     if (this.state !== "playing") return;
     if (this.currentPlayerId !== playerId) {
       const player = this.players.get(playerId);
@@ -344,7 +350,7 @@ export class GameSession {
     this.advanceTurn();
   }
 
-  handlePauseGame(playerId: string): void {
+  handlePauseGame(playerId: PlayerId): void {
     if (this.state !== "playing") return;
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
@@ -356,7 +362,7 @@ export class GameSession {
     console.log(`[Session ${this.id}] Game paused by "${playerId}".`);
   }
 
-  handleResumeGame(playerId: string): void {
+  handleResumeGame(playerId: PlayerId): void {
     if (this.state !== "paused") return;
     this.state = "playing";
     this.startTimer();
@@ -365,7 +371,7 @@ export class GameSession {
     console.log(`[Session ${this.id}] Game resumed by "${playerId}".`);
   }
 
-  handleForfeitGame(playerId: string): void {
+  handleForfeitGame(playerId: PlayerId): void {
     const player = this.players.get(playerId);
     if (!player) return;
 
@@ -375,7 +381,7 @@ export class GameSession {
 
     if (this.hostId === playerId) {
       const next = [...this.players.values()].find((p) => p.isConnected && p.id !== playerId);
-      this.hostId = next?.id ?? "";
+      this.hostId = next?.id ?? ("" as PlayerId);
     }
 
     const stillActive = this.getActivePlayers();
@@ -431,7 +437,7 @@ export class GameSession {
 
   // ─── Message handling ───
 
-  handleMessage(playerId: string, msg: ClientMessage): void {
+  handleMessage(playerId: PlayerId, msg: ClientMessage): void {
     switch (msg.type) {
       case "start_game":   this.startGame(); break;
       case "guess":        this.handleGuess(playerId, msg.word); break;
@@ -445,6 +451,11 @@ export class GameSession {
         if (player) this.sendTo(player.ws, { type: "pong" });
         break;
       }
+      case "join":
+        // join is handled at the server level, not session level
+        break;
+      default:
+        assertNever(msg);
     }
   }
 
@@ -469,22 +480,24 @@ export class GameSession {
           }
         : null;
 
+    const config: GameConfig = {
+      pointsPerCorrect: CONFIG.POINTS_PER_CORRECT,
+      hintCostPoints: CONFIG.HINT_COST_POINTS,
+      turnsPerPlayer: CONFIG.TURNS_PER_PLAYER,
+      sessionDurationSec: CONFIG.SESSION_DURATION_SEC,
+      minWordLength: CONFIG.MIN_WORD_LENGTH,
+      maxWordLength: CONFIG.MAX_WORD_LENGTH,
+      minPlayers: CONFIG.MIN_PLAYERS,
+      maxPlayers: CONFIG.MAX_PLAYERS,
+    };
+
     return {
       sessionId: this.id,
       hostId: this.hostId,
       state: this.state,
-      players: [...this.players.values()].map(({ ws, ...rest }) => rest),
+      players: [...this.players.values()].map(({ ws: _ws, ...rest }) => rest),
       round,
-      config: {
-        pointsPerCorrect: CONFIG.POINTS_PER_CORRECT,
-        hintCostPoints: CONFIG.HINT_COST_POINTS,
-        turnsPerPlayer: CONFIG.TURNS_PER_PLAYER,
-        sessionDurationSec: CONFIG.SESSION_DURATION_SEC,
-        minWordLength: CONFIG.MIN_WORD_LENGTH,
-        maxWordLength: CONFIG.MAX_WORD_LENGTH,
-        minPlayers: CONFIG.MIN_PLAYERS,
-        maxPlayers: CONFIG.MAX_PLAYERS,
-      },
+      config,
       countdownLeft: this.countdownLeft,
     };
   }

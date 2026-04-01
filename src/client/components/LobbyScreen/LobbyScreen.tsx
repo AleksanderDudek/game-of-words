@@ -1,6 +1,6 @@
 import styles from "./LobbyScreen.module.scss";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
-import type { LobbyScreenProps } from "./LobbyScreen.costs";
+import type { LobbyScreenProps } from "./LobbyScreen.types";
 
 export function LobbyScreen({ session, playerId, onStartGame }: LobbyScreenProps) {
   const minPlayers = session.config.minPlayers ?? 2;

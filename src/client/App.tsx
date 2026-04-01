@@ -1,14 +1,29 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useGameSocket } from "./hooks/useGameSocket/useGameSocket";
 import { JoinScreen } from "./components/JoinScreen/JoinScreen";
 import { LobbyScreen } from "./components/LobbyScreen/LobbyScreen";
 import { CountdownScreen } from "./components/CountdownScreen/CountdownScreen";
 import { GameScreen } from "./components/GameScreen/GameScreen";
 import { GameOverScreen } from "./components/GameOverScreen/GameOverScreen";
+import { ServerSelectScreen } from "./components/ServerSelectScreen/ServerSelectScreen";
+import { SINGLE_SERVER_URL, GAME_SERVERS } from "./config/servers";
+import type { GameServerEntry } from "@/shared/types";
 import "./styles/global.scss";
 
+/** True when a single WS URL is configured (Docker Compose / dev mode) */
+const isSingleServerMode = Boolean(SINGLE_SERVER_URL);
+
 export default function App() {
-  const { session, playerId, connected, events, join, send, forfeitGame } = useGameSocket();
+  const [selectedServer, setSelectedServer] = useState<GameServerEntry | null>(null);
+
+  // Determine WebSocket URL: single-server mode → env var; multi-server → user selection
+  const wsUrl = isSingleServerMode
+    ? SINGLE_SERVER_URL!
+    : selectedServer?.url ?? null;
+
+  const { session, playerId, connected, events, join, send, forfeitGame } = useGameSocket({
+    serverUrl: wsUrl,
+  });
   const [nameInput, setNameInput] = useState("");
   const [sessionIdInput, setSessionIdInput] = useState("");
   const [guessInput, setGuessInput] = useState("");
@@ -45,6 +60,21 @@ export default function App() {
   const handlePassTurn = () => send({ type: "pass_turn" });
   const handlePauseGame = () => send({ type: "pause_game" });
   const handleResumeGame = () => send({ type: "resume_game" });
+
+  const handleServerSelect = useCallback((server: GameServerEntry) => {
+    setSelectedServer(server);
+  }, []);
+
+  // ─── Server Selection (multi-server mode only) ───
+  if (!isSingleServerMode && !selectedServer) {
+    return (
+      <div className="app">
+        <div className="screen">
+          <ServerSelectScreen servers={GAME_SERVERS} onSelect={handleServerSelect} />
+        </div>
+      </div>
+    );
+  }
 
   if (!session) {
     return (

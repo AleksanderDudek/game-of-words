@@ -1,14 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { LobbyScreen } from "./LobbyScreen";
-import type { SessionSnapshot } from "@/shared/types";
+import type { SessionSnapshot, PlayerId, SessionId } from "@/shared/types";
 
 const baseSession: SessionSnapshot = {
-  sessionId: "ABC123",
+  sessionId: "ABC123" as SessionId,
   state: "lobby",
   players: [
-    { id: "p1", name: "Alice", score: 0, isConnected: true },
-    { id: "p2", name: "Bob", score: 0, isConnected: true },
+    { id: "p1" as PlayerId, name: "Alice", score: 0, isConnected: true },
+    { id: "p2" as PlayerId, name: "Bob", score: 0, isConnected: true },
   ],
   round: null,
   config: {

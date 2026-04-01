@@ -1,5 +1,5 @@
 import styles from "./GameOverScreen.module.scss";
-import type { GameOverScreenProps } from "./GameOverScreen.costs";
+import type { GameOverScreenProps } from "./GameOverScreen.types";
 
 export function GameOverScreen({ players, playerId, onNewGame }: GameOverScreenProps) {
   const sorted = [...players].sort((a, b) => b.score - a.score);

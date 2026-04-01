@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { PlayerCard } from "./PlayerCard";
-import type { Player } from "@/shared/types";
+import type { Player, PlayerId } from "@/shared/types";
 
 const makePlayer = (overrides?: Partial<Player>): Player => ({
-  id: "p1",
+  id: "p1" as PlayerId,
   name: "Alice",
   score: 100,
   isConnected: true,

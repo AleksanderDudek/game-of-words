@@ -2,11 +2,11 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { EventLog } from "./EventLog";
 import { formatEvent, resolvePlayerName } from "./EventLog.utils";
-import type { Player, ServerMessage } from "@/shared/types";
+import type { Player, ServerMessage, PlayerId } from "@/shared/types";
 
 const players: Player[] = [
-  { id: "p1", name: "Alice", score: 50, isConnected: true },
-  { id: "p2", name: "Bob", score: 30, isConnected: true },
+  { id: "p1" as PlayerId, name: "Alice", score: 50, isConnected: true },
+  { id: "p2" as PlayerId, name: "Bob", score: 30, isConnected: true },
 ];
 
 describe("resolvePlayerName", () => {

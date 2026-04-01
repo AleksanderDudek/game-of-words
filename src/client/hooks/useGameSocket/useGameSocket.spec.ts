@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useGameSocket } from "./useGameSocket";
-import type { ServerMessage } from "@/shared/types";
+import type { ServerMessage, SessionId } from "@/shared/types";
 
 // ─── Mock WebSocket ───
 
@@ -85,7 +85,7 @@ describe("useGameSocket", () => {
       MockWebSocket.lastInstance.simulateMessage({
         type: "session_update",
         session: {
-          sessionId: "sess1",
+          sessionId: "sess1" as SessionId,
           state: "lobby",
           players: [],
           round: null,

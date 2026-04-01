@@ -1,5 +1,5 @@
 import styles from "./JoinScreen.module.scss";
-import type { JoinScreenProps } from "./JoinScreen.costs";
+import type { JoinScreenProps } from "./JoinScreen.types";
 
 export function JoinScreen({
   connected,

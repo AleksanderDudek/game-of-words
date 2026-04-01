@@ -2,14 +2,14 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { createRef } from "react";
 import { GameScreen } from "./GameScreen";
-import type { SessionSnapshot } from "@/shared/types";
+import type { SessionSnapshot, PlayerId, SessionId } from "@/shared/types";
 
 const baseSession: SessionSnapshot = {
-  sessionId: "XYZ",
+  sessionId: "XYZ" as SessionId,
   state: "playing",
   players: [
-    { id: "p1", name: "Alice", score: 200, isConnected: true },
-    { id: "p2", name: "Bob", score: 50, isConnected: true },
+    { id: "p1" as PlayerId, name: "Alice", score: 200, isConnected: true },
+    { id: "p2" as PlayerId, name: "Bob", score: 50, isConnected: true },
   ],
   round: {
     roundNumber: 2,
@@ -23,7 +23,7 @@ const baseSession: SessionSnapshot = {
     hint: "A campfire's ambition",
     difficulty: 5,
     timeLeft: 30,
-    currentPlayerId: "p1",
+    currentPlayerId: "p1" as PlayerId,
     turnsRemaining: 3,
     wordLength: 5,
   },
@@ -97,8 +97,8 @@ describe("GameScreen", () => {
     const sessionPoor = {
       ...baseSession,
       players: [
-        { id: "p1", name: "Alice", score: 0, isConnected: true },
-        { id: "p2", name: "Bob", score: 0, isConnected: true },
+        { id: "p1" as PlayerId, name: "Alice", score: 0, isConnected: true },
+        { id: "p2" as PlayerId, name: "Bob", score: 0, isConnected: true },
       ],
     };
     render(<GameScreen {...defaultProps} session={sessionPoor} />);

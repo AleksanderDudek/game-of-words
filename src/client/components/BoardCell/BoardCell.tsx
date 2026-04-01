@@ -1,6 +1,6 @@
 import styles from "./BoardCell.module.scss";
 import { getBoardCellClassName } from "./BoardCell.utils";
-import type { BoardCellProps } from "./BoardCell.costs";
+import type { BoardCellProps } from "./BoardCell.types";
 
 export function BoardCell({ cell, index }: BoardCellProps) {
   const cls = getBoardCellClassName(cell)

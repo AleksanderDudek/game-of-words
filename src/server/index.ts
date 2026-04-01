@@ -1,12 +1,13 @@
 // ═══════════════════════════════════════════════════════════════
-// SIGNAL DECAY — WebSocket Server
+// SIGNAL DECAY — WebSocket + REST Server
 // ═══════════════════════════════════════════════════════════════
 
+import http, { IncomingMessage, ServerResponse } from "http";
 import { WebSocketServer, WebSocket } from "ws";
-import { IncomingMessage } from "http";
 import { CONFIG } from "./config";
 import { GameSession } from "./session";
-import { ClientMessage } from "../shared/types";
+import { isClientMessage, toPlayerId } from "../shared/types";
+import type { ServerInfo } from "../shared/types";
 
 const sessions = new Map<string, GameSession>();
 const playerSessions = new Map<WebSocket, { sessionId: string; playerId: string }>();
@@ -60,9 +61,52 @@ function getSession(sessionId: string): GameSession | undefined {
   return sessions.get(sessionId);
 }
 
-// ─── Start Server ───
+// ─── REST API Handler ───
+function handleHttpRequest(req: IncomingMessage, res: ServerResponse): void {
+  // CORS headers for cross-origin server info requests
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  if (req.method === "GET" && req.url === "/api/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok", region: CONFIG.REGION }));
+    return;
+  }
+
+  if (req.method === "GET" && req.url === "/api/info") {
+    const activeSessionList = [...sessions.values()].filter((s) => s.state !== "game_over");
+    const totalPlayers = activeSessionList.reduce(
+      (sum, s) => sum + [...s.players.values()].filter((p) => p.isConnected).length,
+      0,
+    );
+    const info: ServerInfo = {
+      region: CONFIG.REGION,
+      name: CONFIG.SERVER_NAME,
+      activeSessions: activeSessionList.length,
+      totalPlayers,
+      maxSessions: CONFIG.MAX_CONCURRENT_SESSIONS,
+    };
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(info));
+    return;
+  }
+
+  res.writeHead(404, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({ error: "Not found" }));
+}
+
+// ─── Start HTTP + WebSocket Server ───
+const httpServer = http.createServer(handleHttpRequest);
+
 const wss = new WebSocketServer({
-  port: CONFIG.WS_PORT,
+  server: httpServer,
   verifyClient: (info: { req: IncomingMessage }) => isOriginAllowed(info.req),
 });
 
@@ -70,7 +114,9 @@ console.log(`
 ╔══════════════════════════════════════════════════╗
 ║           ⚡ SIGNAL DECAY SERVER ⚡              ║
 ║                                                  ║
-║   WebSocket listening on ws://localhost:${CONFIG.WS_PORT}    ║
+║   Listening on :${String(CONFIG.WS_PORT).padEnd(33)}║
+║   Region: ${CONFIG.REGION.padEnd(38)}║
+║   Server: ${CONFIG.SERVER_NAME.padEnd(38)}║
 ║   Max sessions: ${String(CONFIG.MAX_CONCURRENT_SESSIONS).padEnd(33)}║
 ║   Word length: ${CONFIG.MIN_WORD_LENGTH} → ${String(CONFIG.MAX_WORD_LENGTH).padEnd(30)}║
 ║   LLM endpoint: ${(CONFIG.LLM_ENDPOINT || "(fallback word bank)").slice(0, 30).padEnd(31)}║
@@ -88,13 +134,20 @@ wss.on("connection", (ws: WebSocket) => {
       return;
     }
 
-    let msg: ClientMessage;
+    let parsed: unknown;
     try {
-      msg = JSON.parse(raw.toString());
+      parsed = JSON.parse(raw.toString());
     } catch {
       ws.send(JSON.stringify({ type: "error", message: "Invalid JSON" }));
       return;
     }
+
+    // ─── Type guard validation ───
+    if (!isClientMessage(parsed)) {
+      ws.send(JSON.stringify({ type: "error", message: "Invalid message type" }));
+      return;
+    }
+    const msg = parsed;
 
     // ─── Input validation ───
     if (msg.type === "join") {
@@ -157,7 +210,7 @@ wss.on("connection", (ws: WebSocket) => {
       return;
     }
 
-    session.handleMessage(binding.playerId, msg);
+    session.handleMessage(toPlayerId(binding.playerId), msg);
   });
 
   ws.on("close", () => {
@@ -166,7 +219,7 @@ wss.on("connection", (ws: WebSocket) => {
     if (binding) {
       const session = sessions.get(binding.sessionId);
       if (session) {
-        session.removePlayer(binding.playerId);
+        session.removePlayer(toPlayerId(binding.playerId));
 
         // Clean up empty sessions
         const connected = [...session.players.values()].filter((p) => p.isConnected);
@@ -197,3 +250,5 @@ setInterval(() => {
     }
   }
 }, 30000);
+
+httpServer.listen(CONFIG.WS_PORT);

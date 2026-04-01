@@ -3,7 +3,7 @@ import { BoardCell } from "../BoardCell/BoardCell";
 import { TimerBar } from "../TimerBar/TimerBar";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
 import { EventLog } from "../EventLog/EventLog";
-import type { GameScreenProps } from "./GameScreen.costs";
+import type { GameScreenProps } from "./GameScreen.types";
 
 export function GameScreen({
   session,

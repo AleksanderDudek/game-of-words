@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { ClientMessage, ServerMessage, SessionSnapshot } from "@/shared/types";
 
-const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:8080`;
+const FALLBACK_WS_URL = `ws://${window.location.hostname}:8080`;
 
 const STORAGE_KEY = "signal-decay-session";
 
@@ -36,6 +36,11 @@ function clearStored(): void {
   }
 }
 
+export interface UseGameSocketOptions {
+  /** WebSocket URL to connect to. Pass undefined/null to defer connection. */
+  serverUrl?: string | null;
+}
+
 export interface UseGameSocket {
   session: SessionSnapshot | null;
   playerId: string | null;
@@ -48,7 +53,8 @@ export interface UseGameSocket {
   forfeitGame: () => void;
 }
 
-export function useGameSocket(): UseGameSocket {
+export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket {
+  const { serverUrl = FALLBACK_WS_URL } = options;
   const wsRef = useRef<WebSocket | null>(null);
   const [session, setSession] = useState<SessionSnapshot | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
@@ -57,11 +63,15 @@ export function useGameSocket(): UseGameSocket {
   const [events, setEvents] = useState<ServerMessage[]>([]);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const playerNameRef = useRef<string>("");
+  const serverUrlRef = useRef(serverUrl);
+  serverUrlRef.current = serverUrl;
 
   const connect = useCallback(() => {
+    const url = serverUrlRef.current;
+    if (!url) return; // no URL = don't connect yet
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(url);
     wsRef.current = ws;
 
     ws.onopen = () => {

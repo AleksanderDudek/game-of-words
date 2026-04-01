@@ -1,5 +1,5 @@
 import styles from "./PlayerCard.module.scss";
-import type { PlayerCardProps } from "./PlayerCard.costs";
+import type { PlayerCardProps } from "./PlayerCard.types";
 
 export function PlayerCard({ player, isCurrent, isYou }: PlayerCardProps) {
   const cardClass = [

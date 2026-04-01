@@ -1,0 +1,38 @@
+# ═══════════════════════════════════════════════════════════════
+# Fly.io Configuration — Signal Decay Game Server
+# ═══════════════════════════════════════════════════════════════
+#
+# This is the base fly.toml template. Each region gets its own
+# Fly.io app (signal-decay-us, signal-decay-eu, signal-decay-asia)
+# deployed via GitHub Actions with region-specific overrides.
+#
+# Initial setup per region:
+#   flyctl apps create signal-decay-us  --org personal
+#   flyctl apps create signal-decay-eu  --org personal
+#   flyctl apps create signal-decay-asia --org personal
+
+app = "signal-decay"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  WS_PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 100
+    soft_limit = 80
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { GameOverScreen } from "./GameOverScreen";
-import type { Player } from "@/shared/types";
+import type { Player, PlayerId } from "@/shared/types";
 
 const players: Player[] = [
-  { id: "p1", name: "Alice", score: 350, isConnected: true },
-  { id: "p2", name: "Bob", score: 120, isConnected: false },
-  { id: "p3", name: "Carol", score: 200, isConnected: true },
+  { id: "p1" as PlayerId, name: "Alice", score: 350, isConnected: true },
+  { id: "p2" as PlayerId, name: "Bob", score: 120, isConnected: false },
+  { id: "p3" as PlayerId, name: "Carol", score: 200, isConnected: true },
 ];
 
 describe("GameOverScreen", () => {

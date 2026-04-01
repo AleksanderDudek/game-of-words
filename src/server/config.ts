@@ -16,6 +16,10 @@ export const CONFIG = {
   WS_PORT:                 envInt("WS_PORT", 8080),
   MAX_CONCURRENT_SESSIONS: envInt("MAX_CONCURRENT_SESSIONS", 10),
 
+  // ─── Region (multi-server deployment) ───
+  REGION:                  envStr("REGION", "local"),
+  SERVER_NAME:             envStr("SERVER_NAME", "Local Dev"),
+
   // ─── Word Difficulty Progression ───
   MIN_WORD_LENGTH:         envInt("MIN_WORD_LENGTH", 4),
   MAX_WORD_LENGTH:         envInt("MAX_WORD_LENGTH", 20),
@@ -46,6 +50,6 @@ export const CONFIG = {
   RATE_LIMIT_MSG_PER_SEC:  envInt("RATE_LIMIT_MSG_PER_SEC", 15),
   MAX_NAME_LENGTH:         envInt("MAX_NAME_LENGTH", 20),
   MAX_GUESS_LENGTH:        envInt("MAX_GUESS_LENGTH", 50),
-};
+} as const;
 
-export type GameConfig = typeof CONFIG;
+export type ServerConfig = typeof CONFIG;
