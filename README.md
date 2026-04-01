@@ -8,13 +8,41 @@
 [![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)](https://react.dev/)
 [![WebSocket](https://img.shields.io/badge/WebSocket-RFC_6455-4ade80)](https://datatracker.ietf.org/doc/html/rfc6455)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ed?logo=docker&logoColor=white)](https://docker.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
 Words arrive with their middle letters scrambled. Race to decode the signal before it's lost forever.
 
-[Quick Start](#-quick-start) · [How to Play](#-how-to-play) · [Configuration](#-configuration) · [LLM Integration](#-pluggable-llm-endpoint) · [Docker](#-docker-deployment) · [Architecture](#-architecture)
+🕹️ **[Play now → aleksanderdudek.github.io/game-of-words](https://aleksanderdudek.github.io/game-of-words/)**
+
+[Play Now](#-play-now) · [Quick Start](#-quick-start) · [How to Play](#-how-to-play) · [Configuration](#-configuration) · [LLM Integration](#-pluggable-llm-endpoint) · [Docker](#-docker-deployment) · [Architecture](#-architecture)
 
 </div>
+
+---
+
+## 🕹️ Play Now
+
+The game is live at **https://aleksanderdudek.github.io/game-of-words/**
+
+### Playing with 2 people
+
+1. Both players open **https://aleksanderdudek.github.io/game-of-words/**
+2. Each picks a server (choose the same region for lower latency between you)
+3. **Player 1** enters a callsign and clicks **Connect** — note the **Session Code** shown in the lobby
+4. **Player 2** enters their callsign, pastes the session code into the *Session Code* field, and clicks **Connect**
+5. Once both are in the lobby, either player clicks **Start Game**
+
+### Playing solo (testing / demo)
+
+You can simulate a 2-player game from a single machine:
+
+1. Open **https://aleksanderdudek.github.io/game-of-words/** in a normal window
+2. Open the **same URL in an Incognito / Private window** (Cmd+Shift+N in Chrome)
+3. In the normal window: enter a callsign → Connect → copy the **Session Code**
+4. In the Incognito window: enter a different callsign → paste the Session Code → Connect
+5. Both tabs are now in the same game — you can play both sides by switching tabs
+
+> **Tip:** keep both windows side-by-side so you can see each player's view simultaneously.
 
 ---
 
@@ -244,4 +272,4 @@ signal-decay/
 
 ## 📜 License
 
-[MIT](LICENSE) — go wild.
+[AGPL v3](LICENSE)
