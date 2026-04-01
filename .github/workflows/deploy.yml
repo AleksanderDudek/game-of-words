@@ -46,11 +46,14 @@ jobs:
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Configure fly.toml for ${{ matrix.server.fly_region }}
+        run: |
+          sed -i 's/^app = .*/app = "${{ matrix.server.app }}"/' fly.toml
+          sed -i 's/^primary_region = .*/primary_region = "${{ matrix.server.fly_region }}"/' fly.toml
+
       - name: Deploy to Fly.io (${{ matrix.server.fly_region }})
         run: |
           flyctl deploy \
-            --app ${{ matrix.server.app }} \
-            --region ${{ matrix.server.fly_region }} \
             --dockerfile Dockerfile \
             --env REGION=${{ matrix.server.region }} \
             --env SERVER_NAME="${{ matrix.server.name }}" \
