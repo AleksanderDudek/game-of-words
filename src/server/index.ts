@@ -28,7 +28,7 @@ function isRateLimited(ws: WebSocket): boolean {
 
 // ─── Origin validation ───
 function isOriginAllowed(req: IncomingMessage): boolean {
-  if (!CONFIG.ALLOWED_ORIGINS) return true; // empty = allow all (dev mode)
+  if (!CONFIG.ALLOWED_ORIGINS || CONFIG.ALLOWED_ORIGINS === "*") return true;
   const origin = req.headers.origin ?? "";
   const allowed = CONFIG.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
   return allowed.includes(origin);
