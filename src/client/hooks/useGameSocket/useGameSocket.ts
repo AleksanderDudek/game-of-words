@@ -136,12 +136,20 @@ export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket
   }, []);
 
   useEffect(() => {
+    // Reset stale connection before connecting to new URL
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
     connect();
     return () => {
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-      wsRef.current?.close();
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
-  }, [connect]);
+  }, [connect, serverUrl]);
 
   const send = useCallback((msg: ClientMessage) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
