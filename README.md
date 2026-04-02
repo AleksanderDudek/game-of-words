@@ -27,7 +27,7 @@ The game is live at **https://aleksanderdudek.github.io/game-of-words/**
 ### Playing with 2 people
 
 1. Both players open **https://aleksanderdudek.github.io/game-of-words/**
-2. Each picks a server (choose the same region for lower latency between you)
+2. Wait for the server to connect (free tier may take ~30s on first visit — enjoy the jokes!)
 3. **Player 1** enters a callsign and clicks **Connect** — note the **Session Code** shown in the lobby
 4. **Player 2** enters their callsign, pastes the session code into the *Session Code* field, and clicks **Connect**
 5. Once both are in the lobby, either player clicks **Start Game**
@@ -43,6 +43,8 @@ You can simulate a 2-player game from a single machine:
 5. Both tabs are now in the same game — you can play both sides by switching tabs
 
 > **Tip:** keep both windows side-by-side so you can see each player's view simultaneously.
+
+> **Note:** The game server runs on Render's free tier. It sleeps after 15 minutes of inactivity. The first connection wakes it up (~30s), after which it responds instantly.
 
 ---
 

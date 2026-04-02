@@ -11,25 +11,11 @@ import type { GameServerEntry } from "@/shared/types";
  */
 const DEFAULT_SERVERS: GameServerEntry[] = [
   {
-    id: "us-east",
-    name: "US East",
-    region: "Virginia",
-    url: "wss://signal-decay-us.fly.dev",
-    flag: "🇺🇸",
-  },
-  {
-    id: "eu-west",
-    name: "Europe",
-    region: "London",
-    url: "wss://signal-decay-eu.fly.dev",
-    flag: "🇬🇧",
-  },
-  {
-    id: "asia-east",
-    name: "Asia Pacific",
-    region: "Tokyo",
-    url: "wss://signal-decay-asia.fly.dev",
-    flag: "🇯🇵",
+    id: "render",
+    name: "Signal Decay",
+    region: "Oregon",
+    url: "wss://signal-decay.onrender.com",
+    flag: "🌐",
   },
 ];
 

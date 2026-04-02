@@ -1,0 +1,118 @@
+.connecting-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+  text-align: center;
+}
+
+.signal-icon {
+  font-size: 56px;
+  animation: bob 2s ease-in-out infinite;
+}
+
+.connecting-title {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  min-width: 380px;
+}
+
+.connecting-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+// ─── Progress Bar ───
+
+.progress-bar {
+  width: 100%;
+  max-width: 320px;
+  height: 4px;
+  background: var(--bg-surface);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  border-radius: 2px;
+  animation: sweep 2s ease-in-out infinite;
+}
+
+// ─── Joke Card ───
+
+.joke-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  max-width: 420px;
+  width: 100%;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.joke-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.joke-setup {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.joke-punchline {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--green);
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.joke-punchline.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.counter {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+// ─── Animations ───
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-5deg); }
+  75% { transform: translateY(-3px) rotate(3deg); }
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(250%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

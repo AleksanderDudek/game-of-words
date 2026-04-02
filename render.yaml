@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: signal-decay
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REGION
+        value: us-east
+      - key: SERVER_NAME
+        value: Signal Decay
+      - key: ALLOWED_ORIGINS
+        value: "*"
+    healthCheckPath: /api/health

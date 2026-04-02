@@ -6,6 +6,7 @@ import { CountdownScreen } from "./components/CountdownScreen/CountdownScreen";
 import { GameScreen } from "./components/GameScreen/GameScreen";
 import { GameOverScreen } from "./components/GameOverScreen/GameOverScreen";
 import { ServerSelectScreen } from "./components/ServerSelectScreen/ServerSelectScreen";
+import { ConnectingScreen } from "./components/ConnectingScreen/ConnectingScreen";
 import { SINGLE_SERVER_URL, GAME_SERVERS } from "./config/servers";
 import type { GameServerEntry } from "@/shared/types";
 import "./styles/global.scss";
@@ -71,6 +72,17 @@ export default function App() {
       <div className="app">
         <div className="screen">
           <ServerSelectScreen servers={GAME_SERVERS} onSelect={handleServerSelect} />
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Connecting screen (waiting for cold-start wake-up) ───
+  if (wsUrl && !connected) {
+    return (
+      <div className="app">
+        <div className="screen">
+          <ConnectingScreen />
         </div>
       </div>
     );

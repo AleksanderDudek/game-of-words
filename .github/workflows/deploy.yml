@@ -26,46 +26,15 @@ jobs:
       - run: npm run lint
       - run: npm test
 
-  # ─── Deploy game servers to Fly.io (multi-region) ──────────────────────
-  deploy-servers:
-    name: Deploy Server — ${{ matrix.server.name }}
-    runs-on: ubuntu-latest
-    needs: ci
-    if: vars.DEPLOY_TARGET == 'fly' || vars.DEPLOY_TARGET == ''
-    strategy:
-      matrix:
-        server:
-          - { app: signal-decay-us,   name: US East,      region: us-east,   fly_region: iad }
-          - { app: signal-decay-eu,   name: Europe,       region: eu-west,   fly_region: lhr }
-          - { app: signal-decay-asia, name: Asia Pacific,  region: asia-east, fly_region: nrt }
-    env:
-      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Configure fly.toml for ${{ matrix.server.fly_region }}
-        run: |
-          sed -i 's/^app = .*/app = "${{ matrix.server.app }}"/' fly.toml
-          sed -i 's/^primary_region = .*/primary_region = "${{ matrix.server.fly_region }}"/' fly.toml
-
-      - name: Deploy to Fly.io (${{ matrix.server.fly_region }})
-        run: |
-          flyctl deploy \
-            --dockerfile Dockerfile \
-            --env REGION=${{ matrix.server.region }} \
-            --env SERVER_NAME="${{ matrix.server.name }}" \
-            --env ALLOWED_ORIGINS="${{ vars.ALLOWED_ORIGINS || '*' }}" \
-            --strategy immediate
+  # ─── Deploy game server to Render (auto-deploys via repo webhook) ────
+  # Render automatically deploys on push to main via its GitHub integration.
+  # No CI step needed — this comment is for documentation.
 
   # ─── Deploy static client to GitHub Pages ──────────────────────────────
   deploy-client:
     name: Deploy Client (GitHub Pages)
     runs-on: ubuntu-latest
-    needs: [ci, deploy-servers]
-    if: vars.DEPLOY_TARGET == 'fly' || vars.DEPLOY_TARGET == ''
+    needs: ci
     permissions:
       pages: write
       id-token: write
@@ -85,15 +54,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build client (multi-server mode)
+      - name: Build client (single-server mode)
         run: npm run client:build
         env:
-          VITE_SERVERS: >-
-            [
-              {"id":"us-east","name":"US East","region":"Virginia","url":"wss://signal-decay-us.fly.dev","flag":"🇺🇸"},
-              {"id":"eu-west","name":"Europe","region":"London","url":"wss://signal-decay-eu.fly.dev","flag":"🇬🇧"},
-              {"id":"asia-east","name":"Asia Pacific","region":"Tokyo","url":"wss://signal-decay-asia.fly.dev","flag":"🇯🇵"}
-            ]
+          VITE_WS_URL: ${{ vars.RENDER_WS_URL || 'wss://signal-decay.onrender.com' }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
