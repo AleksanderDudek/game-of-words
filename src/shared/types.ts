@@ -46,6 +46,25 @@ export function toSessionId(raw: string): SessionId {
   return raw as SessionId;
 }
 
+// ─── Word Pack Types (protocol-level) ───
+
+export interface WordPackEntry {
+  word: string;
+  hint: string;
+}
+
+export type PackReference =
+  | { type: "builtin"; packId: string }
+  | { type: "custom"; name: string; words: WordPackEntry[] }
+  | { type: "clear" };
+
+export interface BuiltinPackInfo {
+  id: string;
+  name: string;
+  description: string;
+  wordCount: number;
+}
+
 // ─── Game States ───
 export type SessionState = "lobby" | "countdown" | "playing" | "paused" | "round_end" | "game_over";
 
@@ -101,6 +120,7 @@ export interface SessionSnapshot {
   round: RoundState | null;
   config: GameConfig;
   countdownLeft?: number;
+  activePack?: { name: string; wordCount: number };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -117,6 +137,7 @@ export type ClientMessage =
   | { type: "pause_game" }      // pause the timer
   | { type: "resume_game" }     // resume after pause
   | { type: "forfeit_game" }    // leave the game permanently
+  | { type: "set_word_pack"; pack: PackReference }
   | { type: "ping" };
 
 // ─── Server → Client ───
@@ -153,7 +174,7 @@ export type ExpectedResponse<T extends ClientMessage["type"]> =
 
 const CLIENT_MESSAGE_TYPES: ReadonlySet<string> = new Set<ClientMessage["type"]>([
   "join", "start_game", "guess", "buy_hint", "pass_turn",
-  "pause_game", "resume_game", "forfeit_game", "ping",
+  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "ping",
 ]);
 
 /** Runtime type guard for validating incoming client messages */

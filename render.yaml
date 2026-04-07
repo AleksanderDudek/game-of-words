@@ -12,5 +12,5 @@ services:
       - key: SERVER_NAME
         value: Signal Decay
       - key: ALLOWED_ORIGINS
-        value: "*"
+        value: "https://aleksanderdudek.github.io"  # TODO: replace with your GitHub Pages URL
     healthCheckPath: /api/health

@@ -5,4 +5,5 @@ export interface JoinScreenProps {
   onNameChange: (value: string) => void;
   onSessionIdChange: (value: string) => void;
   onJoin: () => void;
+  onOpenMyPacks: () => void;
 }

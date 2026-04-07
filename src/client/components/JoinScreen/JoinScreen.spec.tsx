@@ -9,6 +9,7 @@ const defaultProps = {
   onNameChange: vi.fn(),
   onSessionIdChange: vi.fn(),
   onJoin: vi.fn(),
+  onOpenMyPacks: vi.fn(),
 };
 
 describe("JoinScreen", () => {
@@ -29,18 +30,21 @@ describe("JoinScreen", () => {
 
   it("disables the button when name is empty", () => {
     render(<JoinScreen {...defaultProps} nameInput="" />);
-    expect(screen.getByRole("button")).toBeDisabled();
+    const connectBtn = screen.getAllByRole("button").find(b => b.textContent?.includes("CONNECT"));
+    expect(connectBtn).toBeDisabled();
   });
 
   it("enables the button when connected and name is filled", () => {
     render(<JoinScreen {...defaultProps} nameInput="Alice" />);
-    expect(screen.getByRole("button")).not.toBeDisabled();
+    const connectBtn = screen.getAllByRole("button").find(b => b.textContent?.includes("CONNECT"));
+    expect(connectBtn).not.toBeDisabled();
   });
 
   it("calls onJoin when button is clicked", () => {
     const onJoin = vi.fn();
     render(<JoinScreen {...defaultProps} nameInput="Alice" onJoin={onJoin} />);
-    fireEvent.click(screen.getByRole("button"));
+    const connectBtn = screen.getAllByRole("button").find(b => b.textContent?.includes("CONNECT"))!;
+    fireEvent.click(connectBtn);
     expect(onJoin).toHaveBeenCalledOnce();
   });
 

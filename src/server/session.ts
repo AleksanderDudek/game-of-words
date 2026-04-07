@@ -21,7 +21,8 @@ import {
   assertNever,
 } from "../shared/types";
 import { buildBoard, revealNextPair, checkGuess, boardToString, remainingPairs } from "../shared/board";
-import { generateWord } from "./wordgen";
+import { generateWord, getBuiltinPackWords, BUILTIN_PACKS, GeneratedWord } from "./wordgen";
+import type { PackReference } from "../shared/types";
 
 interface ConnectedPlayer extends Player {
   ws: WebSocket;
@@ -43,6 +44,9 @@ export class GameSession {
   countdownLeft: number = 0;
   currentDifficulty: number = CONFIG.MIN_WORD_LENGTH;
   wordsAtCurrentDifficulty: number = 0;
+  pendingPack: { name: string; words: GeneratedWord[] } | null = null;
+  packQueue: GeneratedWord[] = [];
+  packQueueIndex: number = 0;
 
   constructor() {
     this.id = toSessionId(uuid().slice(0, 8));
@@ -148,6 +152,13 @@ export class GameSession {
     this.currentDifficulty = CONFIG.MIN_WORD_LENGTH;
     this.wordsAtCurrentDifficulty = 0;
     this.roundNumber = 0;
+    // Snapshot pending pack into a shuffled queue for this game run
+    if (this.pendingPack) {
+      this.packQueue = [...this.pendingPack.words].sort(() => Math.random() - 0.5);
+      this.packQueueIndex = 0;
+    } else {
+      this.packQueue = [];
+    }
     const active = this.getActivePlayers();
     this.currentPlayerId = active[0].id;
     await this.startNewRound();
@@ -166,8 +177,21 @@ export class GameSession {
     this.turnsRemaining = CONFIG.TURNS_PER_PLAYER;
     this.timeLeft = CONFIG.SESSION_DURATION_SEC;
 
-    // Generate word at current difficulty
-    const { word, hint } = await generateWord(this.currentDifficulty);
+    // Draw from pack queue if active, otherwise generate
+    let word: string;
+    let hint: string;
+    if (this.packQueue.length > 0) {
+      if (this.packQueueIndex >= this.packQueue.length) {
+        // Re-shuffle and cycle
+        this.packQueue.sort(() => Math.random() - 0.5);
+        this.packQueueIndex = 0;
+      }
+      const entry = this.packQueue[this.packQueueIndex++];
+      word = entry.word;
+      hint = entry.hint;
+    } else {
+      ({ word, hint } = await generateWord(this.currentDifficulty));
+    }
     this.originalWord = word;
     this.hint = hint;
     this.board = buildBoard(word);
@@ -446,6 +470,7 @@ export class GameSession {
       case "pause_game":   this.handlePauseGame(playerId); break;
       case "resume_game":  this.handleResumeGame(playerId); break;
       case "forfeit_game": this.handleForfeitGame(playerId); break;
+      case "set_word_pack": this.handleSetWordPack(playerId, msg.pack); break;
       case "ping": {
         const player = this.players.get(playerId);
         if (player) this.sendTo(player.ws, { type: "pong" });
@@ -499,7 +524,81 @@ export class GameSession {
       round,
       config,
       countdownLeft: this.countdownLeft,
+      activePack: this.pendingPack
+        ? { name: this.pendingPack.name, wordCount: this.pendingPack.words.length }
+        : undefined,
     };
+  }
+
+  // ─── Pack Selection ───
+
+  handleSetWordPack(playerId: PlayerId, pack: PackReference): void {
+    if (this.state !== "lobby") {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Cannot change pack after game starts" });
+      return;
+    }
+    if (this.hostId !== playerId) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Only the host can set the word pack" });
+      return;
+    }
+
+    if (pack.type === "clear") {
+      this.pendingPack = null;
+      this.broadcastState();
+      return;
+    }
+
+    if (pack.type === "builtin") {
+      if (!/^[a-z0-9-]+$/.test(pack.packId)) {
+        const player = this.players.get(playerId);
+        if (player) this.sendTo(player.ws, { type: "error", message: "Invalid pack ID" });
+        return;
+      }
+      const words = getBuiltinPackWords(pack.packId);
+      if (!words) {
+        const player = this.players.get(playerId);
+        if (player) this.sendTo(player.ws, { type: "error", message: "Unknown built-in pack" });
+        return;
+      }
+      this.pendingPack = { name: BUILTIN_PACKS[pack.packId]!.name, words };
+      this.broadcastState();
+      return;
+    }
+
+    // Custom pack — validate and sanitize
+    if (typeof pack.name !== "string" || pack.name.trim().length === 0 || pack.name.length > 50) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Invalid pack name" });
+      return;
+    }
+    if (!Array.isArray(pack.words) || pack.words.length === 0 || pack.words.length > 500) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Pack must have 1–500 words" });
+      return;
+    }
+
+    const validWord = /^[a-z][a-z' -]*[a-z]$|^[a-z]$/;
+    const words: GeneratedWord[] = [];
+    for (const entry of pack.words) {
+      if (typeof entry.word !== "string" || typeof entry.hint !== "string") continue;
+      const word = entry.word.toLowerCase().replace(/[^\x20-\x7e]/g, "").trim();
+      const hint = entry.hint.replace(/[^\x20-\x7e]/g, "").trim();
+      if (word.length < 2 || word.length > 50) continue;
+      if (hint.length === 0 || hint.length > 200) continue;
+      if (!validWord.test(word)) continue;
+      words.push({ word, hint });
+    }
+
+    if (words.length === 0) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "No valid words in pack" });
+      return;
+    }
+
+    this.pendingPack = { name: pack.name.trim(), words };
+    this.broadcastState();
   }
 
   broadcastState(): void {

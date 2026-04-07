@@ -7,8 +7,11 @@ import { GameScreen } from "./components/GameScreen/GameScreen";
 import { GameOverScreen } from "./components/GameOverScreen/GameOverScreen";
 import { ServerSelectScreen } from "./components/ServerSelectScreen/ServerSelectScreen";
 import { ConnectingScreen } from "./components/ConnectingScreen/ConnectingScreen";
+import { MyPacksScreen } from "./components/MyPacksScreen/MyPacksScreen";
 import { SINGLE_SERVER_URL, GAME_SERVERS } from "./config/servers";
-import type { GameServerEntry } from "@/shared/types";
+import { usePackStorage } from "./hooks/usePackStorage/usePackStorage";
+import type { GameServerEntry, BuiltinPackInfo, PackReference } from "@/shared/types";
+import type { WordPack } from "./lib/wordPack";
 import "./styles/global.scss";
 
 /** True when a single WS URL is configured (Docker Compose / dev mode) */
@@ -16,6 +19,8 @@ const isSingleServerMode = Boolean(SINGLE_SERVER_URL);
 
 export default function App() {
   const [selectedServer, setSelectedServer] = useState<GameServerEntry | null>(null);
+  const [view, setView] = useState<"game" | "packs">("game");
+  const [builtinPacks, setBuiltinPacks] = useState<BuiltinPackInfo[]>([]);
 
   // Determine WebSocket URL: single-server mode → env var; multi-server → user selection
   const wsUrl = isSingleServerMode
@@ -25,10 +30,22 @@ export default function App() {
   const { session, playerId, connected, events, join, send, forfeitGame } = useGameSocket({
     serverUrl: wsUrl,
   });
+  const { packs: localPacks } = usePackStorage();
+
   const [nameInput, setNameInput] = useState("");
   const [sessionIdInput, setSessionIdInput] = useState("");
   const [guessInput, setGuessInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch built-in packs from server when we have a URL
+  useEffect(() => {
+    if (!wsUrl) return;
+    const httpUrl = wsUrl.replace(/^wss?/, "http").replace(/\/ws$/, "");
+    fetch(`${httpUrl}/api/packs`)
+      .then((r) => r.json())
+      .then((data: BuiltinPackInfo[]) => setBuiltinPacks(data))
+      .catch(() => {});
+  }, [wsUrl]);
 
   const isHost = session?.hostId === playerId;
 
@@ -66,6 +83,37 @@ export default function App() {
     setSelectedServer(server);
   }, []);
 
+  const handleSetPack = useCallback(
+    (ref: PackReference) => send({ type: "set_word_pack", pack: ref }),
+    [send],
+  );
+
+  const handleSelectPackFromMyPacks = useCallback(
+    (pack: WordPack) => {
+      send({
+        type: "set_word_pack",
+        pack: { type: "custom", name: pack.name, words: pack.words },
+      });
+      setView("game");
+    },
+    [send],
+  );
+
+  // ─── My Packs screen (accessible from anywhere pre-game) ───
+  if (view === "packs") {
+    return (
+      <div className="app">
+        <div className="screen">
+          <MyPacksScreen
+            onClose={() => setView("game")}
+            onSelectPack={session?.state === "lobby" && isHost ? handleSelectPackFromMyPacks : undefined}
+            selectedPackId={undefined}
+          />
+        </div>
+      </div>
+    );
+  }
+
   // ─── Server Selection (multi-server mode only) ───
   if (!isSingleServerMode && !selectedServer) {
     return (
@@ -99,6 +147,7 @@ export default function App() {
             onNameChange={setNameInput}
             onSessionIdChange={setSessionIdInput}
             onJoin={handleJoin}
+            onOpenMyPacks={() => setView("packs")}
           />
         </div>
       </div>
@@ -112,7 +161,11 @@ export default function App() {
           <LobbyScreen
             session={session}
             playerId={playerId}
+            builtinPacks={builtinPacks}
+            localPacks={localPacks}
             onStartGame={() => send({ type: "start_game" })}
+            onSetPack={handleSetPack}
+            onOpenMyPacks={() => setView("packs")}
           />
         </div>
       </div>

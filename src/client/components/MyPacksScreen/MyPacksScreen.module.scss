@@ -1,0 +1,277 @@
+.my-packs-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ─── Header ───
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: color 0.2s, border-color 0.2s;
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--border-bright);
+  }
+}
+
+.title {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--text);
+  flex: 1;
+}
+
+// ─── Drive Section ───
+
+.drive-section {
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drive-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.drive-info {
+  flex: 1;
+}
+
+.drive-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.5px;
+}
+
+.drive-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.drive-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+
+  &.connected {
+    color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+  }
+}
+
+// ─── Upload ───
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-bright);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: var(--blue-dim);
+  }
+}
+
+.upload-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+// ─── Error banner ───
+
+.error-banner {
+  padding: 10px 14px;
+  background: var(--red-dim);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--red);
+}
+
+// ─── Pack list ───
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-bottom: -8px;
+}
+
+.pack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pack-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: var(--border-bright);
+  }
+
+  &.selected {
+    border-color: var(--green);
+    background: var(--green-dim);
+  }
+}
+
+.pack-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pack-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pack-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.source-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 1px 6px;
+  border-radius: 3px;
+
+  &.local {
+    color: var(--blue);
+    background: var(--blue-dim);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+  }
+
+  &.drive {
+    color: var(--purple);
+    background: var(--purple-dim);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+  }
+}
+
+.pack-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-muted);
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--border-bright);
+  }
+
+  &.use {
+    color: var(--green);
+    border-color: rgba(74, 222, 128, 0.4);
+
+    &:hover {
+      background: var(--green-dim);
+    }
+  }
+
+  &.sync {
+    color: var(--purple);
+    border-color: rgba(167, 139, 250, 0.4);
+
+    &:hover {
+      background: var(--purple-dim);
+    }
+  }
+
+  &.delete {
+    &:hover {
+      color: var(--red);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  line-height: 1.8;
+}

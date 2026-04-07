@@ -7,7 +7,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import { CONFIG } from "./config";
 import { GameSession } from "./session";
 import { isClientMessage, toPlayerId } from "../shared/types";
-import type { ServerInfo } from "../shared/types";
+import type { ServerInfo, BuiltinPackInfo } from "../shared/types";
+import { BUILTIN_PACKS, getBuiltinPackWords } from "./wordgen";
 
 const sessions = new Map<string, GameSession>();
 const playerSessions = new Map<WebSocket, { sessionId: string; playerId: string }>();
@@ -77,6 +78,18 @@ function handleHttpRequest(req: IncomingMessage, res: ServerResponse): void {
   if (req.method === "GET" && req.url === "/api/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ status: "ok", region: CONFIG.REGION }));
+    return;
+  }
+
+  if (req.method === "GET" && req.url === "/api/packs") {
+    const packs: BuiltinPackInfo[] = Object.entries(BUILTIN_PACKS).map(([id, info]) => ({
+      id,
+      name: info.name,
+      description: info.description,
+      wordCount: getBuiltinPackWords(id)?.length ?? 0,
+    }));
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(packs));
     return;
   }
 

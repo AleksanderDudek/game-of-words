@@ -8,6 +8,7 @@ export function JoinScreen({
   onNameChange,
   onSessionIdChange,
   onJoin,
+  onOpenMyPacks,
 }: JoinScreenProps) {
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") onJoin();
@@ -67,6 +68,9 @@ export function JoinScreen({
           disabled={!connected || !nameInput.trim()}
         >
           CONNECT →
+        </button>
+        <button className="btn" onClick={onOpenMyPacks}>
+          MY PACKS
         </button>
       </div>
 

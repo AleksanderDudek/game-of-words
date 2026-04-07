@@ -21,39 +21,49 @@ const baseSession: SessionSnapshot = {
   },
 };
 
+const lobbyProps = {
+  session: baseSession,
+  playerId: "p1",
+  builtinPacks: [],
+  localPacks: [],
+  onStartGame: vi.fn(),
+  onSetPack: vi.fn(),
+  onOpenMyPacks: vi.fn(),
+};
+
 describe("LobbyScreen", () => {
   it("renders the session code", () => {
-    render(<LobbyScreen session={baseSession} playerId="p1" onStartGame={vi.fn()} />);
+    render(<LobbyScreen {...lobbyProps} />);
     expect(screen.getByText("ABC123")).toBeInTheDocument();
   });
 
   it("renders all player names", () => {
-    render(<LobbyScreen session={baseSession} playerId="p1" onStartGame={vi.fn()} />);
+    render(<LobbyScreen {...lobbyProps} />);
     expect(screen.getByText("Alice")).toBeInTheDocument();
     expect(screen.getByText("Bob")).toBeInTheDocument();
   });
 
   it("shows start button when 2+ players are present", () => {
-    render(<LobbyScreen session={baseSession} playerId="p1" onStartGame={vi.fn()} />);
+    render(<LobbyScreen {...lobbyProps} />);
     expect(screen.getByRole("button", { name: /start game/i })).toBeInTheDocument();
   });
 
   it("hides start button and shows waiting text with < 2 players", () => {
     const session = { ...baseSession, players: [baseSession.players[0]] };
-    render(<LobbyScreen session={session} playerId="p1" onStartGame={vi.fn()} />);
+    render(<LobbyScreen {...lobbyProps} session={session} />);
     expect(screen.queryByRole("button", { name: /start game/i })).not.toBeInTheDocument();
     expect(screen.getByText(/need at least 2 players/i)).toBeInTheDocument();
   });
 
   it("calls onStartGame when start button is clicked", () => {
     const onStartGame = vi.fn();
-    render(<LobbyScreen session={baseSession} playerId="p1" onStartGame={onStartGame} />);
+    render(<LobbyScreen {...lobbyProps} onStartGame={onStartGame} />);
     fireEvent.click(screen.getByRole("button", { name: /start game/i }));
     expect(onStartGame).toHaveBeenCalledOnce();
   });
 
   it("renders config values", () => {
-    render(<LobbyScreen session={baseSession} playerId="p1" onStartGame={vi.fn()} />);
+    render(<LobbyScreen {...lobbyProps} />);
     expect(screen.getByText("4→10 letters")).toBeInTheDocument();
     expect(screen.getByText("45s")).toBeInTheDocument();
     expect(screen.getByText("30 pts")).toBeInTheDocument();

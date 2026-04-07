@@ -235,3 +235,22 @@ export async function generateWord(targetLength: number): Promise<GeneratedWord>
   console.log(`[WordGen] Bank fallback: "${bankResult.word}" (${bankResult.word.length} chars)`);
   return bankResult;
 }
+
+// ─── Built-in Pack Registry ───
+
+export const BUILTIN_PACKS: Record<string, { name: string; description: string }> = {
+  general: {
+    name: "General Vocabulary",
+    description: "A broad mix of English words across all difficulty levels",
+  },
+};
+
+export function getBuiltinPackWords(packId: string): GeneratedWord[] | null {
+  if (packId === "general") {
+    return Object.values(WORD_BANK).flat().map((e) => ({
+      word: e.word.toLowerCase(),
+      hint: e.hint,
+    }));
+  }
+  return null;
+}
