@@ -96,20 +96,32 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
 
       {/* Name + description */}
       <div className={styles["meta"]}>
-        <input
-          className={styles["name-input"]}
-          placeholder={t("packEditor.namePlaceholder")}
-          value={name}
-          maxLength={50}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          className={styles["desc-input"]}
-          placeholder={t("packEditor.descPlaceholder")}
-          value={description}
-          maxLength={200}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <div className={styles["field-wrap"]}>
+          <input
+            className={`${styles["name-input"]} ${name.length >= 45 ? styles["near-limit"] : ""}`}
+            placeholder={t("packEditor.namePlaceholder")}
+            value={name}
+            maxLength={50}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <span className={`${styles["char-count"]} ${name.length >= 45 ? styles["warn"] : ""}`}>
+            {name.length}/50
+          </span>
+        </div>
+        <div className={styles["field-wrap"]}>
+          <input
+            className={`${styles["desc-input"]} ${description.length >= 180 ? styles["near-limit"] : ""}`}
+            placeholder={t("packEditor.descPlaceholder")}
+            value={description}
+            maxLength={200}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          {description.length > 0 && (
+            <span className={`${styles["char-count"]} ${description.length >= 180 ? styles["warn"] : ""}`}>
+              {description.length}/200
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Table header */}
@@ -130,13 +142,20 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
               maxLength={50}
               onChange={(e) => updateRow(i, "word", e.target.value)}
             />
-            <input
-              className={styles["hint-input"]}
-              placeholder={t("packEditor.hintPlaceholder")}
-              value={row.hint}
-              maxLength={200}
-              onChange={(e) => updateRow(i, "hint", e.target.value)}
-            />
+            <div className={styles["hint-wrap"]}>
+              <input
+                className={`${styles["hint-input"]} ${row.hint.length >= 180 ? styles["near-limit"] : ""}`}
+                placeholder={t("packEditor.hintPlaceholder")}
+                value={row.hint}
+                maxLength={200}
+                onChange={(e) => updateRow(i, "hint", e.target.value)}
+              />
+              {row.hint.length >= 160 && (
+                <span className={`${styles["hint-char-count"]} ${row.hint.length >= 180 ? styles["warn"] : ""}`}>
+                  {row.hint.length}/200
+                </span>
+              )}
+            </div>
             <button
               className={styles["del-btn"]}
               onClick={() => removeRow(i)}
@@ -155,7 +174,9 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
       </button>
 
       <div className={styles["footer-hint"]}>
-        {t("packEditor.footerHint", { count: validCount })}
+        <span className={validCount >= 490 ? styles["warn"] : ""}>
+          {t("packEditor.footerHint", { count: validCount })}
+        </span>
       </div>
     </div>
   );

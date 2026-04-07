@@ -51,7 +51,12 @@ export function JoinScreen({
         </div>
 
         <div className={styles["input-group"]}>
-          <label>{t("join.callsign")}</label>
+          <div className={styles["label-row"]}>
+            <label>{t("join.callsign")}</label>
+            <span className={`${styles["char-count"]} ${nameInput.length >= 14 ? styles["warn"] : ""}`}>
+              {nameInput.length}/16
+            </span>
+          </div>
           <input
             type="text"
             value={nameInput}
@@ -60,21 +65,28 @@ export function JoinScreen({
             placeholder={t("join.namePlaceholder")}
             maxLength={16}
             disabled={!connected}
+            className={nameInput.length >= 14 ? styles["input-warn"] : ""}
           />
         </div>
 
         <div className={styles["input-group"]}>
-          <label>
-            {t("join.sessionCode")} <span className={styles["optional"]}>{t("join.optional")}</span>
-          </label>
+          <div className={styles["label-row"]}>
+            <label>
+              {t("join.sessionCode")} <span className={styles["optional"]}>{t("join.optional")}</span>
+            </label>
+            {sessionIdInput && (
+              <span className={styles["char-count"]}>{sessionIdInput.length}/8</span>
+            )}
+          </div>
           <input
             type="text"
             value={sessionIdInput}
-            onChange={(e) => onSessionIdChange(e.target.value)}
+            onChange={(e) => onSessionIdChange(e.target.value.toUpperCase())}
             onKeyDown={handleKey}
             placeholder={t("join.sessionPlaceholder")}
             maxLength={8}
             disabled={!connected}
+            style={{ textTransform: "uppercase" }}
           />
         </div>
 

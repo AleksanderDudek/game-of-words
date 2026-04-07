@@ -68,11 +68,33 @@
   gap: 6px;
 }
 
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
 .input-group label {
   font-size: 11px;
   letter-spacing: 2px;
   color: var(--text-muted);
   text-transform: uppercase;
+}
+
+.char-count {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0;
+  transition: color 0.2s;
+
+  &.warn {
+    color: var(--orange);
+  }
+}
+
+.input-warn {
+  border-color: var(--orange) !important;
+  box-shadow: 0 0 12px rgba(251, 146, 60, 0.1);
 }
 
 .optional {

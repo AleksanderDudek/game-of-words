@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./GameScreen.module.scss";
 import { BoardCell } from "../BoardCell/BoardCell";
@@ -25,6 +26,20 @@ export function GameScreen({
   const isMyTurn = round.currentPlayerId === playerId;
   const me = session.players.find((p) => p.id === playerId);
   const canAffordHint = (me?.score ?? 0) >= session.config.hintCostPoints;
+
+  const [shake, setShake] = useState(false);
+  const prevEventsLen = useRef(events.length);
+
+  useEffect(() => {
+    if (events.length > prevEventsLen.current) {
+      const last = events[events.length - 1];
+      if (last?.type === "guess_result" && !last.correct && last.playerId === playerId) {
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+      }
+    }
+    prevEventsLen.current = events.length;
+  }, [events, playerId]);
 
   const turnIndicatorClass = [
     styles["turn-indicator"],
@@ -81,16 +96,26 @@ export function GameScreen({
       {session.state === "playing" && (
         <div className={styles["guess-area"]}>
           <div className={styles["guess-input-row"]}>
-            <input
-              ref={inputRef}
-              type="text"
-              value={guessInput}
-              onChange={(e) => onGuessChange(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && onGuess()}
-              placeholder={isMyTurn ? t("game.guessPlaceholder") : t("game.waitingPlaceholder")}
-              disabled={!isMyTurn}
-              className={styles["guess-input"]}
-            />
+            <div className={styles["guess-input-wrap"]}>
+              <input
+                ref={inputRef}
+                type="text"
+                value={guessInput}
+                onChange={(e) => onGuessChange(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onGuess()}
+                placeholder={isMyTurn ? t("game.guessPlaceholder") : t("game.waitingPlaceholder")}
+                disabled={!isMyTurn}
+                className={`${styles["guess-input"]} ${shake ? styles["shake"] : ""}`}
+              />
+              {isMyTurn && (
+                <span className={`${styles["guess-len"]} ${
+                  guessInput.length === round.wordLength ? styles["exact"] :
+                  guessInput.length > round.wordLength ? styles["over"] : ""
+                }`}>
+                  {guessInput.length}/{round.wordLength}
+                </span>
+              )}
+            </div>
             <button
               className={`btn primary ${styles["guess-btn"]}`}
               onClick={onGuess}
