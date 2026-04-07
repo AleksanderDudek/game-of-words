@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import styles from "./JoinScreen.module.scss";
 import type { JoinScreenProps } from "./JoinScreen.types";
 
@@ -10,18 +11,33 @@ export function JoinScreen({
   onJoin,
   onOpenMyPacks,
 }: JoinScreenProps) {
+  const { t, i18n } = useTranslation();
+
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") onJoin();
   };
 
   return (
     <div className={styles["join-screen"]}>
+      <div className={styles["lang-switcher"]}>
+        <button
+          onClick={() => i18n.changeLanguage("en")}
+          className={i18n.language.startsWith("en") ? styles["active"] : ""}
+        >
+          {t("lang.en")}
+        </button>
+        <button
+          onClick={() => i18n.changeLanguage("pl")}
+          className={i18n.language.startsWith("pl") ? styles["active"] : ""}
+        >
+          {t("lang.pl")}
+        </button>
+      </div>
+
       <div className={styles["logo-section"]}>
         <div className={styles["logo-badge"]}>⚡</div>
         <h1 className={styles["logo-title"]}>SIGNAL DECAY</h1>
-        <p className={styles["logo-subtitle"]}>
-          Decode the scrambled signal before it's lost forever
-        </p>
+        <p className={styles["logo-subtitle"]}>{t("join.subtitle")}</p>
       </div>
 
       <div className={styles["join-form"]}>
@@ -31,17 +47,17 @@ export function JoinScreen({
           }`}
         >
           <div className={styles["status-dot"]} />
-          {connected ? "Server connected" : "Connecting..."}
+          {connected ? t("join.statusConnected") : t("join.statusConnecting")}
         </div>
 
         <div className={styles["input-group"]}>
-          <label>CALLSIGN</label>
+          <label>{t("join.callsign")}</label>
           <input
             type="text"
             value={nameInput}
             onChange={(e) => onNameChange(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Enter your name"
+            placeholder={t("join.namePlaceholder")}
             maxLength={16}
             disabled={!connected}
           />
@@ -49,14 +65,14 @@ export function JoinScreen({
 
         <div className={styles["input-group"]}>
           <label>
-            SESSION CODE <span className={styles["optional"]}>(optional)</span>
+            {t("join.sessionCode")} <span className={styles["optional"]}>{t("join.optional")}</span>
           </label>
           <input
             type="text"
             value={sessionIdInput}
             onChange={(e) => onSessionIdChange(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Leave empty to auto-join"
+            placeholder={t("join.sessionPlaceholder")}
             maxLength={8}
             disabled={!connected}
           />
@@ -67,20 +83,16 @@ export function JoinScreen({
           onClick={onJoin}
           disabled={!connected || !nameInput.trim()}
         >
-          CONNECT →
+          {t("join.connectBtn")}
         </button>
         <button className="btn" onClick={onOpenMyPacks}>
-          MY PACKS
+          {t("join.myPacksBtn")}
         </button>
       </div>
 
       <div className={styles["rules-brief"]}>
-        <h3>HOW IT WORKS</h3>
-        <p>
-          Words arrive with their <em>middle letters scrambled</em> — first and last
-          stay put. Take turns guessing the original word. Spend points to reveal
-          swapped pairs. Difficulty increases each round.
-        </p>
+        <h3>{t("join.howItWorks")}</h3>
+        <p dangerouslySetInnerHTML={{ __html: t("join.rules") }} />
       </div>
     </div>
   );

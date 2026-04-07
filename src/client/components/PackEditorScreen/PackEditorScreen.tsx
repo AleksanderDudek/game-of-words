@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
+import { useTranslation } from "react-i18next";
 import styles from "./PackEditorScreen.module.scss";
 import type { WordPack } from "@/client/lib/wordPack";
 
@@ -22,6 +23,7 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
       ? initialPack.words.map((e) => ({ word: e.word, hint: e.hint }))
       : [{ word: "", hint: "" }]
   );
+  const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,12 +43,12 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
     setError(null);
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setError("Pack name is required.");
+      setError(t("packEditor.errorName"));
       return;
     }
     const validRows = rows.filter((r) => r.word.trim() && r.hint.trim());
     if (validRows.length === 0) {
-      setError("Add at least one word with a hint.");
+      setError(t("packEditor.errorWords"));
       return;
     }
 
@@ -81,11 +83,11 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
       {/* Header */}
       <div className={styles["header"]}>
         <button className={styles["back-btn"]} onClick={onClose}>
-          ← BACK
+          {t("common.back")}
         </button>
-        <h2 className={styles["title"]}>{initialPack ? "EDIT PACK" : "NEW PACK"}</h2>
+        <h2 className={styles["title"]}>{initialPack ? t("packEditor.titleEdit") : t("packEditor.titleNew")}</h2>
         <button className={styles["save-btn"]} onClick={handleSave} disabled={saving}>
-          {saving ? "SAVING…" : "✓ SAVE"}
+          {saving ? t("packEditor.saving") : t("packEditor.save")}
         </button>
       </div>
 
@@ -96,14 +98,14 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
       <div className={styles["meta"]}>
         <input
           className={styles["name-input"]}
-          placeholder="Pack name…"
+          placeholder={t("packEditor.namePlaceholder")}
           value={name}
           maxLength={50}
           onChange={(e) => setName(e.target.value)}
         />
         <input
           className={styles["desc-input"]}
-          placeholder="Description — shown in the pack list (optional)"
+          placeholder={t("packEditor.descPlaceholder")}
           value={description}
           maxLength={200}
           onChange={(e) => setDescription(e.target.value)}
@@ -112,8 +114,8 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
 
       {/* Table header */}
       <div className={styles["table-header"]}>
-        <span>WORD</span>
-        <span>HINT — shown to other players</span>
+        <span>{t("packEditor.colWord")}</span>
+        <span>{t("packEditor.colHint")}</span>
         <span />
       </div>
 
@@ -123,14 +125,14 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
           <div key={i} className={styles["row"]}>
             <input
               className={styles["word-input"]}
-              placeholder="word"
+              placeholder={t("packEditor.wordPlaceholder")}
               value={row.word}
               maxLength={50}
               onChange={(e) => updateRow(i, "word", e.target.value)}
             />
             <input
               className={styles["hint-input"]}
-              placeholder="clue…"
+              placeholder={t("packEditor.hintPlaceholder")}
               value={row.hint}
               maxLength={200}
               onChange={(e) => updateRow(i, "hint", e.target.value)}
@@ -139,7 +141,7 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
               className={styles["del-btn"]}
               onClick={() => removeRow(i)}
               disabled={rows.length === 1}
-              title="Remove row"
+              title={t("packEditor.removeRow")}
             >
               ✕
             </button>
@@ -149,11 +151,11 @@ export function PackEditorScreen({ initialPack, onSave, onClose }: Props) {
 
       {/* Add row */}
       <button className={styles["add-row-btn"]} onClick={addRow} disabled={rows.length >= 500}>
-        + ADD WORD
+        {t("packEditor.addWord")}
       </button>
 
       <div className={styles["footer-hint"]}>
-        {validCount} / 500 valid {validCount === 1 ? "entry" : "entries"} — empty rows are ignored on save
+        {t("packEditor.footerHint", { count: validCount })}
       </div>
     </div>
   );

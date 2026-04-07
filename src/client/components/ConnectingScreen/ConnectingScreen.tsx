@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./ConnectingScreen.module.scss";
 
 interface Joke {
@@ -6,7 +7,7 @@ interface Joke {
   punchline: string;
 }
 
-const FALLBACK_JOKES: Joke[] = [
+const FALLBACK_JOKES_EN: Joke[] = [
   { setup: "Why do programmers prefer dark mode?", punchline: "Because light attracts bugs." },
   { setup: "What's a computer's favorite snack?", punchline: "Microchips." },
   { setup: "Why was the JavaScript developer sad?", punchline: "Because he didn't Node how to Express himself." },
@@ -22,7 +23,12 @@ const PUNCHLINE_DELAY = 3_000;
 const JOKE_API = "https://official-joke-api.appspot.com/jokes/random/10";
 
 export function ConnectingScreen() {
-  const [jokes, setJokes] = useState<Joke[]>(FALLBACK_JOKES);
+  const { t } = useTranslation();
+  const localizedFallback = (t("connecting.jokes", { returnObjects: true }) as Joke[]);
+  const fallbackJokes = Array.isArray(localizedFallback) && localizedFallback.length > 0
+    ? localizedFallback
+    : FALLBACK_JOKES_EN;
+  const [jokes, setJokes] = useState<Joke[]>(fallbackJokes);
   const [jokeIndex, setJokeIndex] = useState(0);
   const [showPunchline, setShowPunchline] = useState(false);
   const [dots, setDots] = useState(1);
@@ -77,10 +83,10 @@ export function ConnectingScreen() {
     <div className={styles["connecting-screen"]}>
       <div className={styles["signal-icon"]}>📡</div>
       <h2 className={styles["connecting-title"]}>
-        ESTABLISHING CONNECTION{".".repeat(dots)}
+        {t("connecting.title")}{"." .repeat(dots)}
       </h2>
       <p className={styles["connecting-hint"]}>
-        Server is waking up — this may take up to 30 seconds
+        {t("connecting.hint")}
       </p>
 
       <div className={styles["progress-bar"]}>
@@ -88,7 +94,7 @@ export function ConnectingScreen() {
       </div>
 
       <div className={styles["joke-card"]}>
-        <div className={styles["joke-label"]}>WHILE YOU WAIT</div>
+        <div className={styles["joke-label"]}>{t("connecting.whileYouWait")}</div>
         <p className={styles["joke-setup"]}>{joke.setup}</p>
         <p
           className={`${styles["joke-punchline"]} ${

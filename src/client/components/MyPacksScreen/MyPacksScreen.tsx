@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./MyPacksScreen.module.scss";
 import { usePackStorage } from "@/client/hooks/usePackStorage/usePackStorage";
 import { PackEditorScreen } from "@/client/components/PackEditorScreen/PackEditorScreen";
@@ -12,6 +13,7 @@ function formatDate(ts: number): string {
 export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacksScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   // null = list view, undefined = create new, WordPack = edit existing
+  const { t } = useTranslation();
   const [editorPack, setEditorPack] = useState<WordPack | undefined | null>(null);
 
   const {
@@ -35,7 +37,7 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
     try {
       await addPackFromFile(file);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to import pack");
+      alert(err instanceof Error ? err.message : t("myPacks.importFailed"));
     }
   }
 
@@ -43,12 +45,12 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
     try {
       await syncToDrive(pack);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Sync failed");
+      alert(err instanceof Error ? err.message : t("myPacks.syncFailed"));
     }
   }
 
   async function handleDelete(pack: WordPack) {
-    if (!confirm(`Delete "${pack.name}"?`)) return;
+    if (!confirm(t("myPacks.deleteConfirm", { name: pack.name }))) return;
     await deletePack(pack);
   }
 
@@ -83,38 +85,38 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
       {/* Header */}
       <div className={styles["header"]}>
         <button className={styles["back-btn"]} onClick={onClose}>
-          ← BACK
+          {t("common.back")}
         </button>
-        <h2 className={styles["title"]}>MY PACKS</h2>
+        <h2 className={styles["title"]}>{t("myPacks.title")}</h2>
       </div>
 
       {/* Google Drive section */}
       <div className={styles["drive-section"]}>
         <div className={styles["drive-icon"]}>☁</div>
         <div className={styles["drive-info"]}>
-          <div className={styles["drive-title"]}>Google Drive Sync</div>
+          <div className={styles["drive-title"]}>{t("myPacks.driveTitle")}</div>
           <div className={styles["drive-subtitle"]}>
             {driveConnected
-              ? "Packs are backed up to your Google Drive and available on all devices."
+              ? t("myPacks.driveConnected")
               : driveAvailable
-              ? "Connect to back up packs to your Google Drive — no account on our side needed."
-              : "Configure VITE_GOOGLE_CLIENT_ID to enable Drive sync."}
+              ? t("myPacks.driveAvailable")
+              : t("myPacks.driveUnconfigured")}
           </div>
         </div>
         {driveConnected ? (
-          <div className={`${styles["drive-badge"]} ${styles["connected"]}`}>CONNECTED</div>
+          <div className={`${styles["drive-badge"]} ${styles["connected"]}`}>{t("myPacks.connectedBadge")}</div>
         ) : driveAvailable ? (
           <button className="btn" onClick={connectDrive}>
-            Connect
+            {t("myPacks.connectBtn")}
           </button>
         ) : (
           <button className="btn" disabled>
-            Not configured
+            {t("myPacks.notConfiguredBtn")}
           </button>
         )}
         {driveConnected && (
           <button className="btn" onClick={disconnectDrive} style={{ marginLeft: 4 }}>
-            Disconnect
+            {t("myPacks.disconnectBtn")}
           </button>
         )}
       </div>
@@ -128,13 +130,13 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
           className={styles["upload-btn"]}
           onClick={() => setEditorPack(undefined)}
         >
-          + CREATE NEW PACK
+          {t("myPacks.createBtn")}
         </button>
         <button
           className={styles["upload-btn"]}
           onClick={() => fileInputRef.current?.click()}
         >
-          ↑ IMPORT PACK FROM FILE
+          {t("myPacks.importBtn")}
         </button>
         <input
           ref={fileInputRef}
@@ -153,13 +155,11 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
       {/* Pack list */}
       {!loading && packs.length === 0 ? (
         <div className={styles["empty-state"]}>
-          No packs yet.
-          <br />
-          Import a JSON file or download a template from the README.
+          {t("myPacks.emptyState").split("\n").map((line, i) => i === 0 ? <span key={i}>{line}<br /></span> : <span key={i}>{line}</span>)}
         </div>
       ) : (
         <>
-          <div className={styles["section-label"]}>SAVED PACKS — {packs.length}</div>
+          <div className={styles["section-label"]}>{t("myPacks.savedPacks")} — {packs.length}</div>
           <div className={styles["pack-list"]}>
             {packs.map((pack) => (
               <div
@@ -174,9 +174,9 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
                     >
                       {pack.source.toUpperCase()}
                     </span>
-                    <span>{pack.words.length} words</span>
-                    <span>Added {formatDate(pack.createdAt)}</span>
-                    {pack.lastUsedAt && <span>Used {formatDate(pack.lastUsedAt)}</span>}
+                    <span>{pack.words.length} {t("common.words")}</span>
+                    <span>{t("myPacks.added")} {formatDate(pack.createdAt)}</span>
+                    {pack.lastUsedAt && <span>{t("myPacks.used")} {formatDate(pack.lastUsedAt)}</span>}
                   </div>
                 </div>
                 <div className={styles["pack-actions"]}>
@@ -185,20 +185,20 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
                       className={`${styles["action-btn"]} ${styles["use"]}`}
                       onClick={() => onSelectPack(pack)}
                     >
-                      USE
+                      {t("myPacks.useBtn")}
                     </button>
                   )}
                   <button
                     className={`${styles["action-btn"]} ${styles["edit"]}`}
                     onClick={() => setEditorPack(pack)}
                   >
-                    EDIT
+                    {t("myPacks.editBtn")}
                   </button>
                   <button
                     className={`${styles["action-btn"]} ${styles["export"]}`}
                     onClick={() => handleExport(pack)}
                   >
-                    ↓ JSON
+                    {t("myPacks.exportBtn")}
                   </button>
                   {driveConnected && pack.source === "local" && (
                     <button

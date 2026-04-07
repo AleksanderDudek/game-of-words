@@ -1,0 +1,172 @@
+{
+  "common": {
+    "you": "YOU",
+    "pts": "pts",
+    "words": "words",
+    "letters": "letters",
+    "back": "← BACK"
+  },
+
+  "serverSelect": {
+    "title": "⚡ SIGNAL DECAY",
+    "subtitle": "Choose a server to connect to",
+    "pinging": "pinging...",
+    "offline": "offline",
+    "ms": "ms",
+    "playersOnline_one": "{{count}} player online",
+    "playersOnline_other": "{{count}} players online"
+  },
+
+  "connecting": {
+    "title": "ESTABLISHING CONNECTION",
+    "hint": "Server is waking up — this may take up to 30 seconds",
+    "whileYouWait": "WHILE YOU WAIT",
+    "jokes": [
+      { "setup": "Why do programmers prefer dark mode?", "punchline": "Because light attracts bugs." },
+      { "setup": "What's a computer's favorite snack?", "punchline": "Microchips." },
+      { "setup": "Why was the JavaScript developer sad?", "punchline": "Because he didn't Node how to Express himself." },
+      { "setup": "What do you call a fake noodle?", "punchline": "An impasta." },
+      { "setup": "Why don't scientists trust atoms?", "punchline": "Because they make up everything." },
+      { "setup": "What did the ocean say to the shore?", "punchline": "Nothing, it just waved." },
+      { "setup": "Why did the scarecrow win an award?", "punchline": "Because he was outstanding in his field." },
+      { "setup": "What do you call a bear with no teeth?", "punchline": "A gummy bear." }
+    ]
+  },
+
+  "countdown": {
+    "label": "SIGNAL INCOMING"
+  },
+
+  "join": {
+    "subtitle": "Decode the scrambled signal before it's lost forever",
+    "statusConnected": "Server connected",
+    "statusConnecting": "Connecting...",
+    "callsign": "CALLSIGN",
+    "namePlaceholder": "Enter your name",
+    "sessionCode": "SESSION CODE",
+    "optional": "(optional)",
+    "sessionPlaceholder": "Leave empty to auto-join",
+    "connectBtn": "CONNECT →",
+    "myPacksBtn": "MY PACKS",
+    "howItWorks": "HOW IT WORKS",
+    "rules": "Words arrive with their <em>middle letters scrambled</em> — first and last stay put. Take turns guessing the original word. Spend points to reveal swapped pairs. Difficulty increases each round."
+  },
+
+  "lobby": {
+    "session": "SESSION",
+    "waitingTitle": "Waiting for players...",
+    "waitingHint": "Share the session code with friends to join",
+    "spectatorWatching_one": "• {{count}} spectator watching",
+    "spectatorWatching_other": "• {{count}} spectators watching",
+    "hostBadge": "HOST",
+    "spectatorBadge": "SPECTATOR",
+    "configWords": "Words",
+    "configTurnGuesses": "Turn guesses",
+    "configRoundTime": "Round time",
+    "configHintCost": "Hint cost",
+    "wordPack": "WORD PACK",
+    "defaultPack": "Default (server word bank)",
+    "builtinPacks": "Built-in packs",
+    "myPacks": "My packs",
+    "useBelow": "— use ↓",
+    "managePacksBtn": "My Packs →",
+    "packLabel": "PACK",
+    "startGameBtn": "START GAME",
+    "needPlayers_one": "Need at least {{count}} player",
+    "needPlayers_other": "Need at least {{count}} players"
+  },
+
+  "game": {
+    "session": "SESSION",
+    "round": "ROUND",
+    "hint": "HINT",
+    "paused": "⏸ GAME PAUSED",
+    "roundEnd": "Next round starting...",
+    "yourTurn": "YOUR TURN",
+    "guessesLeft_one": "{{count}} guess left",
+    "guessesLeft_other": "{{count}} guesses left",
+    "theirTurn": "{{name}}'s turn",
+    "guessPlaceholder": "Type your guess...",
+    "waitingPlaceholder": "Waiting for your turn...",
+    "guessBtn": "GUESS",
+    "revealPair": "🔓 REVEAL PAIR ({{cost}} pts)",
+    "passTurn": "↷ PASS TURN",
+    "pause": "⏸ PAUSE",
+    "resume": "▶ RESUME",
+    "leaveGame": "✕ LEAVE GAME"
+  },
+
+  "gameOver": {
+    "title": "SIGNAL LOST",
+    "subtitle": "Final Standings",
+    "newGame": "NEW GAME"
+  },
+
+  "playerCard": {
+    "pts": "pts"
+  },
+
+  "myPacks": {
+    "title": "MY PACKS",
+    "driveTitle": "Google Drive Sync",
+    "driveConnected": "Packs are backed up to your Google Drive and available on all devices.",
+    "driveAvailable": "Connect to back up packs to your Google Drive — no account on our side needed.",
+    "driveUnconfigured": "Configure VITE_GOOGLE_CLIENT_ID to enable Drive sync.",
+    "connectedBadge": "CONNECTED",
+    "connectBtn": "Connect",
+    "notConfiguredBtn": "Not configured",
+    "disconnectBtn": "Disconnect",
+    "createBtn": "+ CREATE NEW PACK",
+    "importBtn": "↑ IMPORT PACK FROM FILE",
+    "formatHint": "JSON format:",
+    "formatLimit": "Up to 500 words per pack.",
+    "emptyState": "No packs yet.\nImport a JSON file or download a template from the README.",
+    "savedPacks": "SAVED PACKS",
+    "sourceLocal": "LOCAL",
+    "sourceDrive": "DRIVE",
+    "sourceBuiltin": "BUILTIN",
+    "added": "Added",
+    "used": "Used",
+    "useBtn": "USE",
+    "editBtn": "EDIT",
+    "exportBtn": "↓ JSON",
+    "syncBtn": "↑ SYNC",
+    "deleteConfirm": "Delete \"{{name}}\"?",
+    "importFailed": "Failed to import pack",
+    "syncFailed": "Sync failed"
+  },
+
+  "packEditor": {
+    "titleNew": "NEW PACK",
+    "titleEdit": "EDIT PACK",
+    "saving": "SAVING…",
+    "save": "✓ SAVE",
+    "errorName": "Pack name is required.",
+    "errorWords": "Add at least one word with a hint.",
+    "namePlaceholder": "Pack name…",
+    "descPlaceholder": "Description — shown in the pack list (optional)",
+    "colWord": "WORD",
+    "colHint": "HINT — shown to other players",
+    "wordPlaceholder": "word",
+    "hintPlaceholder": "clue…",
+    "removeRow": "Remove row",
+    "addWord": "+ ADD WORD",
+    "footerHint_one": "{{count}} / 500 valid entry — empty rows are ignored on save",
+    "footerHint_other": "{{count}} / 500 valid entries — empty rows are ignored on save"
+  },
+
+  "eventLog": {
+    "guessCorrect": "✓ {{name}} guessed correctly!",
+    "guessWrong": "✗ {{name}} guessed \"{{guess}}\"",
+    "hintRevealed": "🔓 {{name}} revealed a pair",
+    "roundWon": "🏆 {{name}} solved it! (+{{points}}) — \"{{word}}\"",
+    "timeUp": "⏰ Time's up! The word was \"{{word}}\"",
+    "turnSwitched": "↻ {{name}}'s turn",
+    "error": "⚠ {{message}}"
+  },
+
+  "lang": {
+    "en": "EN",
+    "pl": "PL"
+  }
+}

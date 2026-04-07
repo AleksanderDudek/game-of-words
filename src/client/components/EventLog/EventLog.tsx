@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./EventLog.module.scss";
 import { formatEvent } from "./EventLog.utils";
 import type { EventLogProps } from "./EventLog.utils";
 
 export function EventLog({ events, players }: EventLogProps) {
+  const { t } = useTranslation();
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,7 +17,7 @@ export function EventLog({ events, players }: EventLogProps) {
   return (
     <div className={styles["event-log"]} ref={logRef}>
       {events.map((ev, i) => {
-        const entry = formatEvent(ev, players);
+        const entry = formatEvent(ev, players, t);
         if (!entry) return null;
 
         const classNames = entry.className

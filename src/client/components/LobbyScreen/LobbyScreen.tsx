@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import styles from "./LobbyScreen.module.scss";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
 import type { LobbyScreenProps } from "./LobbyScreen.types";
@@ -11,6 +12,7 @@ export function LobbyScreen({
   onSetPack,
   onOpenMyPacks,
 }: LobbyScreenProps) {
+  const { t } = useTranslation();
   const minPlayers = session.config.minPlayers ?? 2;
   const activeCount = session.players.filter((p) => !p.isSpectator).length;
   const canStart = activeCount >= minPlayers;
@@ -20,14 +22,14 @@ export function LobbyScreen({
   return (
     <div className={styles["lobby-screen"]}>
       <div className={styles["session-header"]}>
-        <span className={styles["session-label"]}>SESSION</span>
+        <span className={styles["session-label"]}>{t("lobby.session")}</span>
         <span className={styles["session-code"]}>{session.sessionId}</span>
       </div>
 
-      <h2 className={styles["lobby-title"]}>Waiting for players...</h2>
+      <h2 className={styles["lobby-title"]}>{t("lobby.waitingTitle")}</h2>
       <p className={styles["lobby-hint"]}>
-        Share the session code with friends to join
-        {spectatorCount > 0 && ` • ${spectatorCount} spectator${spectatorCount !== 1 ? "s" : ""} watching`}
+        {t("lobby.waitingHint")}
+        {spectatorCount > 0 && ` ${t("lobby.spectatorWatching", { count: spectatorCount })}`}
       </p>
 
       <div className={styles["player-list"]}>
@@ -39,10 +41,10 @@ export function LobbyScreen({
               isYou={p.id === playerId}
             />
             {p.id === session.hostId && (
-              <span className={styles["host-badge"]}>HOST</span>
+              <span className={styles["host-badge"]}>{t("lobby.hostBadge")}</span>
             )}
             {p.isSpectator && (
-              <span className={styles["spectator-badge"]}>SPECTATOR</span>
+              <span className={styles["spectator-badge"]}>{t("lobby.spectatorBadge")}</span>
             )}
           </div>
         ))}
@@ -50,22 +52,22 @@ export function LobbyScreen({
 
       <div className={styles["lobby-config"]}>
         <div className={styles["config-item"]}>
-          <span>Words</span>
+          <span>{t("lobby.configWords")}</span>
           <span>
-            {session.config.minWordLength}→{session.config.maxWordLength} letters
+            {session.config.minWordLength}→{session.config.maxWordLength} {t("common.letters")}
           </span>
         </div>
         <div className={styles["config-item"]}>
-          <span>Turn guesses</span>
+          <span>{t("lobby.configTurnGuesses")}</span>
           <span>{session.config.turnsPerPlayer}</span>
         </div>
         <div className={styles["config-item"]}>
-          <span>Round time</span>
+          <span>{t("lobby.configRoundTime")}</span>
           <span>{session.config.sessionDurationSec}s</span>
         </div>
         <div className={styles["config-item"]}>
-          <span>Hint cost</span>
-          <span>{session.config.hintCostPoints} pts</span>
+          <span>{t("lobby.configHintCost")}</span>
+          <span>{session.config.hintCostPoints} {t("common.pts")}</span>
         </div>
       </div>
 
@@ -73,10 +75,10 @@ export function LobbyScreen({
       {isHost && (
         <div className={styles["pack-selector"]}>
           <div className={styles["pack-selector-label"]}>
-            WORD PACK
+            {t("lobby.wordPack")}
             {session.activePack && (
               <span className={styles["active-pack-badge"]}>
-                {session.activePack.name} · {session.activePack.wordCount} words
+                {session.activePack.name} · {session.activePack.wordCount} {t("common.words")}
               </span>
             )}
           </div>
@@ -100,9 +102,9 @@ export function LobbyScreen({
                 // custom packs are sent via onOpenMyPacks → USE button
               }}
             >
-              <option value="">Default (server word bank)</option>
+              <option value="">{t("lobby.defaultPack")}</option>
               {builtinPacks.length > 0 && (
-                <optgroup label="Built-in packs">
+                <optgroup label={t("lobby.builtinPacks")}>
                   {builtinPacks.map((p) => (
                     <option key={p.id} value={`builtin:${p.id}`}>
                       {p.name} ({p.wordCount} words)
@@ -111,17 +113,17 @@ export function LobbyScreen({
                 </optgroup>
               )}
               {localPacks.length > 0 && (
-                <optgroup label="My packs">
+                <optgroup label={t("lobby.myPacks")}>
                   {localPacks.map((p) => (
                     <option key={p.id} value={`custom:${p.name}`} disabled>
-                      {p.name} ({p.words.length} words) — use ↓
+                      {p.name} ({p.words.length} {t("common.words")}) {t("lobby.useBelow")}
                     </option>
                   ))}
                 </optgroup>
               )}
             </select>
             <button className={styles["manage-packs-btn"]} onClick={onOpenMyPacks}>
-              My Packs →
+              {t("lobby.managePacksBtn")}
             </button>
           </div>
         </div>
@@ -130,20 +132,20 @@ export function LobbyScreen({
       {/* Pack info for non-hosts */}
       {!isHost && session.activePack && (
         <div className={styles["pack-info-row"]}>
-          <span className={styles["pack-info-label"]}>PACK</span>
+          <span className={styles["pack-info-label"]}>{t("lobby.packLabel")}</span>
           <span className={styles["pack-info-value"]}>
-            {session.activePack.name} · {session.activePack.wordCount} words
+            {session.activePack.name} · {session.activePack.wordCount} {t("common.words")}
           </span>
         </div>
       )}
 
       {canStart ? (
         <button className="btn primary" onClick={onStartGame}>
-          START GAME
+          {t("lobby.startGameBtn")}
         </button>
       ) : (
         <div className={styles["waiting-dots"]}>
-          Need at least {minPlayers} players
+          {t("lobby.needPlayers", { count: minPlayers })}
           <span className={styles["dots-anim"]}>...</span>
         </div>
       )}

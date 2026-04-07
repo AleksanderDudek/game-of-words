@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./ServerSelectScreen.module.scss";
 import type { ServerSelectScreenProps, ServerStatus } from "./ServerSelectScreen.types";
 import type { GameServerEntry, ServerInfo } from "@/shared/types";
@@ -28,6 +29,7 @@ function latencyClass(ms: number): string {
 }
 
 export function ServerSelectScreen({ servers, onSelect }: ServerSelectScreenProps) {
+  const { t } = useTranslation();
   const [statuses, setStatuses] = useState<Map<string, ServerStatus>>(new Map());
 
   const refreshAll = useCallback(() => {
@@ -51,10 +53,8 @@ export function ServerSelectScreen({ servers, onSelect }: ServerSelectScreenProp
 
   return (
     <div className={styles["server-select-screen"]}>
-      <h1 className={styles["select-title"]}>⚡ SIGNAL DECAY</h1>
-      <p className={styles["select-subtitle"]}>
-        Choose a server to connect to
-      </p>
+      <h1 className={styles["select-title"]}>{t("serverSelect.title")}</h1>
+      <p className={styles["select-subtitle"]}>{t("serverSelect.subtitle")}</p>
 
       <div className={styles["server-list"]}>
         {servers.map((server) => {
@@ -82,20 +82,20 @@ export function ServerSelectScreen({ servers, onSelect }: ServerSelectScreenProp
               <div className={styles["server-meta"]}>
                 {status === undefined ? (
                   <span className={`${styles["server-latency"]} ${styles["loading-dot"]}`}>
-                    pinging...
+                    {t("serverSelect.pinging")}
                   </span>
                 ) : isOffline ? (
-                  <span className={styles["server-latency"]}>offline</span>
+                  <span className={styles["server-latency"]}>{t("serverSelect.offline")}</span>
                 ) : (
                   <>
                     <span
                       className={`${styles["server-latency"]} ${latencyClass(status.latency!)}`}
                     >
-                      {status.latency}ms
+                      {status.latency}{t("serverSelect.ms")}
                     </span>
                     {status.info && (
                       <span className={styles["server-players"]}>
-                        {status.info.totalPlayers} player{status.info.totalPlayers !== 1 ? "s" : ""} online
+                        {t("serverSelect.playersOnline", { count: status.info.totalPlayers })}
                       </span>
                     )}
                   </>

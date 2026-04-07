@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import styles from "./PlayerCard.module.scss";
 import type { PlayerCardProps } from "./PlayerCard.types";
 
 export function PlayerCard({ player, isCurrent, isYou }: PlayerCardProps) {
+  const { t } = useTranslation();
   const cardClass = [
     styles["player-card"],
     isCurrent ? styles["current"] : "",
@@ -23,9 +25,9 @@ export function PlayerCard({ player, isCurrent, isYou }: PlayerCardProps) {
       <div className={styles["player-info"]}>
         <span className={styles["player-name"]}>
           {player.name}
-          {isYou && <span className={styles["you-badge"]}>YOU</span>}
+          {isYou && <span className={styles["you-badge"]}>{t("common.you")}</span>}
         </span>
-        <span className={styles["player-score"]}>{player.score} pts</span>
+        <span className={styles["player-score"]}>{player.score} {t("common.pts")}</span>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import styles from "./GameScreen.module.scss";
 import { BoardCell } from "../BoardCell/BoardCell";
 import { TimerBar } from "../TimerBar/TimerBar";
@@ -19,6 +20,7 @@ export function GameScreen({
   onForfeitGame,
   inputRef,
 }: GameScreenProps) {
+  const { t } = useTranslation();
   const round = session.round!;
   const isMyTurn = round.currentPlayerId === playerId;
   const me = session.players.find((p) => p.id === playerId);
@@ -35,19 +37,19 @@ export function GameScreen({
     <div className={styles["game-screen"]}>
       <div className={styles["game-topbar"]}>
         <div className={styles["session-badge"]}>
-          <span className={styles["session-label"]}>SESSION</span>
+          <span className={styles["session-label"]}>{t("game.session")}</span>
           <span className={styles["session-code"]}>{session.sessionId}</span>
         </div>
         <div className={styles["round-badge"]}>
-          ROUND {round.roundNumber}
-          <span className={styles["difficulty-tag"]}>{round.wordLength} letters</span>
+          {t("game.round")} {round.roundNumber}
+          <span className={styles["difficulty-tag"]}>{round.wordLength} {t("common.letters")}</span>
         </div>
       </div>
 
       <TimerBar timeLeft={round.timeLeft} total={session.config.sessionDurationSec} />
 
       <div className={styles["hint-box"]}>
-        <span className={styles["hint-label"]}>HINT</span>
+        <span className={styles["hint-label"]}>{t("game.hint")}</span>
         <span className={styles["hint-text"]}>{round.hint}</span>
       </div>
 
@@ -59,19 +61,19 @@ export function GameScreen({
 
       <div className={turnIndicatorClass}>
         {session.state === "paused" ? (
-          <span className={styles["paused-text"]}>⏸ GAME PAUSED</span>
+          <span className={styles["paused-text"]}>{t("game.paused")}</span>
         ) : session.state === "round_end" ? (
-          <span className={styles["round-end-msg"]}>Next round starting...</span>
+          <span className={styles["round-end-msg"]}>{t("game.roundEnd")}</span>
         ) : isMyTurn ? (
           <>
-            <span className={styles["turn-text"]}>YOUR TURN</span>
+            <span className={styles["turn-text"]}>{t("game.yourTurn")}</span>
             <span className={styles["turns-left"]}>
-              {round.turnsRemaining} guess{round.turnsRemaining !== 1 ? "es" : ""} left
+              {t("game.guessesLeft", { count: round.turnsRemaining })}
             </span>
           </>
         ) : (
           <span className={styles["turn-text"]}>
-            {session.players.find((p) => p.id === round.currentPlayerId)?.name}&apos;s turn
+            {t("game.theirTurn", { name: session.players.find((p) => p.id === round.currentPlayerId)?.name })}
           </span>
         )}
       </div>
@@ -85,7 +87,7 @@ export function GameScreen({
               value={guessInput}
               onChange={(e) => onGuessChange(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && onGuess()}
-              placeholder={isMyTurn ? "Type your guess..." : "Waiting for your turn..."}
+              placeholder={isMyTurn ? t("game.guessPlaceholder") : t("game.waitingPlaceholder")}
               disabled={!isMyTurn}
               className={styles["guess-input"]}
             />
@@ -103,7 +105,7 @@ export function GameScreen({
             disabled={!canAffordHint}
             title={`Costs ${session.config.hintCostPoints} points`}
           >
-            🔓 REVEAL PAIR ({session.config.hintCostPoints} pts)
+            {t("game.revealPair", { cost: session.config.hintCostPoints })}
           </button>
         </div>
       )}
@@ -112,22 +114,22 @@ export function GameScreen({
         <div className={styles["action-bar"]}>
           {session.state === "playing" && isMyTurn && onPassTurn && (
             <button className="btn" onClick={onPassTurn}>
-              ↷ PASS TURN
+              {t("game.passTurn")}
             </button>
           )}
           {session.state === "playing" && onPauseGame && (
             <button className="btn" onClick={onPauseGame}>
-              ⏸ PAUSE
+              {t("game.pause")}
             </button>
           )}
           {session.state === "paused" && onResumeGame && (
             <button className="btn primary" onClick={onResumeGame}>
-              ▶ RESUME
+              {t("game.resume")}
             </button>
           )}
           {onForfeitGame && (
             <button className={`btn ${styles["forfeit-btn"]}`} onClick={onForfeitGame}>
-              ✕ LEAVE GAME
+              {t("game.leaveGame")}
             </button>
           )}
         </div>

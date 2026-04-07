@@ -1,0 +1,172 @@
+{
+  "common": {
+    "you": "TY",
+    "pts": "pkt",
+    "words": "słów",
+    "letters": "liter",
+    "back": "← WRÓĆ"
+  },
+
+  "serverSelect": {
+    "title": "⚡ SIGNAL DECAY",
+    "subtitle": "Wybierz serwer, z którym chcesz się połączyć",
+    "pinging": "ping...",
+    "offline": "offline",
+    "ms": "ms",
+    "playersOnline_one": "{{count}} gracz online",
+    "playersOnline_other": "{{count}} graczy online"
+  },
+
+  "connecting": {
+    "title": "NAWIĄZYWANIE POŁĄCZENIA",
+    "hint": "Serwer się budzi — może to potrwać do 30 sekund",
+    "whileYouWait": "W MIĘDZYCZASIE",
+    "jokes": [
+      { "setup": "Dlaczego programiści wolą ciemny motyw?", "punchline": "Bo jasny przyciąga robaki." },
+      { "setup": "Czym zajmuje się komputer na diecie?", "punchline": "Je mikrochipy." },
+      { "setup": "Dlaczego programista JavaScript był smutny?", "punchline": "Bo nie wiedział, jak się Node Express." },
+      { "setup": "Jak się nazywa fałszywy makaron?", "punchline": "Im-pasta." },
+      { "setup": "Dlaczego naukowcy nie ufają atomom?", "punchline": "Bo z czegoś się wszystko składa." },
+      { "setup": "Co powiedział ocean do brzegu?", "punchline": "Nic, tylko falował." },
+      { "setup": "Dlaczego strach na wróble dostał nagrodę?", "punchline": "Bo wyróżniał się w swojej dziedzinie." },
+      { "setup": "Jak nazwać niedźwiedzia bez zębów?", "punchline": "Żelkowy miś." }
+    ]
+  },
+
+  "countdown": {
+    "label": "SYGNAŁ NADCHODZI"
+  },
+
+  "join": {
+    "subtitle": "Rozszyfruj zakłócony sygnał, zanim zniknie na zawsze",
+    "statusConnected": "Serwer połączony",
+    "statusConnecting": "Łączenie...",
+    "callsign": "PSEUDONIM",
+    "namePlaceholder": "Podaj swoje imię",
+    "sessionCode": "KOD SESJI",
+    "optional": "(opcjonalne)",
+    "sessionPlaceholder": "Zostaw puste, by dołączyć automatycznie",
+    "connectBtn": "POŁĄCZ →",
+    "myPacksBtn": "MOJE PACZKI",
+    "howItWorks": "JAK TO DZIAŁA",
+    "rules": "Słowa przychodzą z <em>przestawionymi środkowymi literami</em> — pierwsza i ostatnia zostają na miejscu. Zgadujcie na zmianę oryginalne słowo. Wydajcie punkty, by odsłonić zamienioną parę. Trudność rośnie z każdą rundą."
+  },
+
+  "lobby": {
+    "session": "SESJA",
+    "waitingTitle": "Oczekiwanie na graczy...",
+    "waitingHint": "Udostępnij kod sesji znajomym, by dołączyli",
+    "spectatorWatching_one": "• {{count}} widz obserwuje",
+    "spectatorWatching_other": "• {{count}} widzów obserwuje",
+    "hostBadge": "HOST",
+    "spectatorBadge": "WIDZ",
+    "configWords": "Słowa",
+    "configTurnGuesses": "Próby na turę",
+    "configRoundTime": "Czas rundy",
+    "configHintCost": "Koszt podpowiedzi",
+    "wordPack": "PACZKA SŁÓW",
+    "defaultPack": "Domyślna (baza serwera)",
+    "builtinPacks": "Wbudowane paczki",
+    "myPacks": "Moje paczki",
+    "useBelow": "— użyj ↓",
+    "managePacksBtn": "Moje paczki →",
+    "packLabel": "PACZKA",
+    "startGameBtn": "ROZPOCZNIJ GRĘ",
+    "needPlayers_one": "Potrzeba co najmniej {{count}} gracza",
+    "needPlayers_other": "Potrzeba co najmniej {{count}} graczy"
+  },
+
+  "game": {
+    "session": "SESJA",
+    "round": "RUNDA",
+    "hint": "WSKAZÓWKA",
+    "paused": "⏸ GRA WSTRZYMANA",
+    "roundEnd": "Następna runda za chwilę...",
+    "yourTurn": "TWOJA TURA",
+    "guessesLeft_one": "{{count}} próba",
+    "guessesLeft_other": "{{count}} próby",
+    "theirTurn": "Tura gracza {{name}}",
+    "guessPlaceholder": "Wpisz odpowiedź...",
+    "waitingPlaceholder": "Poczekaj na swoją turę...",
+    "guessBtn": "ZGADUJ",
+    "revealPair": "🔓 ODKRYJ PARĘ ({{cost}} pkt)",
+    "passTurn": "↷ PASS",
+    "pause": "⏸ PAUZA",
+    "resume": "▶ WZNÓW",
+    "leaveGame": "✕ OPUŚĆ GRĘ"
+  },
+
+  "gameOver": {
+    "title": "SYGNAŁ UTRACONY",
+    "subtitle": "Końcowe wyniki",
+    "newGame": "NOWA GRA"
+  },
+
+  "playerCard": {
+    "pts": "pkt"
+  },
+
+  "myPacks": {
+    "title": "MOJE PACZKI",
+    "driveTitle": "Synchronizacja z Google Drive",
+    "driveConnected": "Paczki są zapisywane na Twoim Google Drive i dostępne na wszystkich urządzeniach.",
+    "driveAvailable": "Połącz, aby zapisywać paczki na Google Drive — bez konta po naszej stronie.",
+    "driveUnconfigured": "Skonfiguruj VITE_GOOGLE_CLIENT_ID, aby włączyć synchronizację z Drive.",
+    "connectedBadge": "POŁĄCZONO",
+    "connectBtn": "Połącz",
+    "notConfiguredBtn": "Nieskonfigurowane",
+    "disconnectBtn": "Rozłącz",
+    "createBtn": "+ UTWÓRZ NOWĄ PACZKĘ",
+    "importBtn": "↑ IMPORTUJ PACZKĘ Z PLIKU",
+    "formatHint": "Format JSON:",
+    "formatLimit": "Maks. 500 słów na paczkę.",
+    "emptyState": "Brak paczek.\nZaimportuj plik JSON lub pobierz szablon z README.",
+    "savedPacks": "ZAPISANE PACZKI",
+    "sourceLocal": "LOKALNA",
+    "sourceDrive": "DRIVE",
+    "sourceBuiltin": "WBUDOWANA",
+    "added": "Dodano",
+    "used": "Użyto",
+    "useBtn": "UŻYJ",
+    "editBtn": "EDYTUJ",
+    "exportBtn": "↓ JSON",
+    "syncBtn": "↑ SYNC",
+    "deleteConfirm": "Usunąć \"{{name}}\"?",
+    "importFailed": "Nie udało się zaimportować paczki",
+    "syncFailed": "Synchronizacja nie powiodła się"
+  },
+
+  "packEditor": {
+    "titleNew": "NOWA PACZKA",
+    "titleEdit": "EDYTUJ PACZKĘ",
+    "saving": "ZAPISYWANIE…",
+    "save": "✓ ZAPISZ",
+    "errorName": "Nazwa paczki jest wymagana.",
+    "errorWords": "Dodaj co najmniej jedno słowo ze wskazówką.",
+    "namePlaceholder": "Nazwa paczki…",
+    "descPlaceholder": "Opis — widoczny na liście paczek (opcjonalne)",
+    "colWord": "SŁOWO",
+    "colHint": "WSKAZÓWKA — widoczna dla innych graczy",
+    "wordPlaceholder": "słowo",
+    "hintPlaceholder": "podpowiedź…",
+    "removeRow": "Usuń wiersz",
+    "addWord": "+ DODAJ SŁOWO",
+    "footerHint_one": "{{count}} / 500 poprawny wpis — puste wiersze są ignorowane przy zapisie",
+    "footerHint_other": "{{count}} / 500 poprawnych wpisów — puste wiersze są ignorowane przy zapisie"
+  },
+
+  "eventLog": {
+    "guessCorrect": "✓ {{name}} odgadł poprawnie!",
+    "guessWrong": "✗ {{name}} zgadł \"{{guess}}\"",
+    "hintRevealed": "🔓 {{name}} odkrył parę",
+    "roundWon": "🏆 {{name}} rozwiązał! (+{{points}}) — \"{{word}}\"",
+    "timeUp": "⏰ Czas minął! Słowo to \"{{word}}\"",
+    "turnSwitched": "↻ Tura gracza {{name}}",
+    "error": "⚠ {{message}}"
+  },
+
+  "lang": {
+    "en": "EN",
+    "pl": "PL"
+  }
+}
