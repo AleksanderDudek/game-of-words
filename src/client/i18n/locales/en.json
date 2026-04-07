@@ -118,6 +118,7 @@
     "disconnectBtn": "Disconnect",
     "createBtn": "+ CREATE NEW PACK",
     "importBtn": "↑ IMPORT PACK FROM FILE",
+    "sampleBtn": "↓ DOWNLOAD SAMPLE PACK",
     "formatHint": "JSON format:",
     "formatLimit": "Up to 500 words per pack.",
     "emptyState": "No packs yet.\nImport a JSON file or download a template from the README.",

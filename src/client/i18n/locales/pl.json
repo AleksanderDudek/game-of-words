@@ -118,6 +118,7 @@
     "disconnectBtn": "Rozłącz",
     "createBtn": "+ UTWÓRZ NOWĄ PACZKĘ",
     "importBtn": "↑ IMPORTUJ PACZKĘ Z PLIKU",
+    "sampleBtn": "↓ POBIERZ PRZYKŁADOWĄ PACZKĘ",
     "formatHint": "Format JSON:",
     "formatLimit": "Maks. 500 słów na paczkę.",
     "emptyState": "Brak paczek.\nZaimportuj plik JSON lub pobierz szablon z README.",

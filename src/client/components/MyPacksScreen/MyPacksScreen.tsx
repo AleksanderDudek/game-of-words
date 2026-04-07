@@ -69,6 +69,27 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
     URL.revokeObjectURL(url);
   }
 
+  function handleDownloadSample() {
+    const sample = {
+      name: "My Sample Pack",
+      description: "An example word pack — replace with your own words and hints.",
+      words: [
+        { word: "signal", hint: "A transmitted message or impulse" },
+        { word: "decode", hint: "To convert a coded message into plain language" },
+        { word: "cipher", hint: "A secret method of writing" },
+        { word: "entropy", hint: "A measure of randomness or disorder" },
+        { word: "frequency", hint: "The rate at which something occurs" },
+      ],
+    };
+    const blob = new Blob([JSON.stringify(sample, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample-pack.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   // ─── Pack editor subscreen ───
   if (editorPack !== null) {
     return (
@@ -137,6 +158,12 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
           onClick={() => fileInputRef.current?.click()}
         >
           {t("myPacks.importBtn")}
+        </button>
+        <button
+          className={styles["sample-btn"]}
+          onClick={handleDownloadSample}
+        >
+          {t("myPacks.sampleBtn")}
         </button>
         <input
           ref={fileInputRef}
