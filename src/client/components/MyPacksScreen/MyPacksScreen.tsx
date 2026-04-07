@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import styles from "./MyPacksScreen.module.scss";
 import { usePackStorage } from "@/client/hooks/usePackStorage/usePackStorage";
+import { PackEditorScreen } from "@/client/components/PackEditorScreen/PackEditorScreen";
 import type { MyPacksScreenProps } from "./MyPacksScreen.types";
 import type { WordPack } from "@/client/lib/wordPack";
 
@@ -10,6 +11,9 @@ function formatDate(ts: number): string {
 
 export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacksScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // null = list view, undefined = create new, WordPack = edit existing
+  const [editorPack, setEditorPack] = useState<WordPack | undefined | null>(null);
+
   const {
     packs,
     driveConnected,
@@ -17,6 +21,7 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
     loading,
     error,
     addPackFromFile,
+    savePack,
     deletePack,
     connectDrive,
     disconnectDrive,
@@ -45,6 +50,32 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
   async function handleDelete(pack: WordPack) {
     if (!confirm(`Delete "${pack.name}"?`)) return;
     await deletePack(pack);
+  }
+
+  function handleExport(pack: WordPack) {
+    const json = JSON.stringify(
+      { name: pack.name, description: pack.description, words: pack.words },
+      null,
+      2
+    );
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${pack.name.toLowerCase().replace(/\s+/g, "-")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ─── Pack editor subscreen ───
+  if (editorPack !== null) {
+    return (
+      <PackEditorScreen
+        initialPack={editorPack}
+        onSave={savePack}
+        onClose={() => setEditorPack(null)}
+      />
+    );
   }
 
   return (
@@ -91,13 +122,19 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
       {/* Error banner */}
       {error && <div className={styles["error-banner"]}>{error}</div>}
 
-      {/* Upload */}
+      {/* Upload / Create */}
       <div className={styles["upload-area"]}>
+        <button
+          className={styles["upload-btn"]}
+          onClick={() => setEditorPack(undefined)}
+        >
+          + CREATE NEW PACK
+        </button>
         <button
           className={styles["upload-btn"]}
           onClick={() => fileInputRef.current?.click()}
         >
-          + IMPORT PACK FROM FILE
+          ↑ IMPORT PACK FROM FILE
         </button>
         <input
           ref={fileInputRef}
@@ -151,6 +188,18 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
                       USE
                     </button>
                   )}
+                  <button
+                    className={`${styles["action-btn"]} ${styles["edit"]}`}
+                    onClick={() => setEditorPack(pack)}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    className={`${styles["action-btn"]} ${styles["export"]}`}
+                    onClick={() => handleExport(pack)}
+                  >
+                    ↓ JSON
+                  </button>
                   {driveConnected && pack.source === "local" && (
                     <button
                       className={`${styles["action-btn"]} ${styles["sync"]}`}

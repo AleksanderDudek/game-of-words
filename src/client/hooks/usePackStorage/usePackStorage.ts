@@ -13,6 +13,7 @@ export interface UsePackStorage {
   error: string | null;
   reload: () => Promise<void>;
   addPackFromFile: (file: File) => Promise<void>;
+  savePack: (pack: WordPack) => Promise<void>;
   deletePack: (pack: WordPack) => Promise<void>;
   connectDrive: () => Promise<void>;
   disconnectDrive: () => void;
@@ -100,6 +101,12 @@ export function usePackStorage(): UsePackStorage {
     await reload();
   }, [reload]);
 
+  const handleSavePack = useCallback(async (pack: WordPack) => {
+    setError(null);
+    await storage.savePack(pack);
+    await reload();
+  }, [reload]);
+
   const handleDeletePack = useCallback(async (pack: WordPack) => {
     setError(null);
     await storage.deletePack(pack.id);
@@ -147,6 +154,7 @@ export function usePackStorage(): UsePackStorage {
     error,
     reload,
     addPackFromFile,
+    savePack: handleSavePack,
     deletePack: handleDeletePack,
     connectDrive: handleConnectDrive,
     disconnectDrive: handleDisconnectDrive,
