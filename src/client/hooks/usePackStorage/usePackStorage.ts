@@ -53,7 +53,6 @@ export function usePackStorage(): UsePackStorage {
           .catch(() => {});
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addPackFromFile = useCallback(async (file: File) => {
