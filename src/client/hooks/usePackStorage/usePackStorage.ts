@@ -40,21 +40,6 @@ export function usePackStorage(): UsePackStorage {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  // On mount, attempt a silent Drive reconnect so the user doesn't have to
-  // click "Connect" again after a page refresh.
-  useEffect(() => {
-    if (!drive.isDriveAvailable() || drive.isDriveConnected()) return;
-    drive.trySilentReconnect().then((ok) => {
-      if (ok) {
-        setDriveConnected(true);
-        drive.listDrivePacks()
-          .then((drivePacks) => Promise.all(drivePacks.map((p) => storage.savePack(p))))
-          .then(() => reload())
-          .catch(() => {});
-      }
-    });
-  }, []);
-
   const addPackFromFile = useCallback(async (file: File) => {
     setError(null);
     const text = await file.text();
