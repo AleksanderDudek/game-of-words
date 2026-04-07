@@ -40,7 +40,10 @@ export default function App() {
   // Fetch built-in packs from server when we have a URL
   useEffect(() => {
     if (!wsUrl) return;
-    const httpUrl = wsUrl.replace(/^wss?/, "http").replace(/\/ws$/, "");
+    const httpUrl = wsUrl
+      .replace(/^wss:\/\//, "https://")
+      .replace(/^ws:\/\//, "http://")
+      .replace(/\/ws$/, "");
     fetch(`${httpUrl}/api/packs`)
       .then((r) => r.json())
       .then((data: BuiltinPackInfo[]) => setBuiltinPacks(data))
