@@ -10,10 +10,13 @@ export function LobbyScreen({
   localPacks,
   onStartGame,
   onSetPack,
+  onSetMaxPlayers,
   onOpenMyPacks,
 }: LobbyScreenProps) {
   const { t } = useTranslation();
   const minPlayers = session.config.minPlayers ?? 2;
+  const maxPlayersLimit = session.config.maxPlayers ?? 8;
+  const currentMaxPlayers = session.playerLimit;
   const activeCount = session.players.filter((p) => !p.isSpectator).length;
   const canStart = activeCount >= minPlayers;
   const spectatorCount = session.players.filter((p) => p.isSpectator).length;
@@ -68,6 +71,32 @@ export function LobbyScreen({
         <div className={styles["config-item"]}>
           <span>{t("lobby.configHintCost")}</span>
           <span>{session.config.hintCostPoints} {t("common.pts")}</span>
+        </div>
+        <div className={styles["config-item"]}>
+          <span>{t("lobby.configMaxPlayers")}</span>
+          {isHost ? (
+            <div className={styles["max-players-control"]}>
+              <button
+                className={styles["stepper-btn"]}
+                onClick={() => onSetMaxPlayers(currentMaxPlayers - 1)}
+                disabled={currentMaxPlayers <= minPlayers}
+                aria-label="Decrease max players"
+              >
+                −
+              </button>
+              <span>{currentMaxPlayers}</span>
+              <button
+                className={styles["stepper-btn"]}
+                onClick={() => onSetMaxPlayers(currentMaxPlayers + 1)}
+                disabled={currentMaxPlayers >= maxPlayersLimit}
+                aria-label="Increase max players"
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <span>{currentMaxPlayers}</span>
+          )}
         </div>
       </div>
 

@@ -33,6 +33,7 @@ export class GameSession {
   hostId: PlayerId = "" as PlayerId;
   state: SessionState = "lobby";
   players: Map<PlayerId, ConnectedPlayer> = new Map();
+  maxPlayers: number = CONFIG.MAX_PLAYERS;
   board: LetterCell[] = [];
   hint: string = "";
   originalWord: string = "";
@@ -73,7 +74,8 @@ export class GameSession {
 
     // ── Full-session guard (count only connected slots) ──
     const connectedCount = [...this.players.values()].filter((p) => p.isConnected).length;
-    if (connectedCount >= CONFIG.MAX_PLAYERS) {
+    // Note: this.maxPlayers may have been updated by the host
+    if (connectedCount >= this.maxPlayers) {
       this.sendTo(ws, { type: "error", message: "Session is full" });
       return "";
     }
@@ -471,6 +473,7 @@ export class GameSession {
       case "resume_game":  this.handleResumeGame(playerId); break;
       case "forfeit_game": this.handleForfeitGame(playerId); break;
       case "set_word_pack": this.handleSetWordPack(playerId, msg.pack); break;
+      case "set_max_players": this.handleSetMaxPlayers(playerId, msg.count); break;
       case "ping": {
         const player = this.players.get(playerId);
         if (player) this.sendTo(player.ws, { type: "pong" });
@@ -523,6 +526,7 @@ export class GameSession {
       players: [...this.players.values()].map(({ ws: _ws, ...rest }) => rest),
       round,
       config,
+      playerLimit: this.maxPlayers,
       countdownLeft: this.countdownLeft,
       activePack: this.pendingPack
         ? { name: this.pendingPack.name, wordCount: this.pendingPack.words.length }
@@ -599,6 +603,32 @@ export class GameSession {
 
     this.pendingPack = { name: pack.name.trim(), words };
     this.broadcastState();
+  }
+
+  // ─── Max Players Configuration ───
+
+  handleSetMaxPlayers(playerId: PlayerId, count: number): void {
+    if (this.state !== "lobby") {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Cannot change max players after game starts" });
+      return;
+    }
+    if (this.hostId !== playerId) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Only the host can change max players" });
+      return;
+    }
+
+    const clamped = Math.max(CONFIG.MIN_PLAYERS, Math.min(CONFIG.MAX_PLAYERS, Math.floor(count)));
+    if (!Number.isFinite(clamped)) {
+      const player = this.players.get(playerId);
+      if (player) this.sendTo(player.ws, { type: "error", message: "Invalid player count" });
+      return;
+    }
+
+    this.maxPlayers = clamped;
+    this.broadcastState();
+    console.log(`[Session ${this.id}] Max players set to ${this.maxPlayers} by host.`);
   }
 
   broadcastState(): void {

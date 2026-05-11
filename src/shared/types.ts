@@ -119,6 +119,7 @@ export interface SessionSnapshot {
   players: Player[];
   round: RoundState | null;
   config: GameConfig;
+  playerLimit: number;      // current per-session max players (host-configurable)
   countdownLeft?: number;
   activePack?: { name: string; wordCount: number };
 }
@@ -138,6 +139,7 @@ export type ClientMessage =
   | { type: "resume_game" }     // resume after pause
   | { type: "forfeit_game" }    // leave the game permanently
   | { type: "set_word_pack"; pack: PackReference }
+  | { type: "set_max_players"; count: number }  // host changes max players (lobby only)
   | { type: "ping" };
 
 // ─── Server → Client ───
@@ -174,7 +176,7 @@ export type ExpectedResponse<T extends ClientMessage["type"]> =
 
 const CLIENT_MESSAGE_TYPES: ReadonlySet<string> = new Set<ClientMessage["type"]>([
   "join", "start_game", "guess", "buy_hint", "pass_turn",
-  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "ping",
+  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "set_max_players", "ping",
 ]);
 
 /** Runtime type guard for validating incoming client messages */

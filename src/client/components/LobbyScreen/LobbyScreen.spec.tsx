@@ -11,6 +11,7 @@ const baseSession: SessionSnapshot = {
     { id: "p2" as PlayerId, name: "Bob", score: 0, isConnected: true },
   ],
   round: null,
+  playerLimit: 4,
   config: {
     pointsPerCorrect: 100,
     hintCostPoints: 30,
@@ -28,6 +29,7 @@ const lobbyProps = {
   localPacks: [],
   onStartGame: vi.fn(),
   onSetPack: vi.fn(),
+  onSetMaxPlayers: vi.fn(),
   onOpenMyPacks: vi.fn(),
 };
 

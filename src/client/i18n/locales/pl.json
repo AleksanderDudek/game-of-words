@@ -64,6 +64,7 @@
     "configTurnGuesses": "Próby na turę",
     "configRoundTime": "Czas rundy",
     "configHintCost": "Koszt podpowiedzi",
+    "configMaxPlayers": "Maks. graczy",
     "wordPack": "PACZKA SŁÓW",
     "defaultPack": "Domyślna (baza serwera)",
     "builtinPacks": "Wbudowane paczki",

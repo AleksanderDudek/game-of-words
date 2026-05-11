@@ -38,7 +38,7 @@ function isOriginAllowed(req: IncomingMessage): boolean {
 function findOrCreateSession(): GameSession {
   // Find an open lobby session
   for (const session of sessions.values()) {
-    if (session.state === "lobby" && session.players.size < CONFIG.MAX_PLAYERS) {
+    if (session.state === "lobby" && session.players.size < session.maxPlayers) {
       return session;
     }
   }

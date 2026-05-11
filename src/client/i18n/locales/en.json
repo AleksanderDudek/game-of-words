@@ -64,6 +64,7 @@
     "configTurnGuesses": "Turn guesses",
     "configRoundTime": "Round time",
     "configHintCost": "Hint cost",
+    "configMaxPlayers": "Max players",
     "wordPack": "WORD PACK",
     "defaultPack": "Default (server word bank)",
     "builtinPacks": "Built-in packs",

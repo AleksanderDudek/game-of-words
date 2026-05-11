@@ -27,6 +27,7 @@ const baseSession: SessionSnapshot = {
     turnsRemaining: 3,
     wordLength: 5,
   },
+  playerLimit: 4,
   config: {
     pointsPerCorrect: 100,
     hintCostPoints: 30,
