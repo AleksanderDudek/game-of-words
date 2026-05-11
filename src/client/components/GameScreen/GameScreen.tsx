@@ -6,6 +6,7 @@ import { TimerBar } from "../TimerBar/TimerBar";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
 import { EventLog } from "../EventLog/EventLog";
 import type { GameScreenProps } from "./GameScreen.types";
+import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 
 export function GameScreen({
   session,
@@ -33,9 +34,14 @@ export function GameScreen({
   useEffect(() => {
     if (events.length > prevEventsLen.current) {
       const last = events[events.length - 1];
-      if (last?.type === "guess_result" && !last.correct && last.playerId === playerId) {
-        setShake(true);
-        setTimeout(() => setShake(false), 500);
+      if (last?.type === "guess_result" && last.playerId === playerId) {
+        if (last.correct) {
+          Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+        } else {
+          setShake(true);
+          setTimeout(() => setShake(false), 500);
+          Haptics.notification({ type: NotificationType.Error }).catch(() => {});
+        }
       }
     }
     prevEventsLen.current = events.length;
