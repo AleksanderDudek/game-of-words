@@ -8,6 +8,8 @@
     "client:build": "tsc -p tsconfig.client.json && vite build",
     "build:app": "tsc -p tsconfig.client.json && VITE_BUILD_TARGET=app vite build",
     "cap:sync": "npm run build:app && npx cap sync",
+    "android:build": "bash scripts/android-build.sh",
+    "android:deploy": "bash scripts/android-deploy.sh",
     "client:preview": "vite preview",
     "server:dev": "tsx watch src/server/index.ts",
     "server:start": "tsx src/server/index.ts",

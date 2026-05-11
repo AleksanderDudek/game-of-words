@@ -46,7 +46,7 @@ fastlane/screenshots/
 fastlane/test_output/
 *.ipa
 *.aab
-keystore.jks
+*.jks
 
 # Ruby
 .bundle/
