@@ -12,8 +12,14 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
-source "$ENV_FILE"
+# Parse .env.local without executing values as shell code (handles special chars in passwords)
+while IFS= read -r line || [[ -n "$line" ]]; do
+  [[ "$line" =~ ^[[:space:]]*# ]] && continue  # skip comments
+  [[ -z "${line// }" ]] && continue             # skip blank lines
+  key="${line%%=*}"
+  value="${line#*=}"
+  export "$key"="$value"
+done < "$ENV_FILE"
 
 check_var() {
   local var_name="$1"
