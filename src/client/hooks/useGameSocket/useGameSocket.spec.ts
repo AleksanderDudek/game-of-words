@@ -89,6 +89,7 @@ describe("useGameSocket", () => {
           state: "lobby",
           players: [],
           round: null,
+          playerLimit: 4,
           config: {
             pointsPerCorrect: 100,
             hintCostPoints: 30,

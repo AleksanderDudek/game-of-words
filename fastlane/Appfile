@@ -1,0 +1,4 @@
+app_identifier("com.signaldecay.app")
+apple_id(ENV["APPLE_ID"])         # set in CI secrets or ~/.env
+itc_team_id(ENV["ITC_TEAM_ID"])   # App Store Connect team ID
+team_id(ENV["APPLE_TEAM_ID"])     # Developer Portal team ID

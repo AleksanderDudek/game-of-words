@@ -1,0 +1,79 @@
+default_platform(:ios)
+
+# ─── Shared ───────────────────────────────────────────────────────────────────
+
+APP_ID       = "com.signaldecay.app"
+SCHEME_IOS   = "App"
+WORKSPACE    = "ios/App/App.xcworkspace"
+
+# ─── iOS ──────────────────────────────────────────────────────────────────────
+
+platform :ios do
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    build_ios
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Release to the App Store"
+  lane :release do
+    build_ios
+    deliver(
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_screenshots: false,
+      skip_metadata: false
+    )
+  end
+
+  private_lane :build_ios do
+    increment_build_number(xcodeproj: "ios/App/App.xcodeproj")
+    gym(
+      workspace: WORKSPACE,
+      scheme: SCHEME_IOS,
+      export_method: "app-store",
+      output_directory: "build/ios",
+      clean: true
+    )
+  end
+
+end
+
+# ─── Android ──────────────────────────────────────────────────────────────────
+
+platform :android do
+
+  desc "Build and push to Play Store internal track"
+  lane :beta do
+    build_android
+    supply(
+      track: "internal",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab"
+    )
+  end
+
+  desc "Promote internal build to production"
+  lane :release do
+    supply(
+      track_promote_to: "production",
+      track: "internal"
+    )
+  end
+
+  private_lane :build_android do
+    gradle(
+      project_dir: "android",
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file"     => ENV["ANDROID_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias"      => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password"   => ENV["ANDROID_KEY_PASSWORD"],
+      }
+    )
+  end
+
+end

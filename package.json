@@ -6,6 +6,8 @@
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "client:dev": "vite",
     "client:build": "tsc -p tsconfig.client.json && vite build",
+    "build:app": "tsc -p tsconfig.client.json && VITE_BUILD_TARGET=app vite build",
+    "cap:sync": "npm run build:app && npx cap sync",
     "client:preview": "vite preview",
     "server:dev": "tsx watch src/server/index.ts",
     "server:start": "tsx src/server/index.ts",
@@ -17,6 +19,12 @@
     "typecheck": "tsc -p tsconfig.client.json --noEmit && tsc -p tsconfig.server.json --noEmit"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.3",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.3.3",
+    "@capacitor/core": "^8.3.3",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.3.3",
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.2.1",
     "react": "^18.3.1",
