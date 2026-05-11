@@ -29,6 +29,11 @@ check_var ANDROID_KEYSTORE_PASSWORD
 check_var ANDROID_KEY_ALIAS
 check_var ANDROID_KEY_PASSWORD
 
+# Resolve relative path against project root
+if [[ "$ANDROID_KEYSTORE_PATH" != /* ]]; then
+  ANDROID_KEYSTORE_PATH="$PROJECT_ROOT/$ANDROID_KEYSTORE_PATH"
+fi
+
 if [[ ! -f "$ANDROID_KEYSTORE_PATH" ]]; then
   echo "ERROR: Keystore not found at $ANDROID_KEYSTORE_PATH"
   echo "       Run: keytool -genkey -v -keystore android/app/signal-decay.jks -alias signal-decay -keyalg RSA -keysize 2048 -validity 10000"
