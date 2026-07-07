@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Signal Decay</string>
-    <string name="title_activity_main">Signal Decay</string>
-    <string name="package_name">com.signaldecay.app</string>
-    <string name="custom_url_scheme">com.signaldecay.app</string>
+    <string name="app_name">Game of Words</string>
+    <string name="title_activity_main">Game of Words</string>
+    <string name="package_name">com.gameofwords.app</string>
+    <string name="custom_url_scheme">com.gameofwords.app</string>
 </resources>

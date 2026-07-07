@@ -2,7 +2,7 @@ default_platform(:ios)
 
 # ─── Shared ───────────────────────────────────────────────────────────────────
 
-APP_ID       = "com.signaldecay.app"
+APP_ID       = "com.gameofwords.app"
 SCHEME_IOS   = "App"
 WORKSPACE    = "ios/App/App.xcworkspace"
 

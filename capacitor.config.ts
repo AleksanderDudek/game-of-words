@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.signaldecay.app",
-  appName: "Signal Decay",
+  appId: "com.gameofwords.app",
+  appName: "Game of Words",
   webDir: "dist/client",
   plugins: {
     SplashScreen: {

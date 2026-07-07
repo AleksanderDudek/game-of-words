@@ -1,4 +1,4 @@
-package com.signaldecay.app;
+package com.gameofwords.app;
 
 import com.getcapacitor.BridgeActivity;
 
