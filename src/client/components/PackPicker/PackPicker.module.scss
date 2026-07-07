@@ -1,0 +1,245 @@
+.picker {
+  position: relative;
+  width: 100%;
+}
+
+// ─── Trigger ───
+
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: rgba(74, 222, 128, 0.5);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--green);
+  }
+}
+
+.trigger-name {
+  color: var(--text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trigger-default {
+  color: var(--text-muted);
+}
+
+.chevron {
+  color: var(--text-muted);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+// ─── Dropdown panel ───
+
+.panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controls {
+  display: flex;
+  gap: 6px;
+}
+
+.search {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 8px 10px;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+}
+
+.sort {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 8px 6px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  text-align: left;
+  padding: 7px 9px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: var(--bg-surface);
+    border-color: var(--border);
+  }
+}
+
+.row-active {
+  background: var(--green-dim);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.row-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.diff {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.diff-1 {
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+.diff-2 {
+  color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.diff-3 {
+  color: var(--orange);
+  background: var(--orange-dim);
+}
+
+.mine {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--blue);
+  background: var(--blue-dim);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.count {
+  font-size: 10px;
+  color: var(--text-muted);
+  min-width: 18px;
+  text-align: right;
+}
+
+.empty {
+  padding: 16px 8px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.manage {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    color: var(--blue);
+    border-color: rgba(96, 165, 250, 0.4);
+  }
+}

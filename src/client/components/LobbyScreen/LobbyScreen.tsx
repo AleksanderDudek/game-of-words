@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import styles from "./LobbyScreen.module.scss";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
+import { PackPicker } from "../PackPicker/PackPicker";
 import type { LobbyScreenProps } from "./LobbyScreen.types";
 
 export function LobbyScreen({
@@ -111,50 +112,13 @@ export function LobbyScreen({
               </span>
             )}
           </div>
-          <div className={styles["pack-selector-row"]}>
-            <select
-              className={styles["pack-select"]}
-              value={
-                session.activePack
-                  ? (builtinPacks.find((b) => b.name === session.activePack!.name)
-                      ? `builtin:${builtinPacks.find((b) => b.name === session.activePack!.name)!.id}`
-                      : `custom:${session.activePack.name}`)
-                  : ""
-              }
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val) {
-                  onSetPack({ type: "clear" });
-                } else if (val.startsWith("builtin:")) {
-                  onSetPack({ type: "builtin", packId: val.slice(8) });
-                }
-                // custom packs are sent via onOpenMyPacks → USE button
-              }}
-            >
-              <option value="">{t("lobby.defaultPack")}</option>
-              {builtinPacks.length > 0 && (
-                <optgroup label={t("lobby.builtinPacks")}>
-                  {builtinPacks.map((p) => (
-                    <option key={p.id} value={`builtin:${p.id}`}>
-                      {p.name} ({p.wordCount} words)
-                    </option>
-                  ))}
-                </optgroup>
-              )}
-              {localPacks.length > 0 && (
-                <optgroup label={t("lobby.myPacks")}>
-                  {localPacks.map((p) => (
-                    <option key={p.id} value={`custom:${p.name}`} disabled>
-                      {p.name} ({p.words.length} {t("common.words")}) {t("lobby.useBelow")}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
-            </select>
-            <button className={styles["manage-packs-btn"]} onClick={onOpenMyPacks}>
-              {t("lobby.managePacksBtn")}
-            </button>
-          </div>
+          <PackPicker
+            builtinPacks={builtinPacks}
+            localPacks={localPacks}
+            activePackName={session.activePack?.name ?? null}
+            onSelect={onSetPack}
+            onManagePacks={onOpenMyPacks}
+          />
         </div>
       )}
 
