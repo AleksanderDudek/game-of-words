@@ -70,4 +70,35 @@ describe("LobbyScreen", () => {
     expect(screen.getByText("45s")).toBeInTheDocument();
     expect(screen.getByText("30 pts")).toBeInTheDocument();
   });
+
+  it("shows the section labels", () => {
+    const hostSession = { ...baseSession, hostId: "p1" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={hostSession} />);
+    expect(screen.getByText(/game settings/i)).toBeInTheDocument();
+    expect(screen.getByText(/word pack/i)).toBeInTheDocument();
+    expect(screen.getByText(/host controls/i)).toBeInTheDocument();
+  });
+
+  it("shows the max players count and allowed range for the host", () => {
+    const hostSession = { ...baseSession, hostId: "p1" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={hostSession} />);
+    expect(screen.getByLabelText(/decrease max players/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/increase max players/i)).toBeInTheDocument();
+    expect(screen.getByText("4")).toBeInTheDocument(); // playerLimit value renders
+    expect(screen.getByText(/allowed: 2.8/i)).toBeInTheDocument(); // range hint (2–8)
+  });
+
+  it("steps the max players count for the host", () => {
+    const onSetMaxPlayers = vi.fn();
+    const hostSession = { ...baseSession, hostId: "p1" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={hostSession} onSetMaxPlayers={onSetMaxPlayers} />);
+    fireEvent.click(screen.getByLabelText(/decrease max players/i));
+    expect(onSetMaxPlayers).toHaveBeenCalledWith(3); // 4 - 1
+  });
+
+  it("hides host controls from non-hosts", () => {
+    render(<LobbyScreen {...lobbyProps} />); // no hostId → viewer is not host
+    expect(screen.queryByText(/host controls/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/decrease max players/i)).not.toBeInTheDocument();
+  });
 });

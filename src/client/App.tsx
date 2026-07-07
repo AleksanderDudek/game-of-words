@@ -165,7 +165,7 @@ export default function App() {
   if (session.state === "lobby") {
     return (
       <div className="app">
-        <div className="screen">
+        <div className="screen screen--lobby">
           <LobbyScreen
             session={session}
             playerId={playerId}

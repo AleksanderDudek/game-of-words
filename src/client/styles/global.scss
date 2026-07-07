@@ -64,6 +64,11 @@ body {
   max-width: 640px;
 }
 
+/* The lobby uses a two-column desktop layout, so it needs more room. */
+.screen--lobby {
+  max-width: 900px;
+}
+
 // ─── Global Buttons ───
 
 .btn {
