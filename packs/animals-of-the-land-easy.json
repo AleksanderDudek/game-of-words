@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Land — Easy",
+  "description": "Familiar terrestrial animals whose common names run six to ten letters long.",
+  "words": [
+    { "word": "GIRAFFE", "hint": "Tallest living land creature, with a very long neck" },
+    { "word": "LEOPARD", "hint": "Big cat with rosette spots, known for hauling prey up trees" },
+    { "word": "RHINOCEROS", "hint": "Thick-skinned grazer with one or two horns on its snout" },
+    { "word": "CHIMPANZEE", "hint": "Great ape sharing much of our DNA that uses tools" },
+    { "word": "ELEPHANT", "hint": "Largest land mammal, with tusks and a trunk" },
+    { "word": "GORILLA", "hint": "Largest of the great apes, chest-beating and ground-dwelling" },
+    { "word": "CHEETAH", "hint": "Fastest land sprinter, marked by tear-line facial stripes" },
+    { "word": "BUFFALO", "hint": "Large horned bovine of African plains or Asian wetlands" },
+    { "word": "HEDGEHOG", "hint": "Small spiny mammal that curls into a ball for defense" },
+    { "word": "ANTELOPE", "hint": "Swift horned grazer of grasslands, such as an impala" },
+    { "word": "KANGAROO", "hint": "Hopping Australian marsupial with a pouch" },
+    { "word": "SQUIRREL", "hint": "Bushy-tailed rodent that hoards nuts in trees" },
+    { "word": "MEERKAT", "hint": "Small burrowing mongoose that stands upright as a sentry" },
+    { "word": "RACCOON", "hint": "Nocturnal masked mammal with a ringed tail and nimble paws" },
+    { "word": "BADGER", "hint": "Stocky burrowing mammal with a black-and-white striped face" }
+  ]
+}

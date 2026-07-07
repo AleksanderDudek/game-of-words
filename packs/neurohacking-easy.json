@@ -1,0 +1,21 @@
+{
+  "name": "Neurohacking — Easy",
+  "description": "Core neurotransmitters, brainwaves, and building-block brain terms for cognitive optimization.",
+  "words": [
+    { "word": "DOPAMINE", "hint": "Reward and motivation neurotransmitter targeted by focus hacks" },
+    { "word": "SEROTONIN", "hint": "Mood-regulating chemical boosted by sunlight and exercise" },
+    { "word": "CORTISOL", "hint": "Stress hormone that high performers try to keep in check" },
+    { "word": "MELATONIN", "hint": "Hormone that governs the sleep-wake cycle" },
+    { "word": "SYNAPSE", "hint": "Junction where one neuron signals the next" },
+    { "word": "NOOTROPIC", "hint": "Supplement or drug taken to sharpen the mind" },
+    { "word": "GLUTAMATE", "hint": "Main excitatory neurotransmitter driving learning signals" },
+    { "word": "OXYTOCIN", "hint": "Bonding hormone released during social connection" },
+    { "word": "CAFFEINE", "hint": "Widely used stimulant that blocks adenosine for alertness" },
+    { "word": "BRAINWAVE", "hint": "Rhythmic electrical pattern measured by an EEG" },
+    { "word": "COGNITION", "hint": "General term for mental processing and thinking" },
+    { "word": "ADRENALINE", "hint": "Fight-or-flight hormone spiking arousal and energy" },
+    { "word": "ENDORPHIN", "hint": "Natural painkiller behind the runner's high" },
+    { "word": "ALPHA WAVE", "hint": "Relaxed, calm-focus brain rhythm around 8 to 12 hertz" },
+    { "word": "THETA WAVE", "hint": "Drowsy, meditative rhythm linked to deep relaxation" }
+  ]
+}

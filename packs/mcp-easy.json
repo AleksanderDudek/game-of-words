@@ -1,0 +1,21 @@
+{
+  "name": "Model Context Protocol (MCP) — Easy",
+  "description": "Core, short MCP terms covering the protocol's basic building blocks and roles.",
+  "words": [
+    { "word": "RESOURCE", "hint": "Server-exposed data item an LLM can read for context" },
+    { "word": "SERVER", "hint": "Program that exposes tools and data to an AI host" },
+    { "word": "CLIENT", "hint": "Component inside a host holding one connection to a provider" },
+    { "word": "SAMPLING", "hint": "Server-initiated request for the host to run an LLM completion" },
+    { "word": "SCHEMA", "hint": "JSON structure defining a function's expected input shape" },
+    { "word": "SESSION", "hint": "A single stateful connection lifecycle between two peers" },
+    { "word": "TRANSPORT", "hint": "Layer carrying messages, such as stdio or streamable HTTP" },
+    { "word": "PROMPTS", "hint": "Reusable templated messages a server offers to users" },
+    { "word": "PROTOCOL", "hint": "The open standard connecting models to external systems" },
+    { "word": "HANDSHAKE", "hint": "Initial exchange where peers agree on version and features" },
+    { "word": "PRIMITIVE", "hint": "A core building block like a tool, resource, or prompt" },
+    { "word": "ENDPOINT", "hint": "Network address a remote server listens on" },
+    { "word": "JSON-RPC", "hint": "Remote procedure call message format used by the protocol" },
+    { "word": "INSPECTOR", "hint": "Official developer tool for testing a server interactively" },
+    { "word": "CAPABILITY", "hint": "A feature a peer declares support for during setup" }
+  ]
+}

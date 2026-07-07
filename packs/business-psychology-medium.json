@@ -1,0 +1,21 @@
+{
+  "name": "Business Psychology — Medium",
+  "description": "Intermediate concepts spanning decision biases, group behavior, and performance in the workplace.",
+  "words": [
+    { "word": "PSYCHOLOGICAL", "hint": "Relating to the mind and mental processes" },
+    { "word": "PRODUCTIVITY", "hint": "A measure of output relative to input" },
+    { "word": "NEGOTIATION", "hint": "Bargaining to reach a mutual agreement" },
+    { "word": "GROUP DYNAMICS", "hint": "How individuals behave and interact within a team" },
+    { "word": "DECISION MAKING", "hint": "The process of choosing among competing options" },
+    { "word": "ANCHORING BIAS", "hint": "Tendency to fixate on an initial reference point" },
+    { "word": "WORK-LIFE BALANCE", "hint": "Healthy division between job demands and personal time" },
+    { "word": "SELF-EFFICACY", "hint": "Belief in one's own capacity to succeed at a task" },
+    { "word": "TEAM COHESION", "hint": "The bonds that keep a group united and committed" },
+    { "word": "FEEDBACK LOOP", "hint": "A cycle where results inform and adjust future actions" },
+    { "word": "ASSERTIVENESS", "hint": "Confidently expressing needs while respecting others" },
+    { "word": "FRAMING EFFECT", "hint": "How the wording of choices sways decisions" },
+    { "word": "SUNK COST BIAS", "hint": "Persisting because of past unrecoverable investment" },
+    { "word": "SOCIAL LOAFING", "hint": "Reducing personal effort when working in a group" },
+    { "word": "RECIPROCITY", "hint": "The urge to return a favor or matching gesture" }
+  ]
+}

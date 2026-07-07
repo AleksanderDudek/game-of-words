@@ -1,0 +1,21 @@
+{
+  "name": "Biohacking — Medium",
+  "description": "Mid-length biohacking concepts spanning fasting, sleep, and metabolism.",
+  "words": [
+    { "word": "INTERMITTENT", "hint": "Describes an eating pattern with cycling on-off windows" },
+    { "word": "RESVERATROL", "hint": "Longevity compound found in red grape skins" },
+    { "word": "MITOCHONDRIA", "hint": "Cellular powerhouses biohackers try to strengthen" },
+    { "word": "RED-LIGHT THERAPY", "hint": "Using specific wavelengths on skin for recovery" },
+    { "word": "COLD EXPOSURE", "hint": "Deliberate chilling of the body to build resilience" },
+    { "word": "SLEEP HYGIENE", "hint": "Habits that promote consistent, restful nights" },
+    { "word": "BLOOD GLUCOSE", "hint": "Sugar level in the bloodstream, often monitored" },
+    { "word": "TIME-RESTRICTED", "hint": "Confining daily meals to a limited number of hours" },
+    { "word": "INTEROCEPTION", "hint": "Sensing internal body signals like hunger or heartbeat" },
+    { "word": "TESTOSTERONE", "hint": "Key male hormone many seek to optimize naturally" },
+    { "word": "NEUROPLASTICITY", "hint": "The brain's ability to rewire and form new pathways" },
+    { "word": "GUT MICROBIOME", "hint": "Community of bacteria in the digestive tract" },
+    { "word": "CIRCADIAN RHYTHM", "hint": "The internal daily clock governing sleep and wake" },
+    { "word": "INFRARED SAUNA", "hint": "Heat cabin using radiant light to warm the body" },
+    { "word": "GREEN TEA EXTRACT", "hint": "Antioxidant supplement rich in catechins" }
+  ]
+}

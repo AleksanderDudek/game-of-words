@@ -1,0 +1,21 @@
+{
+  "name": "Human Anatomy — Easy",
+  "description": "Common bones, organs, and tissues named in six to ten letters.",
+  "words": [
+    { "word": "STERNUM", "hint": "Flat breastbone at the front of the chest" },
+    { "word": "TRACHEA", "hint": "Windpipe carrying air toward the lungs" },
+    { "word": "DIAPHRAGM", "hint": "Dome-shaped muscle used in breathing" },
+    { "word": "METACARPAL", "hint": "One of five long bones in the palm of the hand" },
+    { "word": "SCAPULA", "hint": "Shoulder blade on the upper back" },
+    { "word": "PATELLA", "hint": "Kneecap protecting the joint" },
+    { "word": "HUMERUS", "hint": "Long bone of the upper arm" },
+    { "word": "KIDNEY", "hint": "Bean-shaped organ that filters blood into urine" },
+    { "word": "TENDON", "hint": "Tough band joining muscle to bone" },
+    { "word": "CLAVICLE", "hint": "Collarbone linking the arm to the trunk" },
+    { "word": "VERTEBRA", "hint": "Single bone segment of the spinal column" },
+    { "word": "CARTILAGE", "hint": "Flexible connective tissue at joints and the ears" },
+    { "word": "EARDRUM", "hint": "Membrane that vibrates with incoming sound" },
+    { "word": "BICEPS", "hint": "Front arm muscle that flexes the elbow" },
+    { "word": "CEREBRUM", "hint": "Largest part of the brain, seat of thought" }
+  ]
+}

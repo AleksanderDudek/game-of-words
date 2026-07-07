@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Sea — Hard",
+  "description": "Long, multi-word common names of marine animals, each 16 to 20 letters long.",
+  "words": [
+    { "word": "BOTTLENOSE DOLPHIN", "hint": "Familiar snub-snouted cetacean of aquarium shows" },
+    { "word": "PORTUGUESE MAN OF WAR", "hint": "Floating colonial siphonophore with a gas-filled sail" },
+    { "word": "GIANT PACIFIC OCTOPUS", "hint": "Largest known eight-armed cephalopod of northern seas" },
+    { "word": "SCALLOPED HAMMERHEAD", "hint": "Threatened predator with a notched mallet-shaped head" },
+    { "word": "LEATHERBACK TURTLE", "hint": "Largest living marine reptile, with a ridged carapace" },
+    { "word": "CARIBBEAN LOBSTER", "hint": "Spiny clawless crustacean of warm tropical reefs" },
+    { "word": "NORTHERN ELEPHANT SEAL", "hint": "Huge pinniped bull with an inflatable trunk-like nose" },
+    { "word": "SMALLTOOTH SAWFISH", "hint": "Endangered ray with a long toothed rostrum" },
+    { "word": "ATLANTIC BLUEFIN TUNA", "hint": "Prized torpedo-shaped fish sought for sushi" },
+    { "word": "PEACOCK MANTIS SHRIMP", "hint": "Colorful crustacean with clubbing limbs and complex eyes" },
+    { "word": "JAPANESE SPIDER CRAB", "hint": "Long-legged arthropod with the widest leg span of any" },
+    { "word": "LOGGERHEAD TURTLE", "hint": "Reddish-brown sea reptile with a notably large head" },
+    { "word": "CALIFORNIA SEA LION", "hint": "Barking, whiskered pinniped popular in coastal shows" },
+    { "word": "CARIBBEAN REEF SHARK", "hint": "Grey requiem predator patrolling tropical coral walls" },
+    { "word": "CHAMBERED NAUTILUS", "hint": "Living cephalopod fossil in a spiral compartmented shell" }
+  ]
+}

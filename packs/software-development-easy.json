@@ -1,0 +1,21 @@
+{
+  "name": "Software Development — Easy",
+  "description": "Short, everyday programming terms every developer meets on day one.",
+  "words": [
+    { "word": "COMPILER", "hint": "Tool that translates source code into machine instructions" },
+    { "word": "RECURSION", "hint": "When a routine calls itself to solve a smaller subproblem" },
+    { "word": "FUNCTION", "hint": "Named block of reusable code that can return a value" },
+    { "word": "VARIABLE", "hint": "Named storage location whose value can change" },
+    { "word": "BOOLEAN", "hint": "Data type holding only true or false" },
+    { "word": "DEBUGGER", "hint": "Tool for stepping through code to find defects" },
+    { "word": "RUNTIME", "hint": "The period while a program is executing" },
+    { "word": "POINTER", "hint": "Value that stores a memory address" },
+    { "word": "ITERATOR", "hint": "Object that lets you traverse a collection one item at a time" },
+    { "word": "FRONTEND", "hint": "The client-facing part of an application that users see" },
+    { "word": "BACKEND", "hint": "Server-side logic and data layer behind an app" },
+    { "word": "DATABASE", "hint": "Organized store for persisting structured data" },
+    { "word": "KEYWORD", "hint": "Reserved word with special meaning in a language" },
+    { "word": "SYNTAX", "hint": "The grammar rules that valid code must follow" },
+    { "word": "BRANCH", "hint": "A parallel line of development in version control" }
+  ]
+}

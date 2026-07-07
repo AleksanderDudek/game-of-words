@@ -1,0 +1,21 @@
+{
+  "name": "Software Development — Hard",
+  "description": "Long, multi-word engineering concepts, practices, and architecture terms.",
+  "words": [
+    { "word": "DEPENDENCY INJECTION", "hint": "Supplying an object with its collaborators from outside" },
+    { "word": "CONTINUOUS DELIVERY", "hint": "Keeping code always in a releasable state via automation" },
+    { "word": "GARBAGE COLLECTION", "hint": "Automatic reclaiming of unused memory" },
+    { "word": "OBJECT SERIALIZATION", "hint": "Encoding an instance so it can be saved or sent" },
+    { "word": "BINARY SEARCH TREE", "hint": "Ordered node structure where left keys precede right keys" },
+    { "word": "EXCEPTION HANDLING", "hint": "Catching and responding to runtime errors gracefully" },
+    { "word": "DYNAMIC PROGRAMMING", "hint": "Solving problems by caching overlapping subresults" },
+    { "word": "INTEGRATION TESTING", "hint": "Checking that separate modules work together correctly" },
+    { "word": "ABSTRACT DATA TYPE", "hint": "A model defined by behavior rather than implementation" },
+    { "word": "REGRESSION TESTING", "hint": "Rechecking features to ensure changes broke nothing" },
+    { "word": "INTERFACE SEGREGATION", "hint": "Keeping contracts small so clients depend on little" },
+    { "word": "CONTINUOUS DEPLOYMENT", "hint": "Automatically pushing every passing build to production" },
+    { "word": "INHERITANCE HIERARCHY", "hint": "The tree of parent and child classes in a design" },
+    { "word": "RELATIONAL DATABASE", "hint": "Store organizing data into linked tables of rows" },
+    { "word": "RECURSIVE FUNCTION", "hint": "A routine defined in terms of calls to itself" }
+  ]
+}

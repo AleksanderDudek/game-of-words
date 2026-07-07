@@ -1,0 +1,21 @@
+{
+  "name": "LangChain — Easy",
+  "description": "Short, single-word LangChain building blocks every beginner meets first.",
+  "words": [
+    { "word": "RETRIEVER", "hint": "Component that fetches relevant documents for a query" },
+    { "word": "MEMORY", "hint": "Stores past conversation turns for context" },
+    { "word": "RUNNABLE", "hint": "Core LCEL interface with invoke and stream methods" },
+    { "word": "CALLBACK", "hint": "Hook that fires on events during execution" },
+    { "word": "EMBEDDING", "hint": "Numeric vector representation of a piece of text" },
+    { "word": "TEMPLATE", "hint": "Reusable pattern for building model instructions" },
+    { "word": "STREAMING", "hint": "Emitting output token by token as it is generated" },
+    { "word": "TOOLKIT", "hint": "Bundled group of tools an agent can use" },
+    { "word": "PROMPT", "hint": "The input instruction sent to a language model" },
+    { "word": "LANGSMITH", "hint": "Platform for tracing and debugging LLM apps" },
+    { "word": "LANGGRAPH", "hint": "Library for building stateful, graph-based agents" },
+    { "word": "DOCUMENT", "hint": "Unit of text paired with metadata" },
+    { "word": "SPLITTER", "hint": "Breaks long text into smaller chunks" },
+    { "word": "PARSER", "hint": "Turns raw model output into structured data" },
+    { "word": "LLMCHAIN", "hint": "Classic class pairing a prompt with a model call" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "LangGraph — Medium",
+  "description": "Two-word LangGraph building blocks for graphs, state, and persistence.",
+  "words": [
+    { "word": "CONDITIONAL EDGE", "hint": "A branch whose target is chosen at runtime by a function" },
+    { "word": "STATE SCHEMA", "hint": "Typed structure defining what data the graph carries" },
+    { "word": "COMPILED GRAPH", "hint": "The runnable object produced once building is finalized" },
+    { "word": "PERSISTENCE", "hint": "Durable storage of progress so runs can resume later" },
+    { "word": "MESSAGE STATE", "hint": "Prebuilt schema holding a running chat list" },
+    { "word": "GRAPH BUILDER", "hint": "The class you add nodes and edges to before compiling" },
+    { "word": "TOOL CALLING", "hint": "When a model invokes external functions" },
+    { "word": "STATE REDUCER", "hint": "Function merging updates into a tracked field" },
+    { "word": "MEMORY SAVER", "hint": "In-process checkpointer storing snapshots in RAM" },
+    { "word": "CHECKPOINTER", "hint": "Backend that reads and writes saved graph snapshots" },
+    { "word": "NODE FUNCTION", "hint": "The callable that runs at one step and returns updates" },
+    { "word": "HUMAN FEEDBACK", "hint": "A person's input injected to steer an agent" },
+    { "word": "DYNAMIC EDGE", "hint": "A connection whose destination is computed at runtime" },
+    { "word": "SUBGRAPH NODE", "hint": "A nested flow embedded as a single step" },
+    { "word": "STATE CHANNEL", "hint": "A named slot in shared data whose writes a reducer combines" }
+  ]
+}

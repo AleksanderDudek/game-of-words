@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Land — Hard",
+  "description": "Long full common names of land animals, each sixteen to twenty letters.",
+  "words": [
+    { "word": "GALAPAGOS TORTOISE", "hint": "Giant long-lived reptile from a Pacific island chain" },
+    { "word": "SUMATRAN RHINOCEROS", "hint": "Smallest and hairiest horned pachyderm, from Indonesia" },
+    { "word": "INDIAN RHINOCEROS", "hint": "One-horned armored grazer of South Asian floodplains" },
+    { "word": "SUMATRAN ORANGUTAN", "hint": "Critically endangered red ape of an Indonesian island" },
+    { "word": "BORNEAN ORANGUTAN", "hint": "Red-haired great ape of the world's third-largest island" },
+    { "word": "RETICULATED PYTHON", "hint": "World's longest snake, with a net-like skin pattern" },
+    { "word": "SPOTTED SALAMANDER", "hint": "Yellow-dotted black amphibian of North American forests" },
+    { "word": "GOLIATH BIRDEATER", "hint": "World's heaviest spider, a giant South American tarantula" },
+    { "word": "GOLDEN LION TAMARIN", "hint": "Small bright orange primate of Brazilian coastal forest" },
+    { "word": "AFRICAN BUSH ELEPHANT", "hint": "Biggest of all savanna-dwelling tusked giants" },
+    { "word": "GALAPAGOS LAND IGUANA", "hint": "Yellowish reptile that basks on volcanic Pacific isles" },
+    { "word": "SIBERIAN CHIPMUNK", "hint": "Striped burrowing rodent native to northern Asia" },
+    { "word": "CROSS RIVER GORILLA", "hint": "Rarest ape subspecies, from a Nigeria-Cameroon border area" },
+    { "word": "WESTERN CHIMPANZEE", "hint": "Endangered tool-using ape subspecies of West Africa" },
+    { "word": "AMERICAN BULLFROG", "hint": "Large deep-croaking amphibian native to North America" }
+  ]
+}

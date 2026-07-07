@@ -1,0 +1,21 @@
+{
+  "name": "Retrieval-Augmented Generation (RAG) — Medium",
+  "description": "Common RAG concepts and phrases, each totaling 11-15 letters.",
+  "words": [
+    { "word": "VECTOR SEARCH", "hint": "Finding nearest embeddings in latent space" },
+    { "word": "VECTOR STORE", "hint": "Database specialized for holding embeddings" },
+    { "word": "HYBRID SEARCH", "hint": "Combining keyword and dense-embedding retrieval" },
+    { "word": "KNOWLEDGE BASE", "hint": "Curated collection the system draws facts from" },
+    { "word": "CHUNK OVERLAP", "hint": "Shared tokens between adjacent text segments" },
+    { "word": "QUERY EXPANSION", "hint": "Adding related terms to broaden a search request" },
+    { "word": "HALLUCINATION", "hint": "Fabricated output not supported by sources" },
+    { "word": "TOP-K RETRIEVAL", "hint": "Fetching the k highest-scoring candidates" },
+    { "word": "DENSE RETRIEVAL", "hint": "Embedding-based matching rather than exact keywords" },
+    { "word": "SPARSE VECTORS", "hint": "High-dimensional term-weight representations like BM25" },
+    { "word": "CONTEXT WINDOW", "hint": "Maximum tokens a model can attend to at once" },
+    { "word": "SEMANTIC SEARCH", "hint": "Meaning-based matching beyond literal keywords" },
+    { "word": "COSINE DISTANCE", "hint": "One minus the angle-based closeness measure" },
+    { "word": "EMBEDDING MODEL", "hint": "Encoder that turns text into dense vectors" },
+    { "word": "VECTOR DATABASE", "hint": "Store optimized for similarity queries over embeddings" }
+  ]
+}

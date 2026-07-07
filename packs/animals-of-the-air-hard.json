@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Air — Hard",
+  "description": "Longer full common names of flying creatures, sixteen to twenty letters each.",
+  "words": [
+    { "word": "AMERICAN GOLDFINCH", "hint": "Bright yellow finch of North America with black wings" },
+    { "word": "PILEATED WOODPECKER", "hint": "Large crow-sized bird with a flaming red crest" },
+    { "word": "WANDERING ALBATROSS", "hint": "Ocean seabird boasting the longest wingspan of any bird" },
+    { "word": "CALIFORNIA CONDOR", "hint": "Critically endangered New World vulture of the west coast" },
+    { "word": "MONARCH BUTTERFLY", "hint": "Orange-and-black insect famous for migrating to Mexico" },
+    { "word": "LAUGHING KOOKABURRA", "hint": "Australian bird known for its cackling, laugh-like call" },
+    { "word": "COMMON KINGFISHER", "hint": "Small blue-and-orange bird that dives for river fish" },
+    { "word": "GREATER ROADRUNNER", "hint": "Fast desert cuckoo that runs more than it flies" },
+    { "word": "EMPEROR DRAGONFLY", "hint": "Large blue-green hawking insect patrolling ponds" },
+    { "word": "NORTHERN CARDINAL", "hint": "Crested bright red songbird of eastern woodlands" },
+    { "word": "CAROLINA CHICKADEE", "hint": "Small gray songbird with a black cap and bib" },
+    { "word": "RUFOUS HUMMINGBIRD", "hint": "Reddish-brown nectar sipper of the Pacific coast" },
+    { "word": "EUROPEAN STARLING", "hint": "Glossy speckled bird introduced across North America" },
+    { "word": "BLACKBURNIAN WARBLER", "hint": "Tiny songbird sporting a fiery orange throat" },
+    { "word": "YELLOW-RUMPED WARBLER", "hint": "Migratory songbird nicknamed butter-butt" }
+  ]
+}

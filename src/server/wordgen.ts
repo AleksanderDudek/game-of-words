@@ -2,6 +2,8 @@
 // Word Generator — LLM-powered with fallback word bank
 // ═══════════════════════════════════════════════════════════════
 
+import fs from "fs";
+import path from "path";
 import { CONFIG } from "./config";
 
 export interface GeneratedWord {
@@ -238,11 +240,82 @@ export async function generateWord(targetLength: number): Promise<GeneratedWord>
 
 // ─── Built-in Pack Registry ───
 
+interface LoadedPack {
+  name: string;
+  description: string;
+  words: GeneratedWord[];
+}
+
+/**
+ * Load topical word packs from the repo-level `packs/` directory at startup.
+ * Each `packs/<id>.json` becomes a built-in pack with id `<id>`; ids must match
+ * the /^[a-z0-9-]+$/ pattern enforced when a host selects a built-in pack.
+ * Invalid files are skipped with a warning rather than crashing the server.
+ */
+function loadPackFiles(): Record<string, LoadedPack> {
+  const loaded: Record<string, LoadedPack> = {};
+  // dev (tsx from repo root) & Docker (/app/packs) both resolve via cwd first;
+  // the __dirname fallbacks cover compiled (dist/server/server) and other layouts.
+  const candidates = [
+    path.join(process.cwd(), "packs"),
+    path.join(__dirname, "..", "..", "packs"),
+    path.join(__dirname, "..", "..", "..", "packs"),
+  ];
+  const dir = candidates.find((c) => fs.existsSync(c));
+  if (!dir) {
+    console.warn("[WordGen] No packs/ directory found; only the 'general' pack is available");
+    return loaded;
+  }
+
+  for (const file of fs.readdirSync(dir).sort()) {
+    if (!file.endsWith(".json")) continue;
+    const id = file.slice(0, -".json".length);
+    if (!/^[a-z0-9-]+$/.test(id)) {
+      console.warn(`[WordGen] Skipping pack "${file}": id must match /^[a-z0-9-]+$/`);
+      continue;
+    }
+    try {
+      const raw = JSON.parse(fs.readFileSync(path.join(dir, file), "utf-8")) as {
+        name?: unknown;
+        description?: unknown;
+        words?: unknown;
+      };
+      if (typeof raw.name !== "string" || !Array.isArray(raw.words)) {
+        console.warn(`[WordGen] Skipping pack "${file}": missing "name" or "words" array`);
+        continue;
+      }
+      const words: GeneratedWord[] = [];
+      for (const entry of raw.words) {
+        if (!entry || typeof entry.word !== "string" || typeof entry.hint !== "string") continue;
+        words.push({ word: entry.word.toLowerCase(), hint: entry.hint });
+      }
+      if (words.length === 0) {
+        console.warn(`[WordGen] Skipping pack "${file}": no valid words`);
+        continue;
+      }
+      loaded[id] = {
+        name: raw.name,
+        description: typeof raw.description === "string" ? raw.description : "",
+        words,
+      };
+    } catch (err) {
+      console.warn(`[WordGen] Failed to load pack "${file}": ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  console.log(`[WordGen] Loaded ${Object.keys(loaded).length} topical pack(s) from ${dir}`);
+  return loaded;
+}
+
+const FILE_PACKS = loadPackFiles();
+
 export const BUILTIN_PACKS: Record<string, { name: string; description: string }> = {
   general: {
     name: "General Vocabulary",
     description: "A broad mix of English words across all difficulty levels",
   },
+  ...Object.fromEntries(
+    Object.entries(FILE_PACKS).map(([id, p]) => [id, { name: p.name, description: p.description }]),
+  ),
 };
 
 export function getBuiltinPackWords(packId: string): GeneratedWord[] | null {
@@ -252,5 +325,7 @@ export function getBuiltinPackWords(packId: string): GeneratedWord[] | null {
       hint: e.hint,
     }));
   }
+  const filePack = FILE_PACKS[packId];
+  if (filePack) return filePack.words;
   return null;
 }

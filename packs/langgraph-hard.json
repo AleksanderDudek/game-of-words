@@ -1,0 +1,21 @@
+{
+  "name": "LangGraph — Hard",
+  "description": "Longer multi-word LangGraph patterns for agents, routing, and persistence.",
+  "words": [
+    { "word": "HUMAN IN THE LOOP NODE", "hint": "A pause step letting a person review before proceeding" },
+    { "word": "CONDITIONAL EDGES", "hint": "Branches whose targets a function selects at runtime" },
+    { "word": "STATE PERSISTENCE", "hint": "Durably saving tracked data so a run can resume" },
+    { "word": "MEMORY CHECKPOINT", "hint": "A stored snapshot preserving recall across a thread" },
+    { "word": "CONDITIONAL ROUTING", "hint": "Directing flow down different paths based on current data" },
+    { "word": "STATE GRAPH BUILDER", "hint": "The main class for assembling nodes and edges with typed data" },
+    { "word": "COMPILED STATE GRAPH", "hint": "The finalized runnable ready to invoke or stream" },
+    { "word": "TOOL CALLING AGENT", "hint": "A loop where the model repeatedly invokes functions" },
+    { "word": "REACT AGENT PATTERN", "hint": "Reason-then-act prebuilt loop for function-using models" },
+    { "word": "DYNAMIC INTERRUPT", "hint": "A runtime-raised pause triggered from inside a node" },
+    { "word": "THREAD PERSISTENCE", "hint": "Saving each conversation's history under its own id" },
+    { "word": "CONDITIONAL BRANCHING", "hint": "Splitting execution into paths chosen by a predicate" },
+    { "word": "SUPERVISOR PATTERN", "hint": "Architecture where one orchestrator delegates to workers" },
+    { "word": "GRAPH STATE SCHEMA", "hint": "The typed structure defining what data flows through" },
+    { "word": "MEMORY PERSISTENCE", "hint": "Durably retaining recall so context survives restarts" }
+  ]
+}

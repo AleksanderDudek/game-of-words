@@ -1,0 +1,21 @@
+{
+  "name": "LangGraph — Easy",
+  "description": "Core single-word LangGraph concepts every builder meets first.",
+  "words": [
+    { "word": "CHECKPOINT", "hint": "Saved snapshot of graph state that lets a run resume" },
+    { "word": "REDUCER", "hint": "Function that merges new values into a tracked field" },
+    { "word": "THREAD", "hint": "Identifier grouping one conversation's saved history" },
+    { "word": "MEMORY", "hint": "Retained context that persists across turns" },
+    { "word": "SUBGRAPH", "hint": "A self-contained flow embedded as one step in a larger flow" },
+    { "word": "SUPERVISOR", "hint": "Orchestrator node that routes work to worker agents" },
+    { "word": "INTERRUPT", "hint": "Pause that hands control to a person before continuing" },
+    { "word": "STREAMING", "hint": "Emitting tokens or updates incrementally as they arrive" },
+    { "word": "SCHEMA", "hint": "Typed definition of the fields a graph tracks" },
+    { "word": "LANGCHAIN", "hint": "The parent framework this library extends" },
+    { "word": "COMMAND", "hint": "Object a node returns to update data and pick the next hop" },
+    { "word": "RUNNABLE", "hint": "The invokable unit interface shared across the ecosystem" },
+    { "word": "WORKFLOW", "hint": "An orchestrated sequence of steps toward a goal" },
+    { "word": "MESSAGES", "hint": "The chat history list commonly held in state" },
+    { "word": "ROUTING", "hint": "Deciding which branch to follow next" }
+  ]
+}

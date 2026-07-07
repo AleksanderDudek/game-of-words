@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Air — Easy",
+  "description": "Short-named flying birds and insects with six to ten letters each.",
+  "words": [
+    { "word": "SPARROW", "hint": "Small brown chirping bird common in towns" },
+    { "word": "PELICAN", "hint": "Water bird with a large throat pouch for scooping fish" },
+    { "word": "FLAMINGO", "hint": "Pink wader that often stands on one leg" },
+    { "word": "KINGFISHER", "hint": "Bright bird that dives headfirst for fish" },
+    { "word": "SWALLOW", "hint": "Fork-tailed bird that catches insects in graceful flight" },
+    { "word": "STARLING", "hint": "Glossy flocking bird famous for swirling murmurations" },
+    { "word": "CARDINAL", "hint": "Bright red songbird with a pointed crest" },
+    { "word": "VULTURE", "hint": "Bald-headed scavenger that circles above carrion" },
+    { "word": "OSPREY", "hint": "Fish-eating raptor also called the sea hawk" },
+    { "word": "MAGPIE", "hint": "Black-and-white corvid known for hoarding shiny objects" },
+    { "word": "DRAGONFLY", "hint": "Fast four-winged insect darting near ponds" },
+    { "word": "BUTTERFLY", "hint": "Colorful insect that begins life as a caterpillar" },
+    { "word": "WOODPECKER", "hint": "Bird that drums and chisels holes in tree trunks" },
+    { "word": "MOSQUITO", "hint": "Blood-sucking insect that whines near your ear" },
+    { "word": "BUMBLEBEE", "hint": "Fuzzy buzzing pollinator larger than a honeybee" }
+  ]
+}

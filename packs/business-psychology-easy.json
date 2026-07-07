@@ -1,0 +1,21 @@
+{
+  "name": "Business Psychology — Easy",
+  "description": "Foundational workplace-psychology terms covering motivation, teams, and everyday organizational behavior.",
+  "words": [
+    { "word": "BURNOUT", "hint": "Chronic workplace exhaustion from prolonged stress" },
+    { "word": "MOTIVATION", "hint": "The internal drive that pushes people to act" },
+    { "word": "LEADERSHIP", "hint": "The art of guiding and influencing a group" },
+    { "word": "FEEDBACK", "hint": "Information given to improve someone's performance" },
+    { "word": "TEAMWORK", "hint": "Collaborative effort of a group toward a shared goal" },
+    { "word": "INCENTIVE", "hint": "A reward designed to encourage effort" },
+    { "word": "GROUPTHINK", "hint": "Faulty consensus when harmony overrides critical judgment" },
+    { "word": "MENTORING", "hint": "Guiding a less experienced colleague's growth" },
+    { "word": "RAPPORT", "hint": "A relationship of mutual trust and understanding" },
+    { "word": "MINDSET", "hint": "A fixed or growth belief about one's abilities" },
+    { "word": "WELLBEING", "hint": "An employee's overall health and happiness at work" },
+    { "word": "DELEGATE", "hint": "To assign a task or authority to someone else" },
+    { "word": "ANCHORING", "hint": "Over-relying on the first number or fact you hear" },
+    { "word": "AUTONOMY", "hint": "The freedom to control one's own work" },
+    { "word": "EMPATHY", "hint": "The ability to sense what others feel" }
+  ]
+}

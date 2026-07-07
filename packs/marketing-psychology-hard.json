@@ -1,0 +1,21 @@
+{
+  "name": "Marketing Psychology — Hard",
+  "description": "Longer, compound terms for the principles and biases behind consumer choice.",
+  "words": [
+    { "word": "SCARCITY MARKETING", "hint": "Selling via limited-time or limited-stock urgency" },
+    { "word": "COGNITIVE FLUENCY", "hint": "Ease of processing making a message feel more true" },
+    { "word": "LOSS AVERSION BIAS", "hint": "Tendency to fear giving up more than gaining" },
+    { "word": "CONFIRMATION BIAS", "hint": "Favoring information that supports existing beliefs" },
+    { "word": "SOCIAL PROOF EFFECT", "hint": "Buying because reviews show others already did" },
+    { "word": "BRAND POSITIONING", "hint": "Defining how a label sits versus rivals in minds" },
+    { "word": "RECIPROCITY PRINCIPLE", "hint": "Cialdini rule: a gift creates an urge to give back" },
+    { "word": "AUTHORITY PRINCIPLE", "hint": "Cialdini rule: we defer to credible experts" },
+    { "word": "IMPULSE PURCHASING", "hint": "Unplanned buying triggered on the spot" },
+    { "word": "MARKET SEGMENTATION", "hint": "Splitting buyers into targetable clusters" },
+    { "word": "EMOTIONAL BRANDING", "hint": "Forging feelings-based bonds with a product" },
+    { "word": "CONSUMER BEHAVIOR", "hint": "Study of how people decide what to buy" },
+    { "word": "BRAND STORYTELLING", "hint": "Narrative craft that gives a label meaning" },
+    { "word": "PSYCHOLOGICAL PRICING", "hint": "Tactics like ending in nine to feel cheaper" },
+    { "word": "ANCHORING HEURISTIC", "hint": "Relying on an initial figure when estimating" }
+  ]
+}

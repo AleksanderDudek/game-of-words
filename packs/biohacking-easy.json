@@ -1,0 +1,21 @@
+{
+  "name": "Biohacking — Easy",
+  "description": "Core biohacking and self-optimization terms in short, approachable words.",
+  "words": [
+    { "word": "KETOSIS", "hint": "Metabolic state of burning fat for fuel" },
+    { "word": "FASTING", "hint": "Abstaining from food for a set window" },
+    { "word": "NOOTROPIC", "hint": "Substance taken to boost mental performance" },
+    { "word": "AUTOPHAGY", "hint": "Cellular self-cleanup process triggered by fasting" },
+    { "word": "MELATONIN", "hint": "Hormone that signals the body it is time to sleep" },
+    { "word": "CORTISOL", "hint": "Primary stress hormone tracked by biohackers" },
+    { "word": "CREATINE", "hint": "Popular supplement for strength and brain energy" },
+    { "word": "GROUNDING", "hint": "Barefoot contact with the earth for wellbeing" },
+    { "word": "BREATHWORK", "hint": "Controlled breathing practice for calm and focus" },
+    { "word": "DOPAMINE", "hint": "Reward and motivation neurotransmitter" },
+    { "word": "CAFFEINE", "hint": "Stimulant in coffee used to sharpen alertness" },
+    { "word": "WEARABLE", "hint": "Body-worn device that tracks health metrics" },
+    { "word": "LONGEVITY", "hint": "The pursuit of a longer, healthier lifespan" },
+    { "word": "ADAPTOGEN", "hint": "Herb said to help the body resist stress" },
+    { "word": "COLD PLUNGE", "hint": "Immersing in icy water for recovery benefits" }
+  ]
+}

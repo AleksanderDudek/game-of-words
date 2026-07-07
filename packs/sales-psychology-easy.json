@@ -1,0 +1,21 @@
+{
+  "name": "Sales Psychology — Easy",
+  "description": "Short, everyday persuasion and selling terms of 6-10 letters.",
+  "words": [
+    { "word": "RAPPORT", "hint": "Harmonious connection built with a prospect to ease trust" },
+    { "word": "CLOSING", "hint": "Final stage where the deal gets sealed" },
+    { "word": "SCARCITY", "hint": "Limited-supply tactic that boosts perceived value" },
+    { "word": "URGENCY", "hint": "Time-pressure lever prompting a quick decision" },
+    { "word": "ANCHORING", "hint": "Setting a reference number that shapes later judgments" },
+    { "word": "INFLUENCE", "hint": "Cialdini's word for the power to sway choices" },
+    { "word": "OBJECTION", "hint": "A buyer's stated reason for hesitating" },
+    { "word": "UPSELLING", "hint": "Nudging a customer toward a pricier option" },
+    { "word": "PROSPECT", "hint": "A potential buyer worth pursuing" },
+    { "word": "MIRRORING", "hint": "Subtly matching a person's posture or speech to bond" },
+    { "word": "LIKING", "hint": "Cialdini principle - we say yes to people we favor" },
+    { "word": "AUTHORITY", "hint": "Persuasion via expertise or credentials" },
+    { "word": "INCENTIVE", "hint": "A reward offered to motivate a purchase" },
+    { "word": "REBUTTAL", "hint": "A seller's counter to a raised concern" },
+    { "word": "CONTRAST", "hint": "Judging an offer relative to a nearby comparison" }
+  ]
+}

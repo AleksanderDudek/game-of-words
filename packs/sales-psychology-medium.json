@@ -1,0 +1,21 @@
+{
+  "name": "Sales Psychology — Medium",
+  "description": "Mid-length persuasion and selling concepts of 11-15 letters.",
+  "words": [
+    { "word": "RECIPROCITY", "hint": "Cialdini principle - giving first to get something back" },
+    { "word": "SOCIAL PROOF", "hint": "Following the crowd because others already bought" },
+    { "word": "LOSS AVERSION", "hint": "Preferring to avoid a setback over an equal gain" },
+    { "word": "CROSS-SELLING", "hint": "Offering complementary products alongside the main buy" },
+    { "word": "BUYER PERSONA", "hint": "A semi-fictional profile of an ideal customer" },
+    { "word": "SALES FUNNEL", "hint": "The staged path from lead to purchase" },
+    { "word": "COLD CALLING", "hint": "Contacting strangers who never expressed interest" },
+    { "word": "QUALIFICATION", "hint": "Vetting whether a lead is worth pursuing" },
+    { "word": "NEGOTIATION", "hint": "Back-and-forth bargaining toward agreed terms" },
+    { "word": "PROSPECTING", "hint": "Actively hunting for new potential customers" },
+    { "word": "BANDWAGON EFFECT", "hint": "Wanting something because its popularity is rising" },
+    { "word": "DECOY EFFECT", "hint": "A third pricey option that makes another look better" },
+    { "word": "PRICE ANCHORING", "hint": "Showing a high figure first to frame the real cost" },
+    { "word": "ELEVATOR PITCH", "hint": "A brief compelling summary delivered in seconds" },
+    { "word": "BUYING SIGNALS", "hint": "Verbal or body cues showing readiness to purchase" }
+  ]
+}

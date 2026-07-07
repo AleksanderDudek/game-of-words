@@ -1,0 +1,21 @@
+{
+  "name": "Model Context Protocol (MCP) — Medium",
+  "description": "Mid-length MCP concepts spanning negotiation, messaging, and server-offered features.",
+  "words": [
+    { "word": "CAPABILITIES", "hint": "Feature sets peers advertise to each other at startup" },
+    { "word": "ELICITATION", "hint": "Server asking the user for extra input mid-task" },
+    { "word": "NOTIFICATION", "hint": "One-way message that needs no reply" },
+    { "word": "INTEGRATION", "hint": "Connecting an AI application to outside systems and data" },
+    { "word": "NEGOTIATION", "hint": "Process of agreeing on shared features when initializing" },
+    { "word": "TOOL CALLING", "hint": "Model invoking a server-provided function" },
+    { "word": "INPUT SCHEMA", "hint": "JSON definition of a function's accepted parameters" },
+    { "word": "STDIO TRANSPORT", "hint": "Local channel using standard input and output streams" },
+    { "word": "PROMPT TEMPLATE", "hint": "Reusable parameterized message a server exposes" },
+    { "word": "ROOT DIRECTORY", "hint": "A filesystem boundary a client grants a server access to" },
+    { "word": "SUBSCRIPTION", "hint": "Registering to receive updates when a resource changes" },
+    { "word": "PROGRESS TOKEN", "hint": "Identifier used to report status of a long operation" },
+    { "word": "HOST APPLICATION", "hint": "The AI program, like Claude Desktop, that runs clients" },
+    { "word": "LANGUAGE MODEL", "hint": "The underlying AI that generates completions" },
+    { "word": "RESOURCE URI", "hint": "Unique address identifying a piece of exposed data" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Marketing Psychology — Medium",
+  "description": "Named biases, effects, and strategies that drive buying decisions.",
+  "words": [
+    { "word": "POSITIONING", "hint": "Carving a distinct place in the customer's mind" },
+    { "word": "RECIPROCITY", "hint": "Feeling obliged to return a favor or free gift" },
+    { "word": "SOCIAL PROOF", "hint": "Copying others' actions as evidence of correct behavior" },
+    { "word": "DECOY EFFECT", "hint": "A third inferior option steering choice between two" },
+    { "word": "STORYTELLING", "hint": "Using narrative to make a message stick" },
+    { "word": "SEGMENTATION", "hint": "Dividing a market into distinct buyer groups" },
+    { "word": "BRAND LOYALTY", "hint": "A customer's committed preference for one maker" },
+    { "word": "LOSS AVERSION", "hint": "Pain of losing outweighs pleasure of an equal gain" },
+    { "word": "COLOR PSYCHOLOGY", "hint": "How hues like red or blue shape mood and buying" },
+    { "word": "ENDOWMENT EFFECT", "hint": "Valuing something more just because you own it" },
+    { "word": "FRAMING EFFECT", "hint": "A choice shifting with how the options are worded" },
+    { "word": "SUNK COST FALLACY", "hint": "Sticking with a choice due to past investment" },
+    { "word": "HERD MENTALITY", "hint": "Following the crowd rather than thinking alone" },
+    { "word": "GAMIFICATION", "hint": "Adding points and badges to drive engagement" },
+    { "word": "NEUROMARKETING", "hint": "Using brain science to study consumer response" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Software Development — Medium",
+  "description": "Mid-length concepts spanning paradigms, structures, and testing.",
+  "words": [
+    { "word": "POLYMORPHISM", "hint": "One interface acting on many underlying types" },
+    { "word": "INHERITANCE", "hint": "A class deriving traits from a parent class" },
+    { "word": "ENCAPSULATION", "hint": "Bundling data with the methods that guard it" },
+    { "word": "ABSTRACTION", "hint": "Hiding detail behind a simpler model or interface" },
+    { "word": "REFACTORING", "hint": "Improving code structure without changing behavior" },
+    { "word": "ARCHITECTURE", "hint": "High-level structural design of a system" },
+    { "word": "COMPILATION", "hint": "The act of turning source into an executable" },
+    { "word": "CONCURRENCY", "hint": "Managing multiple tasks making progress at once" },
+    { "word": "BINARY SEARCH", "hint": "Halving a sorted range to locate a target quickly" },
+    { "word": "SERIALIZATION", "hint": "Converting an object into a storable byte stream" },
+    { "word": "VIRTUALIZATION", "hint": "Running isolated guest environments on shared hardware" },
+    { "word": "INTERPRETER", "hint": "Program that executes code line by line without prior compiling" },
+    { "word": "MULTITHREADING", "hint": "Running several threads within one process" },
+    { "word": "UNIT TESTING", "hint": "Verifying individual components in isolation" },
+    { "word": "DESIGN PATTERN", "hint": "A reusable solution template for a common problem" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Neurohacking — Medium",
+  "description": "Intermediate concepts spanning brain training, neurochemistry, and self-directed neural change.",
+  "words": [
+    { "word": "NEUROPLASTIC", "hint": "Describing a brain able to rewire and adapt itself" },
+    { "word": "MINDFULNESS", "hint": "Present-moment awareness practice used to train attention" },
+    { "word": "NEUROGENESIS", "hint": "Birth of new brain cells, notably in the hippocampus" },
+    { "word": "NEUROFEEDBACK", "hint": "Training method showing real-time brain activity to the user" },
+    { "word": "BINAURAL BEATS", "hint": "Two slightly different tones aimed at nudging brain rhythms" },
+    { "word": "COGNITIVE LOAD", "hint": "Amount of mental effort demanded by a task" },
+    { "word": "MYELINATION", "hint": "Insulating of nerve fibers that speeds neural signaling" },
+    { "word": "HIPPOCAMPUS", "hint": "Seahorse-shaped structure central to forming memories" },
+    { "word": "NEUROCHEMISTRY", "hint": "Study of the chemicals that drive brain signaling" },
+    { "word": "CONCENTRATION", "hint": "Sustained mental effort directed at a single thing" },
+    { "word": "BRAIN TRAINING", "hint": "Structured exercises meant to improve mental skills" },
+    { "word": "NEUROMODULATION", "hint": "Adjusting nerve activity via chemical or electrical means" },
+    { "word": "WORKING MEMORY", "hint": "Short-term store that holds and manipulates information" },
+    { "word": "NEUROPLASTICITY", "hint": "The brain's lifelong capacity to reorganize its wiring" },
+    { "word": "SLEEP HYGIENE", "hint": "Habits and routines that support restorative rest" }
+  ]
+}

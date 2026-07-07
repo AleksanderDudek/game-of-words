@@ -1,0 +1,21 @@
+{
+  "name": "Human Anatomy — Hard",
+  "description": "Tongue-twisting muscles, nerves, ligaments, and structures of sixteen to twenty letters.",
+  "words": [
+    { "word": "STERNOCLEIDOMASTOID", "hint": "Long neck muscle that turns and tilts the head" },
+    { "word": "TEMPOROMANDIBULAR", "hint": "Adjective for the hinge joint of the jaw" },
+    { "word": "ANTERIOR CRUCIATE", "hint": "Knee ligament often torn in sports, abbreviated ACL" },
+    { "word": "CARDIOVASCULAR SYSTEM", "hint": "Network formed by the heart and blood vessels" },
+    { "word": "MEDULLA OBLONGATA", "hint": "Lower brainstem controlling heartbeat and breathing" },
+    { "word": "FLEXOR CARPI RADIALIS", "hint": "Forearm muscle that bends the wrist toward the thumb" },
+    { "word": "EXTENSOR DIGITORUM", "hint": "Forearm muscle that straightens the fingers" },
+    { "word": "POSTERIOR CRUCIATE", "hint": "Knee ligament behind its front counterpart, abbreviated PCL" },
+    { "word": "CORACOBRACHIALIS", "hint": "Upper arm muscle that helps flex the shoulder" },
+    { "word": "INTERVENTRICULAR", "hint": "Adjective for the wall dividing the heart chambers" },
+    { "word": "GLOSSOPHARYNGEAL", "hint": "Ninth cranial nerve serving the tongue and throat" },
+    { "word": "INFERIOR VENA CAVA", "hint": "Large vein returning blood from the lower body" },
+    { "word": "TIBIALIS ANTERIOR", "hint": "Shin muscle that lifts the foot upward" },
+    { "word": "INTERCOSTAL MUSCLES", "hint": "Bands between the ribs that assist breathing" },
+    { "word": "VESTIBULOCOCHLEAR", "hint": "Eighth cranial nerve for hearing and balance" }
+  ]
+}

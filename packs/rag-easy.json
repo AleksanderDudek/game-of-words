@@ -1,0 +1,21 @@
+{
+  "name": "Retrieval-Augmented Generation (RAG) — Easy",
+  "description": "Core building-block terms of RAG systems, each a single 6-10 letter word.",
+  "words": [
+    { "word": "CHUNKING", "hint": "Splitting documents into smaller pieces before indexing" },
+    { "word": "EMBEDDING", "hint": "Numeric vector representation of text meaning" },
+    { "word": "RETRIEVER", "hint": "Component that fetches relevant documents for a query" },
+    { "word": "RERANKER", "hint": "Model that reorders candidate passages by relevance" },
+    { "word": "GROUNDING", "hint": "Basing model answers on retrieved source evidence" },
+    { "word": "INDEXING", "hint": "Building a searchable structure over your data" },
+    { "word": "VECTORS", "hint": "Arrays of numbers representing text in latent space" },
+    { "word": "CONTEXT", "hint": "Retrieved text supplied to the model with the prompt" },
+    { "word": "COSINE", "hint": "Angle-based measure used for closeness between vectors" },
+    { "word": "CORPUS", "hint": "The full collection of source documents" },
+    { "word": "RECALL", "hint": "Fraction of relevant items successfully found" },
+    { "word": "PIPELINE", "hint": "The end-to-end retrieve-then-generate workflow" },
+    { "word": "DOCUMENT", "hint": "A single source file or record in the knowledge store" },
+    { "word": "PASSAGE", "hint": "A short retrieved text span used as evidence" },
+    { "word": "RELEVANCE", "hint": "How well a retrieved result matches the query" }
+  ]
+}

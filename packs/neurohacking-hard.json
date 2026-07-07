@@ -1,0 +1,21 @@
+{
+  "name": "Neurohacking — Hard",
+  "description": "Advanced multi-word terms for neural systems, cognitive enhancement, and brain optimization.",
+  "words": [
+    { "word": "NEUROTRANSMITTER", "hint": "Chemical messenger carrying signals across a synapse" },
+    { "word": "PREFRONTAL CORTEX", "hint": "Front brain region behind planning and self-control" },
+    { "word": "COGNITIVE FLEXIBILITY", "hint": "Mental agility to switch between tasks or ideas" },
+    { "word": "COGNITIVE ENHANCEMENT", "hint": "Deliberate boosting of mental performance and capacity" },
+    { "word": "SYNAPTIC PLASTICITY", "hint": "Strengthening or weakening of connections as you learn" },
+    { "word": "EXECUTIVE FUNCTION", "hint": "Top-down control skills like planning and inhibition" },
+    { "word": "NEUROTRANSMISSION", "hint": "Process of relaying chemical signals between neurons" },
+    { "word": "NEURAL PLASTICITY", "hint": "Capacity of nerve networks to change with experience" },
+    { "word": "COGNITIVE TRAINING", "hint": "Guided regimen to strengthen thinking abilities" },
+    { "word": "DEFAULT MODE NETWORK", "hint": "Brain circuit active during rest and mind-wandering" },
+    { "word": "MEMORY CONSOLIDATION", "hint": "Stabilizing of new recollections, largely during sleep" },
+    { "word": "ATTENTION TRAINING", "hint": "Practice aimed at sharpening sustained focus" },
+    { "word": "GAMMA OSCILLATIONS", "hint": "Fast brain rhythms tied to peak awareness and binding" },
+    { "word": "BRAINWAVE ENTRAINMENT", "hint": "Syncing neural rhythms to an external light or sound pulse" },
+    { "word": "SUSTAINED ATTENTION", "hint": "Ability to hold focus on one task over long stretches" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Model Context Protocol (MCP) — Hard",
+  "description": "Long, multi-word MCP terms describing lifecycle, capabilities, and message flows.",
+  "words": [
+    { "word": "PROTOCOL HANDSHAKE", "hint": "Opening version-and-feature agreement between peers" },
+    { "word": "RESOURCE SUBSCRIPTION", "hint": "Registering for change updates on a piece of exposed data" },
+    { "word": "SERVER CAPABILITIES", "hint": "Feature set the tool-and-data provider advertises" },
+    { "word": "CLIENT CAPABILITIES", "hint": "Feature set the host-side connector advertises" },
+    { "word": "INITIALIZE REQUEST", "hint": "First message that begins a connection lifecycle" },
+    { "word": "RESOURCE TEMPLATE", "hint": "Parameterized URI pattern for dynamically addressed data" },
+    { "word": "NOTIFICATION HANDLER", "hint": "Code that reacts to one-way inbound messages" },
+    { "word": "CONTEXT INTEGRATION", "hint": "Wiring external data into a model's working memory" },
+    { "word": "SERVER INITIALIZATION", "hint": "Startup sequence a tool provider performs on connect" },
+    { "word": "ELICITATION REQUEST", "hint": "A server prompt asking the user for more information" },
+    { "word": "STRUCTURED OUTPUT", "hint": "A tool result returned as validated typed data" },
+    { "word": "PROGRESS NOTIFICATION", "hint": "Update message reporting advancement of a long task" },
+    { "word": "STATEFUL CONNECTION", "hint": "A persistent session retaining shared context" },
+    { "word": "CAPABILITY EXCHANGE", "hint": "Mutual advertising of supported features at startup" },
+    { "word": "STDIO TRANSPORT LAYER", "hint": "Local messaging channel over standard streams" }
+  ]
+}

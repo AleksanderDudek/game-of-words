@@ -1,0 +1,21 @@
+{
+  "name": "Human Anatomy — Medium",
+  "description": "Muscles, glands, vessels, and brain regions spanning eleven to fifteen letters.",
+  "words": [
+    { "word": "HYPOTHALAMUS", "hint": "Brain region regulating hunger, thirst, and temperature" },
+    { "word": "GASTROCNEMIUS", "hint": "Large calf muscle at the back of the lower leg" },
+    { "word": "TEMPORAL LOBE", "hint": "Brain area near the ears handling hearing and memory" },
+    { "word": "LATISSIMUS DORSI", "hint": "Broad back muscle used in pulling movements" },
+    { "word": "PARASYMPATHETIC", "hint": "Rest-and-digest branch of the autonomic nervous system" },
+    { "word": "HIPPOCAMPUS", "hint": "Seahorse-shaped structure vital to forming memories" },
+    { "word": "OCCIPITAL LOBE", "hint": "Rear brain region that processes vision" },
+    { "word": "CORPUS CALLOSUM", "hint": "Fiber bundle connecting the two brain hemispheres" },
+    { "word": "FEMORAL ARTERY", "hint": "Major blood vessel supplying the thigh and leg" },
+    { "word": "CAROTID ARTERY", "hint": "Neck vessel carrying blood up to the head" },
+    { "word": "ACHILLES TENDON", "hint": "Cord linking the calf muscles to the heel" },
+    { "word": "PITUITARY GLAND", "hint": "Pea-sized master gland at the base of the brain" },
+    { "word": "SMALL INTESTINE", "hint": "Long coiled tube where most digestion occurs" },
+    { "word": "GALLBLADDER", "hint": "Sac that stores bile beneath the liver" },
+    { "word": "JUGULAR VEIN", "hint": "Neck vessel draining blood from the head" }
+  ]
+}

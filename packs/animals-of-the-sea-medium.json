@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Sea — Medium",
+  "description": "Medium-length names of marine animals, each 11 to 15 letters long.",
+  "words": [
+    { "word": "LEATHERBACK", "hint": "Largest sea turtle, with a ridged rubbery shell" },
+    { "word": "GREAT WHITE SHARK", "hint": "Apex ocean predator famed by a 1975 thriller film" },
+    { "word": "HUMPBACK WHALE", "hint": "Baleen giant known for long songs and breaching" },
+    { "word": "HAMMERHEAD SHARK", "hint": "Predator with a distinctive mallet-shaped head" },
+    { "word": "KILLER WHALE", "hint": "Black-and-white apex predator also called an orca" },
+    { "word": "BELUGA WHALE", "hint": "White Arctic cetacean with a bulbous forehead" },
+    { "word": "LEOPARD SEAL", "hint": "Spotted Antarctic predator that hunts penguins" },
+    { "word": "MANTIS SHRIMP", "hint": "Crustacean with club limbs that strike at bullet speed" },
+    { "word": "SEA CUCUMBER", "hint": "Soft echinoderm resembling a warty tube on the ocean floor" },
+    { "word": "HORSESHOE CRAB", "hint": "Ancient arthropod with a domed shell and a spiky tail" },
+    { "word": "ELECTRIC EEL", "hint": "South American fish that stuns prey with shocks" },
+    { "word": "SURGEONFISH", "hint": "Reef swimmer with scalpel-like spines near its tail" },
+    { "word": "TRIGGERFISH", "hint": "Reef fish that locks a dorsal spine bolt upright" },
+    { "word": "STICKLEBACK", "hint": "Small spiny fish whose males build tidy nests" },
+    { "word": "GREEN TURTLE", "hint": "Herbivorous reptile grazing on seagrass beds" }
+  ]
+}

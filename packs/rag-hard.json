@@ -1,0 +1,21 @@
+{
+  "name": "Retrieval-Augmented Generation (RAG) — Hard",
+  "description": "Advanced RAG terminology as multi-word phrases, each totaling 16-20 letters.",
+  "words": [
+    { "word": "SEMANTIC SIMILARITY", "hint": "Meaning-based closeness between two texts" },
+    { "word": "DOCUMENT RETRIEVAL", "hint": "Fetching whole source files relevant to a query" },
+    { "word": "PASSAGE RETRIEVAL", "hint": "Returning short evidence spans rather than full files" },
+    { "word": "CONTEXT AUGMENTATION", "hint": "Enriching a prompt with fetched external information" },
+    { "word": "VECTOR EMBEDDINGS", "hint": "Dense numeric encodings of text meaning" },
+    { "word": "SIMILARITY SEARCH", "hint": "Finding items closest to a query in vector space" },
+    { "word": "RETRIEVAL PIPELINE", "hint": "Chain from query to fetched supporting evidence" },
+    { "word": "KNOWLEDGE RETRIEVAL", "hint": "Pulling facts from an external store at query time" },
+    { "word": "RELEVANCE RANKING", "hint": "Ordering candidates by how well they fit the query" },
+    { "word": "SEMANTIC RETRIEVAL", "hint": "Meaning-based fetching using dense encodings" },
+    { "word": "CONTEXTUAL GROUNDING", "hint": "Anchoring generated answers in supplied evidence" },
+    { "word": "EMBEDDING GENERATION", "hint": "Producing vector encodings from raw text" },
+    { "word": "CROSS-ENCODER RERANKER", "hint": "Model scoring query-passage pairs jointly for reordering" },
+    { "word": "QUERY REFORMULATION", "hint": "Rewriting a user request to improve retrieval" },
+    { "word": "RECIPROCAL RANK FUSION", "hint": "Merging multiple ordered lists by inverse position" }
+  ]
+}

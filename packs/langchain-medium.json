@@ -1,0 +1,21 @@
+{
+  "name": "LangChain — Medium",
+  "description": "Two-word LangChain components spanning chains, agents, retrieval, and LCEL.",
+  "words": [
+    { "word": "OUTPUT PARSER", "hint": "Converts raw model text into structured results" },
+    { "word": "PROMPT TEMPLATE", "hint": "Reusable, parameterized instruction pattern" },
+    { "word": "VECTOR STORE", "hint": "Database that indexes embeddings for search" },
+    { "word": "TOOL CALLING", "hint": "Model deciding to invoke a function with arguments" },
+    { "word": "AGENT EXECUTOR", "hint": "Runtime loop that runs a reasoner and its actions" },
+    { "word": "TEXT SPLITTER", "hint": "Chops documents into manageable chunks" },
+    { "word": "DOCUMENT LOADER", "hint": "Reads files or external sources into text units" },
+    { "word": "EMBEDDINGS MODEL", "hint": "Turns text into numeric vectors for comparison" },
+    { "word": "RETRIEVAL CHAIN", "hint": "Pipeline that fetches context then answers" },
+    { "word": "FEW-SHOT PROMPT", "hint": "Instruction that includes example demonstrations" },
+    { "word": "SEQUENTIAL CHAIN", "hint": "Links steps so one output feeds the next" },
+    { "word": "STRUCTURED TOOL", "hint": "Function with a typed argument schema for agents" },
+    { "word": "MEMORY BUFFER", "hint": "Holds recent messages for conversational context" },
+    { "word": "CALLBACK HANDLER", "hint": "Object receiving events during a run" },
+    { "word": "RUNNABLE LAMBDA", "hint": "Wraps a plain function into the LCEL interface" }
+  ]
+}

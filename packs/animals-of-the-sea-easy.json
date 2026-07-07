@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Sea — Easy",
+  "description": "Short, familiar names of common ocean creatures, each 6 to 10 letters long.",
+  "words": [
+    { "word": "DOLPHIN", "hint": "Playful, clicking marine mammal known for leaping" },
+    { "word": "OCTOPUS", "hint": "Eight-armed cephalopod that squirts ink" },
+    { "word": "HALIBUT", "hint": "Large flatfish prized as a food catch" },
+    { "word": "STINGRAY", "hint": "Flat cartilaginous swimmer with a venomous tail barb" },
+    { "word": "BARNACLE", "hint": "Crustacean that cements itself to hulls and rocks" },
+    { "word": "MACKEREL", "hint": "Fast-swimming oily fish with a striped back" },
+    { "word": "HERRING", "hint": "Small silvery schooling fish, often smoked or pickled" },
+    { "word": "LOBSTER", "hint": "Clawed crustacean often served with butter" },
+    { "word": "SEAHORSE", "hint": "Upright swimmer whose males carry the young" },
+    { "word": "STARFISH", "hint": "Five-armed echinoderm that clings to reefs" },
+    { "word": "ANCHOVY", "hint": "Tiny salty fish often draped on pizza" },
+    { "word": "SARDINE", "hint": "Little fish famously packed into tins" },
+    { "word": "GROUPER", "hint": "Heavy-bodied reef fish that gulps prey whole" },
+    { "word": "SNAPPER", "hint": "Reddish reef fish popular on seafood menus" },
+    { "word": "HADDOCK", "hint": "North Atlantic cod relative used in fish and chips" }
+  ]
+}

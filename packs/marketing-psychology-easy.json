@@ -1,0 +1,21 @@
+{
+  "name": "Marketing Psychology — Easy",
+  "description": "Core consumer-behavior concepts and persuasion basics in short, everyday terms.",
+  "words": [
+    { "word": "BRANDING", "hint": "Building a distinct identity and image for a product" },
+    { "word": "ANCHORING", "hint": "First number seen biases later value judgments" },
+    { "word": "FRAMING", "hint": "Presenting the same info to sway perception, e.g. 90% fat-free" },
+    { "word": "PRIMING", "hint": "Exposure to one stimulus shaping the response to another" },
+    { "word": "SCARCITY", "hint": "Limited supply raising perceived value and urgency" },
+    { "word": "LOYALTY", "hint": "Repeat buying and devotion to a single label" },
+    { "word": "UPSELLING", "hint": "Nudging a buyer toward a pricier version" },
+    { "word": "AVERSION", "hint": "Strong dislike or reluctance, as in fear of losing" },
+    { "word": "PERSUASION", "hint": "The art of changing attitudes and driving a yes" },
+    { "word": "ATTENTION", "hint": "The scarce mental resource marketers compete for" },
+    { "word": "AUTHORITY", "hint": "Cialdini principle: deferring to credible experts" },
+    { "word": "INFLUENCE", "hint": "Cialdini's classic book on the psychology of yes" },
+    { "word": "CONTRAST", "hint": "Judging things relative to what precedes them" },
+    { "word": "BANDWAGON", "hint": "Doing something because many others already do" },
+    { "word": "HALO EFFECT", "hint": "One good trait coloring the overall impression" }
+  ]
+}

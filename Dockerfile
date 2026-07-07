@@ -20,6 +20,8 @@ FROM base AS server
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist/server ./dist/server
 COPY package.json ./
+# Topical word packs are read from disk at startup (see wordgen.ts loadPackFiles)
+COPY packs/ ./packs/
 ENV NODE_ENV=production
 EXPOSE 8080
 CMD ["node", "dist/server/server/index.js"]

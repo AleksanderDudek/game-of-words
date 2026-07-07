@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Land — Medium",
+  "description": "Terrestrial species whose common names span eleven to fifteen letters.",
+  "words": [
+    { "word": "HIPPOPOTAMUS", "hint": "Massive semi-aquatic African mammal with huge jaws" },
+    { "word": "MOUNTAIN GORILLA", "hint": "Endangered great ape of the Virunga volcanoes" },
+    { "word": "SPOTTED HYENA", "hint": "Laughing African scavenger that hunts in clans" },
+    { "word": "TASMANIAN DEVIL", "hint": "Fierce black marsupial carnivore of an Australian island" },
+    { "word": "BENGAL TIGER", "hint": "Orange striped big cat native to the Indian subcontinent" },
+    { "word": "KOMODO DRAGON", "hint": "World's largest living lizard, from Indonesian islands" },
+    { "word": "PRAYING MANTIS", "hint": "Predatory insect that holds its forelegs as if in worship" },
+    { "word": "GRIZZLY BEAR", "hint": "Large brown bruin of North American wilderness" },
+    { "word": "SNOW LEOPARD", "hint": "Elusive gray big cat of high Central Asian mountains" },
+    { "word": "RATTLESNAKE", "hint": "Venomous pit viper that warns with a buzzing tail" },
+    { "word": "GRASSHOPPER", "hint": "Jumping insect that chirps and can swarm as locusts" },
+    { "word": "HONEY BADGER", "hint": "Fearless burrowing carnivore famous for its tough hide" },
+    { "word": "WATER BUFFALO", "hint": "Domesticated horned bovine used to plow rice paddies" },
+    { "word": "GIANT ANTEATER", "hint": "Long-snouted South American mammal that laps up insects" },
+    { "word": "AFRICAN ELEPHANT", "hint": "Largest living land animal, with big fanning ears" }
+  ]
+}

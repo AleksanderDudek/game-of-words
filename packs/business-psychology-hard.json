@@ -1,0 +1,21 @@
+{
+  "name": "Business Psychology — Hard",
+  "description": "Advanced organizational-psychology theories, cognitive biases, and leadership frameworks.",
+  "words": [
+    { "word": "COGNITIVE DISSONANCE", "hint": "Mental discomfort from holding conflicting beliefs" },
+    { "word": "PSYCHOLOGICAL SAFETY", "hint": "A climate where people feel safe to speak up and take risks" },
+    { "word": "CONFIRMATION BIAS", "hint": "Seeking evidence that supports what you already think" },
+    { "word": "EMPLOYEE ENGAGEMENT", "hint": "Emotional commitment workers feel toward their job" },
+    { "word": "TRANSFORMATIONAL", "hint": "A leadership style that inspires and elevates followers" },
+    { "word": "SELF-ACTUALIZATION", "hint": "Reaching full potential atop Maslow's hierarchy" },
+    { "word": "AVAILABILITY BIAS", "hint": "Judging likelihood by how easily examples come to mind" },
+    { "word": "CONFLICT RESOLUTION", "hint": "Methods for settling disputes between colleagues" },
+    { "word": "ORGANIZATIONAL CHANGE", "hint": "Shifting a company's structure, culture, or processes" },
+    { "word": "INTRINSIC MOTIVATION", "hint": "Drive that comes from internal satisfaction, not rewards" },
+    { "word": "COGNITIVE OVERLOAD", "hint": "Too much information straining mental capacity" },
+    { "word": "IMPOSTOR SYNDROME", "hint": "Feeling like a fraud despite real competence" },
+    { "word": "LEADER-MEMBER EXCHANGE", "hint": "Theory on the quality of boss-subordinate relationships" },
+    { "word": "GOAL SETTING THEORY", "hint": "Locke's idea that specific targets boost performance" },
+    { "word": "CHANGE MANAGEMENT", "hint": "Guiding people through organizational transitions" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "LangChain — Hard",
+  "description": "Longer multi-word LangChain concepts covering retrieval, agents, and LCEL composition.",
+  "words": [
+    { "word": "DOCUMENT LOADER CHAIN", "hint": "Pipeline that ingests files and processes them" },
+    { "word": "CONVERSATION MEMORY", "hint": "Persistent record of a dialogue across turns" },
+    { "word": "VECTOR STORE RETRIEVER", "hint": "Fetches context by embedding similarity from an index" },
+    { "word": "CHAT PROMPT TEMPLATE", "hint": "Structured message pattern for conversational models" },
+    { "word": "RUNNABLE PASSTHROUGH", "hint": "LCEL step that forwards its input unchanged" },
+    { "word": "RUNNABLE SEQUENCE", "hint": "Ordered composition of LCEL steps via the pipe operator" },
+    { "word": "SIMILARITY SEARCH", "hint": "Finding nearest embeddings to a query vector" },
+    { "word": "MESSAGES PLACEHOLDER", "hint": "Slot in a template reserved for a list of prior turns" },
+    { "word": "STRUCTURED CHAT AGENT", "hint": "Reasoner that emits typed, schema-based actions" },
+    { "word": "TOOL CALLING AGENT", "hint": "Reasoner that natively picks functions to invoke" },
+    { "word": "RETRIEVAL AUGMENTED", "hint": "Grounding a model with fetched external context (RAG)" },
+    { "word": "SELF-QUERY RETRIEVER", "hint": "Component that writes its own metadata filters" },
+    { "word": "MULTI-QUERY RETRIEVER", "hint": "Generates several search variations to improve recall" },
+    { "word": "AGENT EXECUTOR CHAIN", "hint": "Loop driving reasoning and action steps" },
+    { "word": "CHAT MESSAGE HISTORY", "hint": "Stored sequence of human and AI turns" }
+  ]
+}

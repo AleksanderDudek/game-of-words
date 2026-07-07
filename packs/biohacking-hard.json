@@ -1,0 +1,21 @@
+{
+  "name": "Biohacking — Hard",
+  "description": "Long, multi-word biohacking protocols and physiology phrases.",
+  "words": [
+    { "word": "COLD WATER IMMERSION", "hint": "Submerging in frigid liquid to spur recovery" },
+    { "word": "INTERMITTENT FASTING", "hint": "Cycling between windows of eating and abstaining" },
+    { "word": "CONTINUOUS GLUCOSE", "hint": "Real-time tracking of blood sugar via a sensor" },
+    { "word": "HEART RATE VARIABILITY", "hint": "Beat-to-beat timing shifts used to gauge recovery" },
+    { "word": "BLUE-LIGHT BLOCKING", "hint": "Filtering evening screen glare to protect sleep" },
+    { "word": "TIME-RESTRICTED EATING", "hint": "Limiting all meals to a set daily hourly window" },
+    { "word": "INFRARED SAUNA THERAPY", "hint": "Radiant heat sessions for detox and recovery" },
+    { "word": "CALORIE RESTRICTION", "hint": "Eating less energy to promote a longer lifespan" },
+    { "word": "NEUROTRANSMITTERS", "hint": "Chemical messengers biohackers tune for mood" },
+    { "word": "HORMONE OPTIMIZATION", "hint": "Fine-tuning endocrine signals for peak function" },
+    { "word": "BREATHWORK PRACTICE", "hint": "A structured routine of controlled breathing drills" },
+    { "word": "NUTRITIONAL KETOSIS", "hint": "Diet-induced fat-burning metabolic state" },
+    { "word": "GLYCEMIC RESPONSE", "hint": "How sharply blood sugar rises after a meal" },
+    { "word": "SLEEP OPTIMIZATION", "hint": "Systematically improving rest quality and duration" },
+    { "word": "COLD PLUNGE THERAPY", "hint": "Icy dip protocol for inflammation and alertness" }
+  ]
+}

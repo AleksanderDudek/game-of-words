@@ -1,0 +1,21 @@
+{
+  "name": "Sales Psychology — Hard",
+  "description": "Long, advanced persuasion and selling phrases of 16-20 letters.",
+  "words": [
+    { "word": "OBJECTION HANDLING", "hint": "Skill of addressing a buyer's concerns to move forward" },
+    { "word": "CONSULTATIVE SELLING", "hint": "Advisory approach focused on diagnosing customer needs" },
+    { "word": "VALUE PROPOSITION", "hint": "The core promise of benefit a product offers" },
+    { "word": "SCARCITY PRINCIPLE", "hint": "Cialdini rule - rarity makes things more desirable" },
+    { "word": "RECIPROCITY PRINCIPLE", "hint": "Cialdini rule about returning a favor after receiving one" },
+    { "word": "CONSUMER PSYCHOLOGY", "hint": "Study of why shoppers think and decide as they do" },
+    { "word": "OVERCOMING OBJECTIONS", "hint": "Resolving buyer pushback to keep a deal alive" },
+    { "word": "RELATIONSHIP SELLING", "hint": "Long-game approach built on trust over transactions" },
+    { "word": "SCARCITY MARKETING", "hint": "Promoting via limited stock or fleeting deadlines" },
+    { "word": "PERSUASION TACTICS", "hint": "Techniques used to sway a prospect's decision" },
+    { "word": "AUTHORITY PRINCIPLE", "hint": "Cialdini rule - we defer to credible experts" },
+    { "word": "COGNITIVE DISSONANCE", "hint": "Mental discomfort a buyer feels after conflicting choices" },
+    { "word": "FEAR OF MISSING OUT", "hint": "Anxiety-driven urge to act before a chance vanishes" },
+    { "word": "EMOTIONAL SELLING", "hint": "Appealing to feelings rather than facts to persuade" },
+    { "word": "PERSUASION PRINCIPLE", "hint": "One of Cialdini's core levers of influence" }
+  ]
+}

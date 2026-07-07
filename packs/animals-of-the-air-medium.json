@@ -1,0 +1,21 @@
+{
+  "name": "Animals of the Air — Medium",
+  "description": "Flying birds and insects with names of eleven to fifteen letters.",
+  "words": [
+    { "word": "HUMMINGBIRD", "hint": "Tiny hovering bird that sips nectar from flowers" },
+    { "word": "MOCKINGBIRD", "hint": "Songbird that imitates the calls of other species" },
+    { "word": "NIGHTINGALE", "hint": "Brown bird celebrated for its rich nighttime song" },
+    { "word": "GRASSHOPPER", "hint": "Leaping insect that chirps in summer fields" },
+    { "word": "PEREGRINE FALCON", "hint": "Fastest bird, diving at over two hundred miles per hour" },
+    { "word": "BARN SWALLOW", "hint": "Fork-tailed migrant that nests in rural outbuildings" },
+    { "word": "GOLDEN EAGLE", "hint": "Large brown raptor with tawny feathers on its nape" },
+    { "word": "HOUSE SPARROW", "hint": "Small brown bird that lives close to people worldwide" },
+    { "word": "WHIPPOORWILL", "hint": "Nocturnal bird named for its repetitive three-note call" },
+    { "word": "TURKEY VULTURE", "hint": "Red-headed scavenger that soars for hours on thermals" },
+    { "word": "CANADA GOOSE", "hint": "Honking waterfowl with a black neck and white chinstrap" },
+    { "word": "MOURNING DOVE", "hint": "Soft gray bird whose cooing sounds sorrowful" },
+    { "word": "CARPENTER BEE", "hint": "Large insect that bores nest tunnels into wood" },
+    { "word": "PRAYING MANTIS", "hint": "Predatory insect that holds its forelegs as if in prayer" },
+    { "word": "COMMON SWIFT", "hint": "Aerial bird that eats, sleeps, and mates on the wing" }
+  ]
+}
