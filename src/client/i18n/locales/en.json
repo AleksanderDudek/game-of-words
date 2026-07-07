@@ -67,8 +67,6 @@
     "configMaxPlayers": "Max players",
     "playersLabel": "Players",
     "settingsLabel": "Game settings",
-    "hostControls": "Host controls",
-    "maxPlayersRange": "Allowed: {{min}}–{{max}}",
     "wordPack": "WORD PACK",
     "defaultPack": "Default (server word bank)",
     "builtinPacks": "Built-in packs",

@@ -159,53 +159,6 @@
 .config-item span:first-child { color: var(--text-muted); }
 .config-item span:last-child { color: var(--text); font-weight: 500; }
 
-// ─── Host controls: max players ───
-
-.max-players-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.max-players-value {
-  min-width: 20px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--green);
-}
-
-.stepper-btn {
-  background: none;
-  border: 1px solid var(--border-bright);
-  border-radius: 4px;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  padding: 1px 7px 2px;
-  transition: all 0.15s;
-
-  &:hover:not(:disabled) {
-    color: var(--green);
-    border-color: rgba(74, 222, 128, 0.5);
-  }
-
-  &:disabled {
-    opacity: 0.3;
-    cursor: default;
-  }
-}
-
-.range-hint {
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  padding-left: 2px;
-}
-
 // ─── Word pack (read-only, non-host) ───
 
 .pack-info-row {

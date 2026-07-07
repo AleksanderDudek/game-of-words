@@ -8,6 +8,5 @@ export interface LobbyScreenProps {
   localPacks: WordPack[];
   onStartGame: () => void;
   onSetPack: (ref: PackReference) => void;
-  onSetMaxPlayers: (count: number) => void;
   onOpenMyPacks: () => void;
 }

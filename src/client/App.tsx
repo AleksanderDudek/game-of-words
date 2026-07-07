@@ -91,11 +91,6 @@ export default function App() {
     [send],
   );
 
-  const handleSetMaxPlayers = useCallback(
-    (count: number) => send({ type: "set_max_players", count }),
-    [send],
-  );
-
   const handleSelectPackFromMyPacks = useCallback(
     (pack: WordPack) => {
       send({
@@ -173,7 +168,6 @@ export default function App() {
             localPacks={localPacks}
             onStartGame={() => send({ type: "start_game" })}
             onSetPack={handleSetPack}
-            onSetMaxPlayers={handleSetMaxPlayers}
             onOpenMyPacks={() => setView("packs")}
           />
         </div>

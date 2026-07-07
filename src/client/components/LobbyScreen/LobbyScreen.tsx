@@ -11,15 +11,12 @@ export function LobbyScreen({
   localPacks,
   onStartGame,
   onSetPack,
-  onSetMaxPlayers,
   onOpenMyPacks,
 }: LobbyScreenProps) {
   const { t } = useTranslation();
   const minPlayers = session.config.minPlayers ?? 2;
-  const maxPlayersLimit = session.config.maxPlayers ?? 8;
-  // playerLimit is always present in the snapshot; fall back defensively so the
-  // value (and the stepper math below) can never render blank / NaN.
-  const currentMaxPlayers = session.playerLimit ?? maxPlayersLimit;
+  // Max players is fixed by server configuration and shown read-only.
+  const maxPlayers = session.config.maxPlayers ?? session.playerLimit;
   const activeCount = session.players.filter((p) => !p.isSpectator).length;
   const canStart = activeCount >= minPlayers;
   const spectatorCount = session.players.filter((p) => p.isSpectator).length;
@@ -82,6 +79,10 @@ export function LobbyScreen({
                 {session.config.hintCostPoints} {t("common.pts")}
               </span>
             </div>
+            <div className={styles["config-item"]}>
+              <span>{t("lobby.configMaxPlayers")}</span>
+              <span>{maxPlayers}</span>
+            </div>
           </div>
         </section>
 
@@ -103,37 +104,6 @@ export function LobbyScreen({
                   : t("lobby.defaultPack")}
               </span>
             </div>
-          )}
-
-          {isHost && (
-            <>
-              <div className={styles["section-label"]}>{t("lobby.hostControls")}</div>
-              <div className={styles["config-item"]}>
-                <span>{t("lobby.configMaxPlayers")}</span>
-                <div className={styles["max-players-control"]}>
-                  <button
-                    className={styles["stepper-btn"]}
-                    onClick={() => onSetMaxPlayers(currentMaxPlayers - 1)}
-                    disabled={currentMaxPlayers <= minPlayers}
-                    aria-label="Decrease max players"
-                  >
-                    −
-                  </button>
-                  <span className={styles["max-players-value"]}>{currentMaxPlayers}</span>
-                  <button
-                    className={styles["stepper-btn"]}
-                    onClick={() => onSetMaxPlayers(currentMaxPlayers + 1)}
-                    disabled={currentMaxPlayers >= maxPlayersLimit}
-                    aria-label="Increase max players"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-              <div className={styles["range-hint"]}>
-                {t("lobby.maxPlayersRange", { min: minPlayers, max: maxPlayersLimit })}
-              </div>
-            </>
           )}
         </section>
       </div>
