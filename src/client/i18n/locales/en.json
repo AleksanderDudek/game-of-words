@@ -37,8 +37,93 @@
     "label": "SIGNAL INCOMING"
   },
 
+  "modes": {
+    "pickerLabel": "Game mode",
+    "soloLocked": "Solo needs a room to yourself",
+    "classic": {
+      "name": "Classic",
+      "tagline": "Free-for-all duel",
+      "rules": "Everyone for themselves. Take turns guessing the same word — each wrong guess burns one of your guesses, then the turn passes. Points are yours alone, and reveals are paid from your own score."
+    },
+    "team": {
+      "name": "Teams",
+      "tagline": "Two squads, steals allowed",
+      "rules": "Two squads alternate holding the word. Your squad shares a pool of guesses and the mic passes to a teammate after every miss. Empty the pool and the other squad gets one short window to steal it for reduced points. Reveals are paid from the squad's score."
+    },
+    "coop": {
+      "name": "Co-op",
+      "tagline": "Everyone versus the words",
+      "rules": "No opponents — the table shares one guess pool per word, one point bank, and a stack of lives. Anyone may buy a reveal at any time. Fail a word and you lose a life; the run is graded when the lives run out."
+    },
+    "solo": {
+      "name": "Solo",
+      "tagline": "Practise against a rival",
+      "rules": "You against a bot rival, alternating turns on the same word. Pick how sharp it plays — Adaptive tracks your score so the match stays close while you learn."
+    }
+  },
+
+  "teams": {
+    "alpha": "ALPHA",
+    "bravo": "BRAVO",
+    "alphaShort": "A",
+    "bravoShort": "B",
+    "joinSquad": "JOIN",
+    "yourSquad": "YOUR SQUAD",
+    "emptySquad": "empty",
+    "attackBanner": "{{team}} is on the word",
+    "stealBanner": "⚡ STEAL — {{team}} has one guess",
+    "solvedCount_one": "{{count}} solved",
+    "solvedCount_other": "{{count}} solved",
+    "memberCount_one": "{{count}} player",
+    "memberCount_other": "{{count}} players"
+  },
+
+  "coop": {
+    "lives": "Lives",
+    "bank": "Bank",
+    "sharedGuesses": "Guesses",
+    "cleared": "Cleared",
+    "livesLeft_one": "{{count}} life left",
+    "livesLeft_other": "{{count}} lives left"
+  },
+
+  "solo": {
+    "rivalBadge": "BOT",
+    "rivalLabel": "RIVAL",
+    "rivalThinking": "{{name}} is thinking…",
+    "difficulty": {
+      "easy": "EASY",
+      "normal": "NORMAL",
+      "hard": "HARD",
+      "adaptive": "ADAPTIVE"
+    },
+    "difficultyHint": {
+      "easy": "Rarely solves early — good for learning the board.",
+      "normal": "A steady rival that punishes slow rounds.",
+      "hard": "Solves fast and buys reveals often.",
+      "adaptive": "Tracks your score: sharpens up when you lead, eases off when you fall behind."
+    }
+  },
+
+  "results": {
+    "teamWinner": "{{team}} takes it",
+    "teamDraw": "Dead heat — no squad ahead",
+    "mvp": "MVP: {{name}} · {{points}} pts",
+    "contributions": "Contributions",
+    "coopSubtitle": "Run complete",
+    "coopCleared_one": "{{count}} word cleared",
+    "coopCleared_other": "{{count}} words cleared",
+    "coopFailed_one": "{{count}} word lost",
+    "coopFailed_other": "{{count}} words lost",
+    "coopBank": "{{points}} pts banked",
+    "soloWin": "You out-decoded {{name}}",
+    "soloLoss": "{{name}} out-decoded you",
+    "soloDraw": "Dead even with the rival"
+  },
+
   "join": {
     "subtitle": "Decode the scrambled signal before it's lost forever",
+    "gameMode": "GAME MODE",
     "statusConnected": "Server connected",
     "statusConnecting": "Connecting...",
     "callsign": "CALLSIGN",
@@ -56,6 +141,13 @@
     "session": "SESSION",
     "waitingTitle": "Waiting for players...",
     "waitingHint": "Share the session code with friends to join",
+    "soloTitle": "Rival standing by",
+    "soloHint": "Pick how hard the bot plays, then start whenever you're ready",
+    "modeLabel": "GAME MODE",
+    "needSquads": "Both squads need a player",
+    "configSteal": "Steal window",
+    "configLives": "Lives",
+    "configSharedGuesses": "Shared guesses",
     "spectatorWatching_one": "• {{count}} spectator watching",
     "spectatorWatching_other": "• {{count}} spectators watching",
     "hostBadge": "HOST",
@@ -103,7 +195,18 @@
     "waitingPlaceholder": "Waiting for your turn...",
     "guessBtn": "GUESS",
     "revealPair": "🔓 REVEAL PAIR ({{cost}} pts)",
+    "revealPairTitle": "Costs {{cost}} pts from {{source}} ({{bank}} available)",
+    "sharedGuessesLeft_one": "{{count}} guess left in the pool",
+    "sharedGuessesLeft_other": "{{count}} guesses left in the pool",
+    "bank": {
+      "classic": "Your points",
+      "team": "Squad bank",
+      "coop": "Shared bank",
+      "solo": "Your points"
+    },
     "passTurn": "↷ PASS TURN",
+    "passMic": "↷ PASS MIC",
+    "passTurnTitle": "In team and co-op games passing spends one guess from the shared pool",
     "pause": "⏸ PAUSE",
     "resume": "▶ RESUME",
     "leaveGame": "✕ LEAVE GAME"
@@ -176,6 +279,9 @@
     "roundWon": "🏆 {{name}} solved it! (+{{points}}) — \"{{word}}\"",
     "timeUp": "⏰ Time's up! The word was \"{{word}}\"",
     "turnSwitched": "↻ {{name}}'s turn",
+    "stealPhase": "⚡ Steal! {{team}} gets {{seconds}}s",
+    "lifeLost_one": "💔 Lost \"{{word}}\" — {{count}} life left",
+    "lifeLost_other": "💔 Lost \"{{word}}\" — {{count}} lives left",
     "error": "⚠ {{message}}"
   },
 

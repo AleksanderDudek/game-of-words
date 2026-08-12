@@ -68,6 +68,36 @@
   border-radius: 3px;
 }
 
+.bot-badge {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--purple);
+  background: var(--purple-dim);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.team-badge {
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+}
+
+.player-card.team-alpha {
+  border-left: 3px solid var(--blue);
+}
+
+.player-card.team-bravo {
+  border-left: 3px solid var(--orange);
+}
+
+.player-card.bot {
+  border-left: 3px solid var(--purple);
+}
+
 .player-score {
   font-size: 12px;
   color: var(--text-dim);

@@ -68,6 +68,49 @@ export interface BuiltinPackInfo {
 // ─── Game States ───
 export type SessionState = "lobby" | "countdown" | "playing" | "paused" | "round_end" | "game_over";
 
+// ─── Game Modes ───
+
+/**
+ * classic — free-for-all, everyone for themselves (original rules)
+ * team    — two squads alternate attacking a word; a failed attack opens a steal
+ * coop    — everyone versus the word list, sharing one guess pool, bank and lives
+ * solo    — one human against a heuristic bot rival
+ */
+export type GameMode = "classic" | "team" | "coop" | "solo";
+
+export const GAME_MODES: readonly GameMode[] = ["classic", "team", "coop", "solo"] as const;
+
+export type TeamId = "alpha" | "bravo";
+
+export const TEAM_IDS: readonly TeamId[] = ["alpha", "bravo"] as const;
+
+/** Bot skill for solo mode. "adaptive" rubber-bands toward the player's score. */
+export type BotDifficulty = "easy" | "normal" | "hard" | "adaptive";
+
+export const BOT_DIFFICULTIES: readonly BotDifficulty[] = ["easy", "normal", "hard", "adaptive"] as const;
+
+/** Team mode round phase: the owning squad attacks first, opponents may steal after a failed attack. */
+export type RoundPhase = "attack" | "steal";
+
+export interface TeamState {
+  id: TeamId;
+  score: number;
+  /** Rounds this team has solved (attack or steal) */
+  solved: number;
+}
+
+export interface CoopState {
+  /** Shared point bank — solves add to it, hints are paid from it */
+  bank: number;
+  livesLeft: number;
+  maxLives: number;
+  /** Shared guesses remaining on the current word */
+  guessesLeft: number;
+  guessesPerRound: number;
+  roundsCleared: number;
+  roundsFailed: number;
+}
+
 // ─── Player ───
 export interface Player {
   id: PlayerId;
@@ -75,6 +118,8 @@ export interface Player {
   score: number;
   isConnected: boolean;
   isSpectator?: boolean;  // joined mid-game; becomes active at next round start
+  team?: TeamId;          // team mode only
+  isBot?: boolean;        // solo mode rival
 }
 
 // ─── A single letter cell on the board ───
@@ -97,6 +142,10 @@ export interface GameConfig {
   readonly maxWordLength: number;
   readonly minPlayers?: number;
   readonly maxPlayers?: number;
+  // ─── Mode-specific (always sent so lobbies can preview the rules) ───
+  readonly coopLives?: number;
+  readonly stealSeconds?: number;
+  readonly stealPointsPct?: number;
 }
 
 // ─── Round state ───
@@ -109,6 +158,11 @@ export interface RoundState {
   currentPlayerId: PlayerId;
   turnsRemaining: number;
   wordLength: number;
+  /** team mode — which squad currently holds the word, and whether this is the steal window */
+  attackingTeam?: TeamId;
+  phase?: RoundPhase;
+  /** solo mode — true while the bot is "thinking" before it answers */
+  botThinking?: boolean;
 }
 
 // ─── Session (full game state sent to clients) ───
@@ -116,12 +170,16 @@ export interface SessionSnapshot {
   sessionId: SessionId;
   hostId?: PlayerId;        // playerId of the session host
   state: SessionState;
+  mode: GameMode;
   players: Player[];
   round: RoundState | null;
   config: GameConfig;
   playerLimit: number;      // current per-session max players (host-configurable)
   countdownLeft?: number;
   activePack?: { name: string; wordCount: number };
+  teams?: TeamState[];      // team mode
+  coop?: CoopState;         // coop mode
+  botDifficulty?: BotDifficulty; // solo mode
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -130,7 +188,7 @@ export interface SessionSnapshot {
 
 // ─── Client → Server ───
 export type ClientMessage =
-  | { type: "join"; name: string; sessionId?: string; playerId?: string } // playerId = rejoin
+  | { type: "join"; name: string; sessionId?: string; playerId?: string; mode?: GameMode } // playerId = rejoin, mode = preferred lobby
   | { type: "start_game" }
   | { type: "guess"; word: string }
   | { type: "buy_hint" }
@@ -140,6 +198,9 @@ export type ClientMessage =
   | { type: "forfeit_game" }    // leave the game permanently
   | { type: "set_word_pack"; pack: PackReference }
   | { type: "set_max_players"; count: number }  // host changes max players (lobby only)
+  | { type: "set_mode"; mode: GameMode }        // host changes game mode (lobby only)
+  | { type: "set_team"; team: TeamId }          // player picks a squad (team mode, lobby only)
+  | { type: "set_bot_difficulty"; difficulty: BotDifficulty } // solo mode (lobby only)
   | { type: "ping" };
 
 // ─── Server → Client ───
@@ -154,6 +215,8 @@ export type ServerMessage =
   | { type: "player_left"; playerId: string; playerName: string }
   | { type: "game_paused"; byPlayerId: string }
   | { type: "game_resumed"; byPlayerId: string }
+  | { type: "steal_phase"; team: TeamId; seconds: number }   // team mode: attack failed, opponents get one shot
+  | { type: "life_lost"; livesLeft: number; word: string }    // coop mode: word not solved
   | { type: "error"; message: string }
   | { type: "pong" };
 
@@ -176,8 +239,24 @@ export type ExpectedResponse<T extends ClientMessage["type"]> =
 
 const CLIENT_MESSAGE_TYPES: ReadonlySet<string> = new Set<ClientMessage["type"]>([
   "join", "start_game", "guess", "buy_hint", "pass_turn",
-  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "set_max_players", "ping",
+  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "set_max_players",
+  "set_mode", "set_team", "set_bot_difficulty", "ping",
 ]);
+
+/** Runtime narrowing for mode values arriving over the wire */
+export function isGameMode(value: unknown): value is GameMode {
+  return typeof value === "string" && (GAME_MODES as readonly string[]).includes(value);
+}
+
+/** Runtime narrowing for team values arriving over the wire */
+export function isTeamId(value: unknown): value is TeamId {
+  return typeof value === "string" && (TEAM_IDS as readonly string[]).includes(value);
+}
+
+/** Runtime narrowing for bot difficulty values arriving over the wire */
+export function isBotDifficulty(value: unknown): value is BotDifficulty {
+  return typeof value === "string" && (BOT_DIFFICULTIES as readonly string[]).includes(value);
+}
 
 /** Runtime type guard for validating incoming client messages */
 export function isClientMessage(msg: unknown): msg is ClientMessage {

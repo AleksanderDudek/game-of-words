@@ -6,6 +6,7 @@ import type { SessionSnapshot, PlayerId, SessionId } from "@/shared/types";
 const baseSession: SessionSnapshot = {
   sessionId: "ABC123" as SessionId,
   state: "lobby",
+  mode: "classic",
   players: [
     { id: "p1" as PlayerId, name: "Alice", score: 0, isConnected: true },
     { id: "p2" as PlayerId, name: "Bob", score: 0, isConnected: true },
@@ -30,6 +31,9 @@ const lobbyProps = {
   onStartGame: vi.fn(),
   onSetPack: vi.fn(),
   onOpenMyPacks: vi.fn(),
+  onSetMode: vi.fn(),
+  onSetTeam: vi.fn(),
+  onSetBotDifficulty: vi.fn(),
 };
 
 describe("LobbyScreen", () => {
@@ -84,5 +88,100 @@ describe("LobbyScreen", () => {
     expect(screen.getByText("6")).toBeInTheDocument(); // the configured max is shown
     expect(screen.queryByLabelText(/decrease max players/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/increase max players/i)).not.toBeInTheDocument();
+  });
+});
+
+describe("LobbyScreen — mode selection", () => {
+  it("lets the host change the mode", () => {
+    const onSetMode = vi.fn();
+    const session = { ...baseSession, hostId: "p1" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={session} onSetMode={onSetMode} />);
+    fireEvent.click(screen.getByRole("radio", { name: /Co-op/ }));
+    expect(onSetMode).toHaveBeenCalledWith("coop");
+  });
+
+  it("shows non-hosts the mode read-only", () => {
+    const session = { ...baseSession, hostId: "p2" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={session} playerId="p1" />);
+    expect(screen.getByRole("radio", { name: /Co-op/ })).toBeDisabled();
+  });
+
+  it("locks solo mode while other people are in the room", () => {
+    const session = { ...baseSession, hostId: "p1" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={session} />);
+    expect(screen.getByRole("radio", { name: /Solo/ })).toBeDisabled();
+  });
+});
+
+describe("LobbyScreen — team mode", () => {
+  const teamSession: SessionSnapshot = {
+    ...baseSession,
+    mode: "team",
+    hostId: "p1" as PlayerId,
+    players: [
+      { id: "p1" as PlayerId, name: "Alice", score: 0, isConnected: true, team: "alpha" },
+      { id: "p2" as PlayerId, name: "Bob", score: 0, isConnected: true, team: "bravo" },
+    ],
+  };
+
+  it("shows both squad rosters", () => {
+    render(<LobbyScreen {...lobbyProps} session={teamSession} />);
+    expect(screen.getByText("ALPHA")).toBeInTheDocument();
+    expect(screen.getByText("BRAVO")).toBeInTheDocument();
+  });
+
+  it("lets a player switch to the other squad but not their own", () => {
+    const onSetTeam = vi.fn();
+    render(<LobbyScreen {...lobbyProps} session={teamSession} onSetTeam={onSetTeam} />);
+    fireEvent.click(screen.getByRole("button", { name: "JOIN" }));
+    expect(onSetTeam).toHaveBeenCalledWith("bravo");
+    expect(screen.getByRole("button", { name: "YOUR SQUAD" })).toBeDisabled();
+  });
+
+  it("blocks the start until both squads have a player", () => {
+    const lopsided: SessionSnapshot = {
+      ...teamSession,
+      players: teamSession.players.map((p) => ({ ...p, team: "alpha" as const })),
+    };
+    render(<LobbyScreen {...lobbyProps} session={lopsided} />);
+    expect(screen.getByText(/Both squads need a player/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /start game/i })).not.toBeInTheDocument();
+  });
+});
+
+describe("LobbyScreen — solo mode", () => {
+  const soloSession: SessionSnapshot = {
+    ...baseSession,
+    mode: "solo",
+    hostId: "p1" as PlayerId,
+    botDifficulty: "adaptive",
+    players: [
+      { id: "p1" as PlayerId, name: "Alice", score: 0, isConnected: true },
+      { id: "bot" as PlayerId, name: "CIPHER", score: 0, isConnected: true, isBot: true },
+    ],
+  };
+
+  it("flags the rival and offers difficulty settings", () => {
+    render(<LobbyScreen {...lobbyProps} session={soloSession} />);
+    expect(screen.getByText("BOT")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ADAPTIVE" })).toBeInTheDocument();
+  });
+
+  it("reports the picked rival difficulty", () => {
+    const onSetBotDifficulty = vi.fn();
+    render(
+      <LobbyScreen
+        {...lobbyProps}
+        session={soloSession}
+        onSetBotDifficulty={onSetBotDifficulty}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "HARD" }));
+    expect(onSetBotDifficulty).toHaveBeenCalledWith("hard");
+  });
+
+  it("can start with just the player and the bot", () => {
+    render(<LobbyScreen {...lobbyProps} session={soloSession} />);
+    expect(screen.getByRole("button", { name: /start game/i })).toBeInTheDocument();
   });
 });

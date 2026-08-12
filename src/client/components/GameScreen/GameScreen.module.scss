@@ -51,6 +51,12 @@
   border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
+.mode-tag {
+  font-size: 13px;
+  line-height: 1;
+  margin-right: 2px;
+}
+
 .hint-box {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -210,6 +216,16 @@
 .hint-btn {
   font-size: 12px;
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hint-bank {
+  font-size: 10px;
+  letter-spacing: 0;
+  color: var(--text-muted);
 }
 
 .bottom-panel {

@@ -7,6 +7,7 @@ import type { SessionSnapshot, PlayerId, SessionId } from "@/shared/types";
 const baseSession: SessionSnapshot = {
   sessionId: "XYZ" as SessionId,
   state: "playing",
+  mode: "classic",
   players: [
     { id: "p1" as PlayerId, name: "Alice", score: 200, isConnected: true },
     { id: "p2" as PlayerId, name: "Bob", score: 50, isConnected: true },
@@ -105,5 +106,109 @@ describe("GameScreen", () => {
     render(<GameScreen {...defaultProps} session={sessionPoor} />);
     const hintBtn = screen.getByRole("button", { name: /reveal pair/i });
     expect(hintBtn).toBeDisabled();
+  });
+});
+
+describe("GameScreen — team mode", () => {
+  const teamSession: SessionSnapshot = {
+    ...baseSession,
+    mode: "team",
+    players: [
+      { id: "p1" as PlayerId, name: "Alice", score: 200, isConnected: true, team: "alpha" },
+      { id: "p2" as PlayerId, name: "Bob", score: 50, isConnected: true, team: "bravo" },
+    ],
+    teams: [
+      { id: "alpha", score: 260, solved: 2 },
+      { id: "bravo", score: 90, solved: 1 },
+    ],
+    round: { ...baseSession.round!, attackingTeam: "alpha", phase: "attack" },
+  };
+
+  it("shows the squad scoreboard and who is on the word", () => {
+    render(<GameScreen {...defaultProps} session={teamSession} />);
+    expect(screen.getByText("260")).toBeInTheDocument();
+    expect(screen.getByText("ALPHA is on the word")).toBeInTheDocument();
+  });
+
+  it("announces the steal window", () => {
+    const stealing: SessionSnapshot = {
+      ...teamSession,
+      round: { ...teamSession.round!, attackingTeam: "bravo", phase: "steal" },
+    };
+    render(<GameScreen {...defaultProps} session={stealing} />);
+    expect(screen.getByText(/STEAL — BRAVO has one guess/)).toBeInTheDocument();
+  });
+
+  it("spends hints from the squad bank", () => {
+    render(<GameScreen {...defaultProps} session={teamSession} />);
+    expect(screen.getByText("Squad bank: 260")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /reveal pair/i })).not.toBeDisabled();
+  });
+
+  it("refuses reveals to the squad that is not on the clock", () => {
+    const defending: SessionSnapshot = {
+      ...teamSession,
+      round: { ...teamSession.round!, attackingTeam: "bravo" },
+    };
+    render(<GameScreen {...defaultProps} session={defending} />);
+    expect(screen.getByRole("button", { name: /reveal pair/i })).toBeDisabled();
+  });
+});
+
+describe("GameScreen — coop mode", () => {
+  const coopSession: SessionSnapshot = {
+    ...baseSession,
+    mode: "coop",
+    coop: {
+      bank: 300,
+      livesLeft: 2,
+      maxLives: 3,
+      guessesLeft: 3,
+      guessesPerRound: 5,
+      roundsCleared: 4,
+      roundsFailed: 1,
+    },
+  };
+
+  it("shows the shared resources", () => {
+    render(<GameScreen {...defaultProps} session={coopSession} />);
+    expect(screen.getByLabelText("2 lives left")).toBeInTheDocument();
+    expect(screen.getByText("3/5")).toBeInTheDocument();
+  });
+
+  it("describes the guess pool as shared", () => {
+    render(<GameScreen {...defaultProps} session={coopSession} playerId="p1" />);
+    expect(screen.getByText("3 guesses left in the pool")).toBeInTheDocument();
+  });
+
+  it("spends hints from the shared bank", () => {
+    render(<GameScreen {...defaultProps} session={coopSession} />);
+    expect(screen.getByText("Shared bank: 300")).toBeInTheDocument();
+  });
+});
+
+describe("GameScreen — solo mode", () => {
+  const soloSession: SessionSnapshot = {
+    ...baseSession,
+    mode: "solo",
+    players: [
+      { id: "p1" as PlayerId, name: "Alice", score: 200, isConnected: true },
+      { id: "bot" as PlayerId, name: "CIPHER", score: 150, isConnected: true, isBot: true },
+    ],
+    round: { ...baseSession.round!, currentPlayerId: "bot" as PlayerId, botThinking: true },
+  };
+
+  it("shows the rival thinking on its turn", () => {
+    render(<GameScreen {...defaultProps} session={soloSession} />);
+    expect(screen.getByText("CIPHER is thinking…")).toBeInTheDocument();
+  });
+
+  it("falls back to a plain turn label once it has answered", () => {
+    const answered: SessionSnapshot = {
+      ...soloSession,
+      round: { ...soloSession.round!, botThinking: false },
+    };
+    render(<GameScreen {...defaultProps} session={answered} />);
+    expect(screen.getByText("CIPHER's turn")).toBeInTheDocument();
   });
 });

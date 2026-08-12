@@ -8,6 +8,8 @@ export function PlayerCard({ player, isCurrent, isYou }: PlayerCardProps) {
     styles["player-card"],
     isCurrent ? styles["current"] : "",
     isYou ? styles["you"] : "",
+    player.team ? styles[`team-${player.team}`] : "",
+    player.isBot ? styles["bot"] : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -26,6 +28,10 @@ export function PlayerCard({ player, isCurrent, isYou }: PlayerCardProps) {
         <span className={styles["player-name"]}>
           {player.name}
           {isYou && <span className={styles["you-badge"]}>{t("common.you")}</span>}
+          {player.isBot && <span className={styles["bot-badge"]}>{t("solo.rivalBadge")}</span>}
+          {player.team && (
+            <span className={styles["team-badge"]}>{t(`teams.${player.team}Short`)}</span>
+          )}
         </span>
         <span className={styles["player-score"]}>{player.score} {t("common.pts")}</span>
       </div>

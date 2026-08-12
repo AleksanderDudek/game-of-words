@@ -10,7 +10,14 @@ import { ConnectingScreen } from "./components/ConnectingScreen/ConnectingScreen
 import { MyPacksScreen } from "./components/MyPacksScreen/MyPacksScreen";
 import { SINGLE_SERVER_URL, GAME_SERVERS } from "./config/servers";
 import { usePackStorage } from "./hooks/usePackStorage/usePackStorage";
-import type { GameServerEntry, BuiltinPackInfo, PackReference } from "@/shared/types";
+import type {
+  GameServerEntry,
+  BuiltinPackInfo,
+  PackReference,
+  GameMode,
+  TeamId,
+  BotDifficulty,
+} from "@/shared/types";
 import type { WordPack } from "./lib/wordPack";
 import "./styles/global.scss";
 
@@ -35,6 +42,8 @@ export default function App() {
   const [nameInput, setNameInput] = useState("");
   const [sessionIdInput, setSessionIdInput] = useState("");
   const [guessInput, setGuessInput] = useState("");
+  // Mode chosen on the join screen — it decides which lobby the server seats us in.
+  const [modeInput, setModeInput] = useState<GameMode>("classic");
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Fetch built-in packs from server when we have a URL
@@ -65,7 +74,9 @@ export default function App() {
 
   const handleJoin = () => {
     if (!nameInput.trim()) return;
-    join(nameInput.trim(), sessionIdInput.trim() || undefined);
+    // Solo rooms are private, so a pasted session code is ignored for them.
+    const targetSession = modeInput === "solo" ? undefined : sessionIdInput.trim() || undefined;
+    join(nameInput.trim(), targetSession, modeInput);
   };
 
   const handleGuess = () => {
@@ -88,6 +99,21 @@ export default function App() {
 
   const handleSetPack = useCallback(
     (ref: PackReference) => send({ type: "set_word_pack", pack: ref }),
+    [send],
+  );
+
+  const handleSetMode = useCallback(
+    (mode: GameMode) => send({ type: "set_mode", mode }),
+    [send],
+  );
+
+  const handleSetTeam = useCallback(
+    (team: TeamId) => send({ type: "set_team", team }),
+    [send],
+  );
+
+  const handleSetBotDifficulty = useCallback(
+    (difficulty: BotDifficulty) => send({ type: "set_bot_difficulty", difficulty }),
     [send],
   );
 
@@ -147,6 +173,8 @@ export default function App() {
             connected={connected}
             nameInput={nameInput}
             sessionIdInput={sessionIdInput}
+            mode={modeInput}
+            onModeChange={setModeInput}
             onNameChange={setNameInput}
             onSessionIdChange={setSessionIdInput}
             onJoin={handleJoin}
@@ -169,6 +197,9 @@ export default function App() {
             onStartGame={() => send({ type: "start_game" })}
             onSetPack={handleSetPack}
             onOpenMyPacks={() => setView("packs")}
+            onSetMode={handleSetMode}
+            onSetTeam={handleSetTeam}
+            onSetBotDifficulty={handleSetBotDifficulty}
           />
         </div>
       </div>
@@ -192,6 +223,9 @@ export default function App() {
           <GameOverScreen
             players={session.players}
             playerId={playerId}
+            mode={session.mode}
+            teams={session.teams}
+            coop={session.coop}
             onNewGame={() => window.location.reload()}
           />
         </div>

@@ -1,0 +1,106 @@
+.team-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.team-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-top-width: 3px;
+  border-radius: 8px;
+}
+
+.team-col.alpha {
+  border-top-color: var(--blue);
+}
+
+.team-col.bravo {
+  border-top-color: var(--orange);
+}
+
+.team-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.team-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.alpha .team-name {
+  color: var(--blue);
+}
+
+.bravo .team-name {
+  color: var(--orange);
+}
+
+.team-size {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.team-members {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 66px;
+}
+
+.team-members li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.team-members li.is-you {
+  color: var(--green);
+}
+
+.member-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag {
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+}
+
+.empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.join-btn {
+  width: 100%;
+  font-size: 11px;
+  padding: 6px 8px;
+}
+
+@media (max-width: 520px) {
+  .team-panel {
+    grid-template-columns: 1fr;
+  }
+}

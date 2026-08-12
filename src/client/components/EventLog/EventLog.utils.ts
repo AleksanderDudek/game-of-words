@@ -44,6 +44,16 @@ export function formatEvent(ev: ServerMessage, players: Player[], t: TFunc): Log
         text: t("eventLog.turnSwitched", { name: getName(ev.newPlayerId) }),
         className: "log-entry turn",
       };
+    case "steal_phase":
+      return {
+        text: t("eventLog.stealPhase", { team: t(`teams.${ev.team}`), seconds: ev.seconds }),
+        className: "log-entry steal",
+      };
+    case "life_lost":
+      return {
+        text: t("eventLog.lifeLost", { word: ev.word, count: ev.livesLeft }),
+        className: "log-entry error",
+      };
     case "error":
       return {
         text: t("eventLog.error", { message: ev.message }),
