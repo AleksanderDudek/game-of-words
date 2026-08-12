@@ -14,7 +14,7 @@ Words arrive with their middle letters scrambled. Race to decode the signal befo
 
 🕹️ **[Play now → aleksanderdudek.github.io/game-of-words](https://aleksanderdudek.github.io/game-of-words/)**
 
-[Play Now](#-play-now) · [Quick Start](#-quick-start) · [How to Play](#-how-to-play) · [Configuration](#-configuration) · [LLM Integration](#-pluggable-llm-endpoint) · [Docker](#-docker-deployment) · [Architecture](#-architecture)
+[Play Now](#-play-now) · [Quick Start](#-quick-start) · [How to Play](#-how-to-play) · [Game Modes](#-game-modes) · [Configuration](#-configuration) · [LLM Integration](#-pluggable-llm-endpoint) · [Docker](#-docker-deployment) · [Architecture](#-architecture)
 
 </div>
 
@@ -50,15 +50,81 @@ You can simulate a 2-player game from a single machine:
 
 ## 🎮 How to Play
 
-1. **Join a session** — Enter a callsign and optionally a session code to join friends
-2. **Read the board** — The word is displayed with its **middle letters shuffled**. First and last characters (and special chars like `-`) stay fixed
-3. **Read the hint** — A witty, non-obvious clue is shown to guide your guess
-4. **Take turns guessing** — Each player gets a set number of guesses per turn, then it switches
-5. **Buy reveals** — Spend earned points to uncover a swapped pair (letters snap back to their correct positions)
-6. **Score** — Correct guess = base points + time bonus + remaining-pairs bonus
-7. **Difficulty ramps** — Word length increases from 4 to 20+ letters as rounds progress
+1. **Pick a mode** — Classic, Teams, Co-op or Solo (see below)
+2. **Join a session** — Enter a callsign and optionally a session code to join friends
+3. **Read the board** — The word is displayed with its **middle letters shuffled**. First and last characters (and special chars like `-`) stay fixed
+4. **Read the hint** — A witty, non-obvious clue is shown to guide your guess
+5. **Take turns guessing** — Each player gets a set number of guesses per turn, then it switches
+6. **Buy reveals** — Spend points to uncover a swapped pair (letters snap back to their correct positions)
+7. **Score** — Correct guess = base points + time bonus + remaining-pairs bonus
+8. **Difficulty ramps** — Word length increases from 4 to 20+ letters as rounds progress
 
 > Swapped pairs never consist of identical letters — every shuffle is meaningful.
+
+---
+
+## 🕹️ Game Modes
+
+The board, timer, word packs and difficulty ramp are identical in every mode.
+What changes is **who holds the mic, where points are banked, and what happens
+when a word goes unsolved**.
+
+| Mode | Players | Turn structure | Point bank | Failing a word |
+|---|---|---|---|---|
+| **Classic** | 2–4 | Personal guess budget, then the turn passes | Your own score | Word revealed, next round |
+| **Teams** | 2–4 (two squads) | Squad shares a pool; the mic moves after every miss | Squad score | Opponents get a steal window |
+| **Co-op** | 2–4 | One shared pool for the table; mic moves after every miss | Shared bank | Costs a life |
+| **Solo** | 1 (+ bot) | You and the bot alternate on the same word | Your own score | Word revealed, next round |
+
+### 🛡 Teams
+
+Two squads (**ALPHA** and **BRAVO**) alternate holding the word. Joining players
+are auto-balanced into the smaller squad, and anyone can switch sides in the
+lobby.
+
+- The squad on the clock shares a pool of guesses. **Every miss hands the mic to
+  the next teammate** — nobody monologues, and the whole squad stays in it.
+- Empty the pool and the round enters a **STEAL**: the other squad gets one
+  guess in a short window (`STEAL_SECONDS`, default 15s) worth a reduced share
+  of the points (`STEAL_POINTS_PCT`, default 60%). This is the game-show
+  pressure valve that keeps the idle squad watching the board.
+- Ownership alternates every round, so a steal never costs a squad its turn.
+- Reveals are paid from the **squad's** score, and only the squad on the clock
+  may buy one. Personal scores are still tracked for the end-of-game MVP.
+
+### 🤝 Co-op
+
+No opponents — the table plays against the word list.
+
+- **One shared guess pool per word** (`COOP_GUESSES_BASE` + player count). A
+  wasted guess costs everyone, which is what makes people talk before answering.
+- **One shared point bank.** Any player may buy a reveal at any time, not just
+  whoever holds the mic.
+- **Lives** (`COOP_LIVES`, default 3). Failing a word costs one; the run ends
+  when they're gone.
+- The run is **graded S/A/B/C/D** on solve rate and volume — co-op rewards a
+  performance, not a winner. Individual scores are shown as contributions.
+
+### 🤖 Solo
+
+One human against a heuristic bot rival, alternating turns on the same word.
+Solo rooms are private and cannot be joined.
+
+The bot obviously knows the answer, so its skill is *simulated*: each guess rolls
+against a solve probability shaped by word length and how many pairs are still
+scrambled. A failed roll plays a **decoy** — the board with one more pair
+transposed — so its turns read as real attempts. It buys reveals when the board
+is messy and it can afford to.
+
+| Difficulty | Behaviour |
+|---|---|
+| `easy` | Rarely solves early — good for learning the board |
+| `normal` | A steady rival that punishes slow rounds |
+| `hard` | Solves fast and buys reveals often |
+| `adaptive` *(default)* | Rubber-bands to your score: sharpens up when you lead, eases off when you fall behind |
+
+**Adaptive** is the recommended setting for practice — it keeps the match close
+without ever being unbeatable.
 
 ---
 
@@ -107,6 +173,13 @@ All game parameters are configurable via environment variables (or by editing `s
 | `SESSION_DURATION_SEC` | `45` | Seconds per round (30–60 recommended) |
 | `MIN_PLAYERS` | `2` | Minimum players to start |
 | `MAX_PLAYERS` | `4` | Maximum players per session |
+| `STEAL_SECONDS` | `15` | Team mode: length of the steal window |
+| `STEAL_POINTS_PCT` | `60` | Team mode: % of round points a steal is worth |
+| `COOP_LIVES` | `3` | Co-op mode: lives per run |
+| `COOP_GUESSES_BASE` | `3` | Co-op mode: shared pool = base + player count |
+| `BOT_NAME` | `CIPHER` | Solo mode: rival's display name |
+| `BOT_MIN_THINK_MS` | `1800` | Solo mode: fastest bot thinking pause |
+| `BOT_MAX_THINK_MS` | `7000` | Solo mode: slowest bot thinking pause |
 
 Copy `.env.example` to `.env` to override:
 
@@ -216,12 +289,17 @@ All messages are JSON. Full TypeScript definitions in `server/src/types.ts`.
 | Client → Server | `start_game` | Start the game from lobby |
 | Client → Server | `guess` | Submit a word guess |
 | Client → Server | `buy_hint` | Spend points to reveal a swapped pair |
+| Client → Server | `set_mode` | Host switches game mode (lobby only) |
+| Client → Server | `set_team` | Player picks a squad (team mode, lobby only) |
+| Client → Server | `set_bot_difficulty` | Host sets the solo rival's skill (lobby only) |
 | Server → Client | `session_update` | Full game state snapshot |
 | Server → Client | `joined` | Confirms join with player ID |
 | Server → Client | `guess_result` | Whether a guess was correct |
 | Server → Client | `hint_revealed` | Which pair was uncovered |
 | Server → Client | `round_won` | Round result with points |
 | Server → Client | `turn_switched` | Whose turn it is now |
+| Server → Client | `steal_phase` | Team mode: attack failed, opponents get one shot |
+| Server → Client | `life_lost` | Co-op mode: word unsolved, a life is gone |
 | Server → Client | `error` | Error messages |
 
 ### Game State Machine
@@ -231,6 +309,12 @@ lobby → countdown → playing ⇄ round_end → game_over
                         ↑          │
                         └──────────┘
                       (next round)
+
+Team mode adds a phase inside `playing`:
+
+  attack ──(pool empty / time up)──► steal ──(miss)──► round_end
+     │                                 │
+     └──────(correct)──────────────────┴──(correct, reduced points)──► round_end
 ```
 
 ---

@@ -45,3 +45,87 @@ describe("GameOverScreen", () => {
     expect(onNewGame).toHaveBeenCalledOnce();
   });
 });
+
+describe("GameOverScreen — team mode", () => {
+  const squads: Player[] = [
+    { id: "p1" as PlayerId, name: "Alice", score: 350, isConnected: true, team: "alpha" },
+    { id: "p2" as PlayerId, name: "Bob", score: 120, isConnected: true, team: "bravo" },
+  ];
+
+  it("declares the winning squad and the MVP", () => {
+    render(
+      <GameOverScreen
+        players={squads}
+        playerId="p1"
+        mode="team"
+        teams={[
+          { id: "alpha", score: 350, solved: 4 },
+          { id: "bravo", score: 120, solved: 1 },
+        ]}
+        onNewGame={vi.fn()}
+      />
+    );
+    expect(screen.getByText("ALPHA takes it")).toBeInTheDocument();
+    expect(screen.getByText("MVP: Alice · 350 pts")).toBeInTheDocument();
+  });
+
+  it("reports a level score as a draw", () => {
+    render(
+      <GameOverScreen
+        players={squads}
+        playerId="p1"
+        mode="team"
+        teams={[
+          { id: "alpha", score: 200, solved: 2 },
+          { id: "bravo", score: 200, solved: 2 },
+        ]}
+        onNewGame={vi.fn()}
+      />
+    );
+    expect(screen.getByText("Dead heat — no squad ahead")).toBeInTheDocument();
+  });
+});
+
+describe("GameOverScreen — coop mode", () => {
+  it("grades the run instead of crowning a winner", () => {
+    render(
+      <GameOverScreen
+        players={players}
+        playerId="p1"
+        mode="coop"
+        coop={{
+          bank: 640,
+          livesLeft: 0,
+          maxLives: 3,
+          guessesLeft: 0,
+          guessesPerRound: 5,
+          roundsCleared: 9,
+          roundsFailed: 1,
+        }}
+        onNewGame={vi.fn()}
+      />
+    );
+    expect(screen.getByText("S")).toBeInTheDocument();
+    expect(screen.getByText("9 words cleared")).toBeInTheDocument();
+    expect(screen.getByText("640 pts banked")).toBeInTheDocument();
+    expect(screen.getByText("Contributions")).toBeInTheDocument();
+  });
+});
+
+describe("GameOverScreen — solo mode", () => {
+  const duel: Player[] = [
+    { id: "p1" as PlayerId, name: "Alice", score: 300, isConnected: true },
+    { id: "bot" as PlayerId, name: "CIPHER", score: 180, isConnected: true, isBot: true },
+  ];
+
+  it("says who out-decoded whom", () => {
+    render(<GameOverScreen players={duel} playerId="p1" mode="solo" onNewGame={vi.fn()} />);
+    expect(screen.getByText("You out-decoded CIPHER")).toBeInTheDocument();
+  });
+
+  it("reports a loss to the rival", () => {
+    const behind = [duel[0], { ...duel[1], score: 900 }];
+    render(<GameOverScreen players={behind} playerId="p1" mode="solo" onNewGame={vi.fn()} />);
+    expect(screen.getByText("CIPHER out-decoded you")).toBeInTheDocument();
+  });
+});

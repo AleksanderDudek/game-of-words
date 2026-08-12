@@ -5,6 +5,9 @@ import { BoardCell } from "../BoardCell/BoardCell";
 import { TimerBar } from "../TimerBar/TimerBar";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
 import { EventLog } from "../EventLog/EventLog";
+import { TeamScoreboard } from "../TeamScoreboard/TeamScoreboard";
+import { CoopStatus } from "../CoopStatus/CoopStatus";
+import { modeMeta } from "@/client/lib/modes";
 import type { GameScreenProps } from "./GameScreen.types";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 
@@ -24,9 +27,19 @@ export function GameScreen({
 }: GameScreenProps) {
   const { t } = useTranslation();
   const round = session.round!;
+  const mode = session.mode;
   const isMyTurn = round.currentPlayerId === playerId;
   const me = session.players.find((p) => p.id === playerId);
-  const canAffordHint = (me?.score ?? 0) >= session.config.hintCostPoints;
+  const currentPlayer = session.players.find((p) => p.id === round.currentPlayerId);
+
+  // Hints are paid from a different pot in every mode: your own points in
+  // classic/solo, the squad's in team, the table's shared bank in coop.
+  const myTeamScore = session.teams?.find((tm) => tm.id === me?.team)?.score ?? 0;
+  let hintBank = me?.score ?? 0;
+  if (mode === "team") hintBank = myTeamScore;
+  if (mode === "coop") hintBank = session.coop?.bank ?? 0;
+  const onAttackingSquad = mode !== "team" || me?.team === round.attackingTeam;
+  const canAffordHint = hintBank >= session.config.hintCostPoints && onAttackingSquad;
 
   const [shake, setShake] = useState(false);
   const prevEventsLen = useRef(events.length);
@@ -47,12 +60,58 @@ export function GameScreen({
     prevEventsLen.current = events.length;
   }, [events, playerId]);
 
+  // Team games read better with squadmates grouped rather than in join order.
+  const rosterOrder =
+    mode === "team"
+      ? [...session.players].sort((a, b) => (a.team ?? "").localeCompare(b.team ?? ""))
+      : session.players;
+
   const turnIndicatorClass = [
     styles["turn-indicator"],
     isMyTurn ? styles["your-turn"] : "",
   ]
     .filter(Boolean)
     .join(" ");
+
+  /**
+   * Whose move it is, phrased for the mode: a personal guess budget in
+   * classic/solo, a shared pool in team/coop, and a "thinking" state while the
+   * solo rival works.
+   */
+  const renderTurnStatus = () => {
+    if (session.state === "paused") {
+      return <span className={styles["paused-text"]}>{t("game.paused")}</span>;
+    }
+    if (session.state === "round_end") {
+      return <span className={styles["round-end-msg"]}>{t("game.roundEnd")}</span>;
+    }
+    if (mode === "solo" && currentPlayer?.isBot) {
+      return (
+        <span className={styles["turn-text"]}>
+          {round.botThinking
+            ? t("solo.rivalThinking", { name: currentPlayer.name })
+            : t("game.theirTurn", { name: currentPlayer.name })}
+        </span>
+      );
+    }
+    if (isMyTurn) {
+      return (
+        <>
+          <span className={styles["turn-text"]}>{t("game.yourTurn")}</span>
+          <span className={styles["turns-left"]}>
+            {mode === "coop" || mode === "team"
+              ? t("game.sharedGuessesLeft", { count: round.turnsRemaining })
+              : t("game.guessesLeft", { count: round.turnsRemaining })}
+          </span>
+        </>
+      );
+    }
+    return (
+      <span className={styles["turn-text"]}>
+        {t("game.theirTurn", { name: currentPlayer?.name })}
+      </span>
+    );
+  };
 
   return (
     <div className={styles["game-screen"]}>
@@ -62,12 +121,32 @@ export function GameScreen({
           <span className={styles["session-code"]}>{session.sessionId}</span>
         </div>
         <div className={styles["round-badge"]}>
+          <span className={styles["mode-tag"]} title={t(`modes.${mode}.name`)}>
+            {modeMeta(mode).icon}
+          </span>
           {t("game.round")} {round.roundNumber}
           <span className={styles["difficulty-tag"]}>{round.wordLength} {t("common.letters")}</span>
         </div>
       </div>
 
-      <TimerBar timeLeft={round.timeLeft} total={session.config.sessionDurationSec} />
+      {mode === "team" && session.teams && (
+        <TeamScoreboard
+          teams={session.teams}
+          players={session.players}
+          attackingTeam={round.attackingTeam}
+          phase={round.phase}
+          myTeam={me?.team}
+        />
+      )}
+
+      {mode === "coop" && session.coop && <CoopStatus coop={session.coop} />}
+
+      <TimerBar
+        timeLeft={round.timeLeft}
+        total={round.phase === "steal"
+          ? session.config.stealSeconds ?? session.config.sessionDurationSec
+          : session.config.sessionDurationSec}
+      />
 
       <div className={styles["hint-box"]}>
         <span className={styles["hint-label"]}>{t("game.hint")}</span>
@@ -80,24 +159,7 @@ export function GameScreen({
         ))}
       </div>
 
-      <div className={turnIndicatorClass}>
-        {session.state === "paused" ? (
-          <span className={styles["paused-text"]}>{t("game.paused")}</span>
-        ) : session.state === "round_end" ? (
-          <span className={styles["round-end-msg"]}>{t("game.roundEnd")}</span>
-        ) : isMyTurn ? (
-          <>
-            <span className={styles["turn-text"]}>{t("game.yourTurn")}</span>
-            <span className={styles["turns-left"]}>
-              {t("game.guessesLeft", { count: round.turnsRemaining })}
-            </span>
-          </>
-        ) : (
-          <span className={styles["turn-text"]}>
-            {t("game.theirTurn", { name: session.players.find((p) => p.id === round.currentPlayerId)?.name })}
-          </span>
-        )}
-      </div>
+      <div className={turnIndicatorClass}>{renderTurnStatus()}</div>
 
       {session.state === "playing" && (
         <div className={styles["guess-area"]}>
@@ -134,9 +196,16 @@ export function GameScreen({
             className={`btn ${styles["hint-btn"]}`}
             onClick={onBuyHint}
             disabled={!canAffordHint}
-            title={`Costs ${session.config.hintCostPoints} points`}
+            title={t("game.revealPairTitle", {
+              cost: session.config.hintCostPoints,
+              bank: hintBank,
+              source: t(`game.bank.${mode}`),
+            })}
           >
             {t("game.revealPair", { cost: session.config.hintCostPoints })}
+            <span className={styles["hint-bank"]}>
+              {t(`game.bank.${mode}`)}: {hintBank}
+            </span>
           </button>
         </div>
       )}
@@ -144,8 +213,8 @@ export function GameScreen({
       {(session.state === "playing" || session.state === "paused") && (
         <div className={styles["action-bar"]}>
           {session.state === "playing" && isMyTurn && onPassTurn && (
-            <button className="btn" onClick={onPassTurn}>
-              {t("game.passTurn")}
+            <button className="btn" onClick={onPassTurn} title={t("game.passTurnTitle")}>
+              {mode === "team" || mode === "coop" ? t("game.passMic") : t("game.passTurn")}
             </button>
           )}
           {session.state === "playing" && onPauseGame && (
@@ -168,7 +237,7 @@ export function GameScreen({
 
       <div className={styles["bottom-panel"]}>
         <div className={styles["players-panel"]}>
-          {session.players.map((p) => (
+          {rosterOrder.map((p) => (
             <PlayerCard
               key={p.id}
               player={p}

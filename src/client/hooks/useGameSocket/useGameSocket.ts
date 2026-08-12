@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ClientMessage, ServerMessage, SessionSnapshot } from "@/shared/types";
+import { ClientMessage, GameMode, ServerMessage, SessionSnapshot } from "@/shared/types";
 
 const FALLBACK_WS_URL = `ws://${window.location.hostname}:8080`;
 
@@ -9,6 +9,7 @@ interface StoredSession {
   playerId: string;
   sessionId: string;
   playerName: string;
+  mode?: GameMode;
 }
 
 function loadStored(): StoredSession | null {
@@ -47,7 +48,7 @@ export interface UseGameSocket {
   sessionId: string | null;
   connected: boolean;
   events: ServerMessage[];
-  join: (name: string, sessionId?: string) => void;
+  join: (name: string, sessionId?: string, mode?: GameMode) => void;
   send: (msg: ClientMessage) => void;
   clearEvents: () => void;
   forfeitGame: () => void;
@@ -63,6 +64,7 @@ export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket
   const [events, setEvents] = useState<ServerMessage[]>([]);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const playerNameRef = useRef<string>("");
+  const modeRef = useRef<GameMode | undefined>(undefined);
   const serverUrlRef = useRef(serverUrl);
   serverUrlRef.current = serverUrl;
 
@@ -84,12 +86,14 @@ export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket
       const stored = loadStored();
       if (stored) {
         playerNameRef.current = stored.playerName;
+        modeRef.current = stored.mode;
         ws.send(
           JSON.stringify({
             type: "join",
             name: stored.playerName,
             sessionId: stored.sessionId,
             playerId: stored.playerId,
+            mode: stored.mode,
           } satisfies ClientMessage)
         );
       }
@@ -106,6 +110,7 @@ export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket
             playerId: msg.playerId,
             sessionId: msg.sessionId,
             playerName: playerNameRef.current,
+            mode: modeRef.current,
           });
           break;
         case "session_update":
@@ -119,6 +124,8 @@ export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket
         case "player_left":
         case "game_paused":
         case "game_resumed":
+        case "steal_phase":
+        case "life_lost":
         case "error":
           setEvents((prev) => [...prev.slice(-20), msg]);
           break;
@@ -158,9 +165,10 @@ export function useGameSocket(options: UseGameSocketOptions = {}): UseGameSocket
   }, []);
 
   const join = useCallback(
-    (name: string, targetSessionId?: string) => {
+    (name: string, targetSessionId?: string, mode?: GameMode) => {
       playerNameRef.current = name;
-      send({ type: "join", name, sessionId: targetSessionId });
+      modeRef.current = mode;
+      send({ type: "join", name, sessionId: targetSessionId, mode });
     },
     [send]
   );

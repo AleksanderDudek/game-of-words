@@ -1,11 +1,14 @@
 import { useTranslation } from "react-i18next";
 import styles from "./JoinScreen.module.scss";
+import { ModePicker } from "../ModePicker/ModePicker";
 import type { JoinScreenProps } from "./JoinScreen.types";
 
 export function JoinScreen({
   connected,
   nameInput,
   sessionIdInput,
+  mode,
+  onModeChange,
   onNameChange,
   onSessionIdChange,
   onJoin,
@@ -52,6 +55,14 @@ export function JoinScreen({
 
         <div className={styles["input-group"]}>
           <div className={styles["label-row"]}>
+            <label>{t("join.gameMode")}</label>
+          </div>
+          <ModePicker value={mode} onChange={onModeChange} disabled={!connected} />
+          <p className={styles["mode-rules"]}>{t(`modes.${mode}.rules`)}</p>
+        </div>
+
+        <div className={styles["input-group"]}>
+          <div className={styles["label-row"]}>
             <label>{t("join.callsign")}</label>
             <span className={`${styles["char-count"]} ${nameInput.length >= 14 ? styles["warn"] : ""}`}>
               {nameInput.length}/16
@@ -69,26 +80,28 @@ export function JoinScreen({
           />
         </div>
 
-        <div className={styles["input-group"]}>
-          <div className={styles["label-row"]}>
-            <label>
-              {t("join.sessionCode")} <span className={styles["optional"]}>{t("join.optional")}</span>
-            </label>
-            {sessionIdInput && (
-              <span className={styles["char-count"]}>{sessionIdInput.length}/8</span>
-            )}
+        {mode !== "solo" && (
+          <div className={styles["input-group"]}>
+            <div className={styles["label-row"]}>
+              <label>
+                {t("join.sessionCode")} <span className={styles["optional"]}>{t("join.optional")}</span>
+              </label>
+              {sessionIdInput && (
+                <span className={styles["char-count"]}>{sessionIdInput.length}/8</span>
+              )}
+            </div>
+            <input
+              type="text"
+              value={sessionIdInput}
+              onChange={(e) => onSessionIdChange(e.target.value.toUpperCase())}
+              onKeyDown={handleKey}
+              placeholder={t("join.sessionPlaceholder")}
+              maxLength={8}
+              disabled={!connected}
+              style={{ textTransform: "uppercase" }}
+            />
           </div>
-          <input
-            type="text"
-            value={sessionIdInput}
-            onChange={(e) => onSessionIdChange(e.target.value.toUpperCase())}
-            onKeyDown={handleKey}
-            placeholder={t("join.sessionPlaceholder")}
-            maxLength={8}
-            disabled={!connected}
-            style={{ textTransform: "uppercase" }}
-          />
-        </div>
+        )}
 
         <button
           className="btn primary"

@@ -1,4 +1,11 @@
-import type { SessionSnapshot, PackReference, BuiltinPackInfo } from "@/shared/types";
+import type {
+  SessionSnapshot,
+  PackReference,
+  BuiltinPackInfo,
+  GameMode,
+  TeamId,
+  BotDifficulty,
+} from "@/shared/types";
 import type { WordPack } from "@/client/lib/wordPack";
 
 export interface LobbyScreenProps {
@@ -9,4 +16,7 @@ export interface LobbyScreenProps {
   onStartGame: () => void;
   onSetPack: (ref: PackReference) => void;
   onOpenMyPacks: () => void;
+  onSetMode: (mode: GameMode) => void;
+  onSetTeam: (team: TeamId) => void;
+  onSetBotDifficulty: (difficulty: BotDifficulty) => void;
 }

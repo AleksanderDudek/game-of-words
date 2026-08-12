@@ -6,8 +6,8 @@ import http, { IncomingMessage, ServerResponse } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { CONFIG } from "./config";
 import { GameSession } from "./session";
-import { isClientMessage, toPlayerId } from "../shared/types";
-import type { ServerInfo, BuiltinPackInfo } from "../shared/types";
+import { isClientMessage, isGameMode, toPlayerId } from "../shared/types";
+import type { GameMode, ServerInfo, BuiltinPackInfo } from "../shared/types";
 import { BUILTIN_PACKS, getBuiltinPackWords } from "./wordgen";
 
 const sessions = new Map<string, GameSession>();
@@ -35,11 +35,14 @@ function isOriginAllowed(req: IncomingMessage): boolean {
   return allowed.includes(origin);
 }
 
-function findOrCreateSession(): GameSession {
-  // Find an open lobby session
-  for (const session of sessions.values()) {
-    if (session.state === "lobby" && session.players.size < session.maxPlayers) {
-      return session;
+function findOrCreateSession(mode: GameMode): GameSession {
+  // Find an open lobby running the mode the player asked for.
+  // Solo rooms are private, so they are never matched — always a fresh room.
+  if (mode !== "solo") {
+    for (const session of sessions.values()) {
+      if (session.mode === mode && session.isJoinable()) {
+        return session;
+      }
     }
   }
 
@@ -52,9 +55,9 @@ function findOrCreateSession(): GameSession {
   }
 
   // Create new session
-  const session = new GameSession();
+  const session = new GameSession(mode);
   sessions.set(session.id, session);
-  console.log(`[Server] New session created: ${session.id} (total: ${sessions.size})`);
+  console.log(`[Server] New ${mode} session created: ${session.id} (total: ${sessions.size})`);
   return session;
 }
 
@@ -96,7 +99,7 @@ function handleHttpRequest(req: IncomingMessage, res: ServerResponse): void {
   if (req.method === "GET" && req.url === "/api/info") {
     const activeSessionList = [...sessions.values()].filter((s) => s.state !== "game_over");
     const totalPlayers = activeSessionList.reduce(
-      (sum, s) => sum + [...s.players.values()].filter((p) => p.isConnected).length,
+      (sum, s) => sum + s.connectedHumans().length,
       0,
     );
     const info: ServerInfo = {
@@ -196,7 +199,7 @@ wss.on("connection", (ws: WebSocket) => {
           }
           session = existing;
         } else {
-          session = findOrCreateSession();
+          session = findOrCreateSession(isGameMode(msg.mode) ? msg.mode : "classic");
         }
 
         const playerId = session.addPlayer(ws, msg.name, msg.playerId);
@@ -234,9 +237,8 @@ wss.on("connection", (ws: WebSocket) => {
       if (session) {
         session.removePlayer(toPlayerId(binding.playerId));
 
-        // Clean up empty sessions
-        const connected = [...session.players.values()].filter((p) => p.isConnected);
-        if (connected.length === 0) {
+        // Clean up empty sessions (a solo-mode bot doesn't keep a room alive)
+        if (!session.hasConnectedHumans()) {
           sessions.delete(session.id);
           console.log(`[Server] Session ${session.id} removed (empty). Total: ${sessions.size}`);
         }
@@ -254,8 +256,7 @@ wss.on("connection", (ws: WebSocket) => {
 setInterval(() => {
   for (const [id, session] of sessions) {
     if (session.state === "game_over") {
-      const connected = [...session.players.values()].filter((p) => p.isConnected);
-      if (connected.length === 0) {
+      if (!session.hasConnectedHumans()) {
         session.cleanup();
         sessions.delete(id);
         console.log(`[Server] Cleaned stale session ${id}`);

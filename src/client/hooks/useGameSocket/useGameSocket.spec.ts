@@ -87,6 +87,7 @@ describe("useGameSocket", () => {
         session: {
           sessionId: "sess1" as SessionId,
           state: "lobby",
+  mode: "classic",
           players: [],
           round: null,
           playerLimit: 4,

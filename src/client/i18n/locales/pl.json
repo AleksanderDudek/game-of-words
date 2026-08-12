@@ -37,8 +37,93 @@
     "label": "SYGNAŁ NADCHODZI"
   },
 
+  "modes": {
+    "pickerLabel": "Tryb gry",
+    "soloLocked": "Tryb solo wymaga pustego pokoju",
+    "classic": {
+      "name": "Klasyczny",
+      "tagline": "Pojedynek każdy na każdego",
+      "rules": "Każdy gra na siebie. Zgadujecie na zmianę to samo słowo — każda pomyłka zużywa jedną z Twoich prób, potem tura przechodzi dalej. Punkty są tylko Twoje, a odkrycia opłacasz z własnego wyniku."
+    },
+    "team": {
+      "name": "Drużyny",
+      "tagline": "Dwie drużyny, z przejęciem",
+      "rules": "Dwie drużyny na zmianę mają słowo. Twoja drużyna dzieli pulę prób, a po każdej pomyłce mikrofon przechodzi do kolegi. Gdy pula się skończy, druga drużyna dostaje jedno krótkie okno na przejęcie za mniejszą liczbę punktów. Odkrycia opłacane są z konta drużyny."
+    },
+    "coop": {
+      "name": "Kooperacja",
+      "tagline": "Wszyscy przeciw słowom",
+      "rules": "Bez przeciwników — stół dzieli jedną pulę prób na słowo, jeden bank punktów i zapas żyć. Każdy może kupić odkrycie w dowolnej chwili. Nierozwiązane słowo kosztuje życie; po utracie żyć przebieg dostaje ocenę."
+    },
+    "solo": {
+      "name": "Solo",
+      "tagline": "Trening z rywalem",
+      "rules": "Ty przeciw botowi, na zmianę przy tym samym słowie. Wybierz, jak ostro gra — tryb adaptacyjny śledzi Twój wynik, żeby mecz był wyrównany podczas nauki."
+    }
+  },
+
+  "teams": {
+    "alpha": "ALFA",
+    "bravo": "BRAWO",
+    "alphaShort": "A",
+    "bravoShort": "B",
+    "joinSquad": "DOŁĄCZ",
+    "yourSquad": "TWOJA DRUŻYNA",
+    "emptySquad": "pusta",
+    "attackBanner": "{{team}} ma słowo",
+    "stealBanner": "⚡ PRZEJĘCIE — {{team}} ma jedną próbę",
+    "solvedCount_one": "{{count}} rozwiązane",
+    "solvedCount_other": "{{count}} rozwiązanych",
+    "memberCount_one": "{{count}} gracz",
+    "memberCount_other": "{{count}} graczy"
+  },
+
+  "coop": {
+    "lives": "Życia",
+    "bank": "Bank",
+    "sharedGuesses": "Próby",
+    "cleared": "Zaliczone",
+    "livesLeft_one": "{{count}} życie",
+    "livesLeft_other": "{{count}} żyć"
+  },
+
+  "solo": {
+    "rivalBadge": "BOT",
+    "rivalLabel": "RYWAL",
+    "rivalThinking": "{{name}} myśli…",
+    "difficulty": {
+      "easy": "ŁATWY",
+      "normal": "NORMALNY",
+      "hard": "TRUDNY",
+      "adaptive": "ADAPTACYJNY"
+    },
+    "difficultyHint": {
+      "easy": "Rzadko trafia szybko — dobry do nauki planszy.",
+      "normal": "Równy rywal, który karze powolne rundy.",
+      "hard": "Trafia szybko i często kupuje odkrycia.",
+      "adaptive": "Śledzi Twój wynik: ostrzy się, gdy prowadzisz, odpuszcza, gdy tracisz."
+    }
+  },
+
+  "results": {
+    "teamWinner": "{{team}} wygrywa",
+    "teamDraw": "Remis — żadna drużyna nie prowadzi",
+    "mvp": "MVP: {{name}} · {{points}} pkt",
+    "contributions": "Wkład graczy",
+    "coopSubtitle": "Przebieg zakończony",
+    "coopCleared_one": "{{count}} słowo zaliczone",
+    "coopCleared_other": "{{count}} słów zaliczonych",
+    "coopFailed_one": "{{count}} słowo stracone",
+    "coopFailed_other": "{{count}} słów straconych",
+    "coopBank": "{{points}} pkt w banku",
+    "soloWin": "Rozszyfrowałeś lepiej niż {{name}}",
+    "soloLoss": "{{name}} rozszyfrował lepiej",
+    "soloDraw": "Remis z rywalem"
+  },
+
   "join": {
     "subtitle": "Rozszyfruj zakłócony sygnał, zanim zniknie na zawsze",
+    "gameMode": "TRYB GRY",
     "statusConnected": "Serwer połączony",
     "statusConnecting": "Łączenie...",
     "callsign": "PSEUDONIM",
@@ -56,6 +141,13 @@
     "session": "SESJA",
     "waitingTitle": "Oczekiwanie na graczy...",
     "waitingHint": "Udostępnij kod sesji znajomym, by dołączyli",
+    "soloTitle": "Rywal gotowy",
+    "soloHint": "Wybierz poziom bota i zacznij, kiedy chcesz",
+    "modeLabel": "TRYB GRY",
+    "needSquads": "Obie drużyny potrzebują gracza",
+    "configSteal": "Okno przejęcia",
+    "configLives": "Życia",
+    "configSharedGuesses": "Wspólne próby",
     "spectatorWatching_one": "• {{count}} widz obserwuje",
     "spectatorWatching_other": "• {{count}} widzów obserwuje",
     "hostBadge": "HOST",
@@ -103,7 +195,18 @@
     "waitingPlaceholder": "Poczekaj na swoją turę...",
     "guessBtn": "ZGADUJ",
     "revealPair": "🔓 ODKRYJ PARĘ ({{cost}} pkt)",
+    "revealPairTitle": "Kosztuje {{cost}} pkt z: {{source}} (dostępne {{bank}})",
+    "sharedGuessesLeft_one": "{{count}} próba w puli",
+    "sharedGuessesLeft_other": "{{count}} prób w puli",
+    "bank": {
+      "classic": "Twoje punkty",
+      "team": "Bank drużyny",
+      "coop": "Wspólny bank",
+      "solo": "Twoje punkty"
+    },
     "passTurn": "↷ PASS",
+    "passMic": "↷ ODDAJ MIKROFON",
+    "passTurnTitle": "W trybie drużynowym i kooperacji oddanie tury zużywa jedną próbę ze wspólnej puli",
     "pause": "⏸ PAUZA",
     "resume": "▶ WZNÓW",
     "leaveGame": "✕ OPUŚĆ GRĘ"
@@ -176,6 +279,9 @@
     "roundWon": "🏆 {{name}} rozwiązał! (+{{points}}) — \"{{word}}\"",
     "timeUp": "⏰ Czas minął! Słowo to \"{{word}}\"",
     "turnSwitched": "↻ Tura gracza {{name}}",
+    "stealPhase": "⚡ Przejęcie! {{team}} ma {{seconds}}s",
+    "lifeLost_one": "💔 Stracone \"{{word}}\" — zostało {{count}} życie",
+    "lifeLost_other": "💔 Stracone \"{{word}}\" — zostało {{count}} żyć",
     "error": "⚠ {{message}}"
   },
 

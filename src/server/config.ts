@@ -40,6 +40,19 @@ export const CONFIG = {
   MIN_PLAYERS:             envInt("MIN_PLAYERS", 2),
   MAX_PLAYERS:             envInt("MAX_PLAYERS", 4),
 
+  // ─── Team Mode ───
+  STEAL_SECONDS:           envInt("STEAL_SECONDS", 15),   // steal window after a failed attack
+  STEAL_POINTS_PCT:        envInt("STEAL_POINTS_PCT", 60), // % of round points awarded on a steal
+
+  // ─── Coop Mode ───
+  COOP_LIVES:              envInt("COOP_LIVES", 3),
+  COOP_GUESSES_BASE:       envInt("COOP_GUESSES_BASE", 3), // shared pool = base + player count
+
+  // ─── Solo Mode ───
+  BOT_NAME:                envStr("BOT_NAME", "CIPHER"),
+  BOT_MIN_THINK_MS:        envInt("BOT_MIN_THINK_MS", 1800),
+  BOT_MAX_THINK_MS:        envInt("BOT_MAX_THINK_MS", 7000),
+
   // ─── LLM Endpoint (pluggable) ───
   LLM_ENDPOINT:            envStr("LLM_ENDPOINT", ""),
   LLM_API_KEY:             envStr("LLM_API_KEY", ""),

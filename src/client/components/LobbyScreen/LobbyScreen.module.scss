@@ -135,6 +135,46 @@
   flex-shrink: 0;
 }
 
+// ─── Mode selection ───
+
+.mode-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: var(--green-dim);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.mode-rules {
+  margin: 0;
+  width: 100%;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.difficulty-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.difficulty-btn {
+  font-size: 10px;
+  padding: 6px 4px;
+}
+
+.difficulty-btn.active {
+  border-color: rgba(167, 139, 250, 0.5);
+  background: var(--purple-dim);
+  color: var(--purple);
+}
+
 // ─── Game settings ───
 
 .lobby-config {

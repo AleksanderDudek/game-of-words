@@ -6,6 +6,8 @@ const defaultProps = {
   connected: true,
   nameInput: "",
   sessionIdInput: "",
+  mode: "classic" as const,
+  onModeChange: vi.fn(),
   onNameChange: vi.fn(),
   onSessionIdChange: vi.fn(),
   onJoin: vi.fn(),

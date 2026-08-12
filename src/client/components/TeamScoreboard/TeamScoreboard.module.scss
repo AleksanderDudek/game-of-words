@@ -1,0 +1,116 @@
+.team-scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.team-score {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.team-score.alpha {
+  border-left-color: var(--blue);
+}
+
+.team-score.bravo {
+  border-left-color: var(--orange);
+}
+
+.team-score.attacking {
+  border-color: rgba(74, 222, 128, 0.45);
+  background: var(--green-dim);
+}
+
+.team-score.attacking.alpha {
+  border-left-color: var(--blue);
+}
+
+.team-score.attacking.bravo {
+  border-left-color: var(--orange);
+}
+
+.team-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.alpha .team-label {
+  color: var(--blue);
+}
+
+.bravo .team-label {
+  color: var(--orange);
+}
+
+.you-tag {
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+}
+
+.team-points {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+}
+
+.team-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.phase-banner {
+  padding: 5px 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+}
+
+.phase-banner.steal {
+  color: var(--yellow);
+  background: var(--yellow-dim);
+  border-color: rgba(251, 191, 36, 0.4);
+  animation: steal-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes steal-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phase-banner.steal {
+    animation: none;
+  }
+}
