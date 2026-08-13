@@ -9,6 +9,11 @@ COPY src/vite-env.d.ts src/
 COPY public/ public/ 2>/dev/null || true
 ARG VITE_WS_URL=ws://localhost:8080
 ENV VITE_WS_URL=$VITE_WS_URL
+# Google Drive pack sync — off unless explicitly enabled at build time
+ARG VITE_ENABLE_GOOGLE_DRIVE=false
+ENV VITE_ENABLE_GOOGLE_DRIVE=$VITE_ENABLE_GOOGLE_DRIVE
+ARG VITE_GOOGLE_CLIENT_ID=
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 RUN npx vite build
 
 FROM nginx:alpine

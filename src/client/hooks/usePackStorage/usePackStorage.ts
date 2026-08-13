@@ -7,6 +7,8 @@ import type { WordPackEntry } from "@/shared/types";
 
 export interface UsePackStorage {
   packs: WordPack[];
+  /** Drive feature flag (VITE_ENABLE_GOOGLE_DRIVE) — off by default. */
+  driveEnabled: boolean;
   driveConnected: boolean;
   driveAvailable: boolean;
   loading: boolean;
@@ -132,6 +134,7 @@ export function usePackStorage(): UsePackStorage {
 
   return {
     packs,
+    driveEnabled: drive.isDriveEnabled(),
     driveConnected,
     driveAvailable: drive.isDriveAvailable(),
     loading,

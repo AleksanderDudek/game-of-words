@@ -1,13 +1,22 @@
 // ═══════════════════════════════════════════════════════════════
 // Google Drive appdata integration — client-side only OAuth2
 // Uses the drive.appdata scope so files live in a hidden app
-// folder; requires VITE_GOOGLE_CLIENT_ID to be configured.
+// folder.
+//
+// Disabled by default: set VITE_ENABLE_GOOGLE_DRIVE=true *and*
+// VITE_GOOGLE_CLIENT_ID to turn the feature on.
 // ═══════════════════════════════════════════════════════════════
 
 import type { WordPack } from "./wordPack";
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
+
+// Vite inlines env vars as strings, so "false" would be truthy — parse
+// against an explicit allowlist so anything unset/typo'd stays off.
+const FEATURE_ENABLED = ["true", "1"].includes(
+  String(import.meta.env.VITE_ENABLE_GOOGLE_DRIVE ?? "").trim().toLowerCase(),
+);
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 const SCOPE = "https://www.googleapis.com/auth/drive.appdata";
@@ -43,16 +52,23 @@ function loadGIS(): Promise<void> {
   });
 }
 
+/** Whether the Drive feature flag is on at all (VITE_ENABLE_GOOGLE_DRIVE). */
+export function isDriveEnabled(): boolean {
+  return FEATURE_ENABLED;
+}
+
+/** Feature flag on *and* an OAuth client ID configured. */
 export function isDriveAvailable(): boolean {
-  return Boolean(CLIENT_ID);
+  return FEATURE_ENABLED && Boolean(CLIENT_ID);
 }
 
 export function isDriveConnected(): boolean {
-  return _accessToken !== null;
+  return FEATURE_ENABLED && _accessToken !== null;
 }
 
 /** Trigger the OAuth consent flow and obtain an access token. */
 export async function connectDrive(): Promise<void> {
+  if (!FEATURE_ENABLED) throw new Error("Google Drive integration is disabled");
   if (!CLIENT_ID) throw new Error("VITE_GOOGLE_CLIENT_ID is not configured");
   await loadGIS();
   return new Promise((resolve, reject) => {
@@ -79,7 +95,7 @@ export async function connectDrive(): Promise<void> {
  * Call this on app startup to auto-reconnect Drive without user interaction.
  */
 export async function trySilentReconnect(): Promise<boolean> {
-  if (!CLIENT_ID) return false;
+  if (!FEATURE_ENABLED || !CLIENT_ID) return false;
   try {
     await loadGIS();
     await new Promise<void>((resolve, reject) => {
@@ -112,6 +128,7 @@ async function driveRequest(
   options: RequestInit = {},
   baseUrl = DRIVE_API,
 ): Promise<Response> {
+  if (!FEATURE_ENABLED) throw new Error("Google Drive integration is disabled");
   const res = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: {
