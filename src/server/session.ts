@@ -33,10 +33,13 @@ import {
   BotDifficulty,
   ServerMessage,
   ClientMessage,
+  CustomRules,
+  ActivePackInfo,
   toPlayerId,
   toSessionId,
   assertNever,
 } from "../shared/types";
+import { sanitizeRules, rampWordCount, rulesAreDefault } from "../shared/rules";
 import { buildBoard, revealNextPair, checkGuess, boardToString, remainingPairs } from "../shared/board";
 import { generateWord, getBuiltinPackWords, BUILTIN_PACKS, GeneratedWord } from "./wordgen";
 import type { PackReference } from "../shared/types";
@@ -61,6 +64,18 @@ interface ConnectedPlayer extends Player {
   ws: WebSocket | null;
 }
 
+/** A pack the host has picked for this run, resolved down to its words. */
+interface SelectedPack {
+  /** "builtin:<id>" / "custom:<name>" — dedupes repeat selections. */
+  key: string;
+  name: string;
+  words: GeneratedWord[];
+}
+
+/** Ceilings on a multi-pack selection, so one host cannot balloon a room. */
+const MAX_SELECTED_PACKS = 12;
+const MAX_SELECTED_WORDS = 2000;
+
 export class GameSession {
   id: SessionId;
   hostId: PlayerId = "" as PlayerId;
@@ -79,9 +94,12 @@ export class GameSession {
   countdownLeft: number = 0;
   currentDifficulty: number = CONFIG.MIN_WORD_LENGTH;
   wordsAtCurrentDifficulty: number = 0;
-  pendingPack: { name: string; words: GeneratedWord[] } | null = null;
+  /** Packs picked in the lobby. Empty = the generated word bank. */
+  selectedPacks: SelectedPack[] = [];
   packQueue: GeneratedWord[] = [];
   packQueueIndex: number = 0;
+  /** Host overrides. Empty object = every rule follows the server config. */
+  rules: CustomRules = {};
 
   // ─── Team mode ───
   teamScores: Record<TeamId, number> = { alpha: 0, bravo: 0 };
@@ -121,7 +139,7 @@ export class GameSession {
     this.attackingTeam = "alpha";
     this.roundPhase = "attack";
     this.coopBank = 0;
-    this.coopLives = CONFIG.COOP_LIVES;
+    this.coopLives = this.livesForMode();
     this.coopCleared = 0;
     this.coopFailed = 0;
 
@@ -169,6 +187,61 @@ export class GameSession {
   /** Minimum seats (bot included) before the mode can start. */
   private minPlayersForMode(): number {
     return this.mode === "solo" ? 2 : CONFIG.MIN_PLAYERS;
+  }
+
+  // ─── Effective Rules ───
+  //
+  // Every rule the host may tune is read through one of these, never off
+  // CONFIG directly. An untouched lobby leaves `rules` empty, so each of
+  // them falls straight back to the server configuration.
+
+  /** Seconds on the clock for a single word. */
+  roundSeconds(): number {
+    return this.rules.roundSeconds ?? CONFIG.SESSION_DURATION_SEC;
+  }
+
+  /** Guesses a player gets per turn (classic / team / solo). */
+  guessesPerTurn(): number {
+    return this.rules.guessesPerTurn ?? CONFIG.TURNS_PER_PLAYER;
+  }
+
+  /** Base of the coop shared pool, before the per-player bonus. */
+  coopGuessBase(): number {
+    return this.rules.guessesPerTurn ?? CONFIG.COOP_GUESSES_BASE;
+  }
+
+  /** Lives a coop run starts with. */
+  livesForMode(): number {
+    return this.rules.coopLives ?? CONFIG.COOP_LIVES;
+  }
+
+  /** Rounds the difficulty ramp yields when the host has not pinned a length. */
+  private rampWords(): number {
+    return rampWordCount(CONFIG.MIN_WORD_LENGTH, CONFIG.MAX_WORD_LENGTH, CONFIG.WORDS_PER_DIFFICULTY);
+  }
+
+  /** Words this run will play through. */
+  wordCount(): number {
+    return this.rules.wordGoal ?? this.rampWords();
+  }
+
+  /** Total words available across the selected packs (after the merge dedupes). */
+  selectedWordCount(): number {
+    return this.mergedPackWords().length;
+  }
+
+  /**
+   * All selected packs flattened into one pool, keeping the first hint seen
+   * for any word two packs happen to share.
+   */
+  private mergedPackWords(): GeneratedWord[] {
+    const byWord = new Map<string, GeneratedWord>();
+    for (const pack of this.selectedPacks) {
+      for (const entry of pack.words) {
+        if (!byWord.has(entry.word)) byWord.set(entry.word, entry);
+      }
+    }
+    return [...byWord.values()];
   }
 
   /** Real people currently in the room — the bot never keeps a session alive. */
@@ -300,13 +373,11 @@ export class GameSession {
     this.wordsAtCurrentDifficulty = 0;
     this.roundNumber = 0;
     this.resetModeScores();
-    // Snapshot pending pack into a shuffled queue for this game run
-    if (this.pendingPack) {
-      this.packQueue = [...this.pendingPack.words].sort(() => Math.random() - 0.5);
-      this.packQueueIndex = 0;
-    } else {
-      this.packQueue = [];
-    }
+    // Snapshot the selected packs into one shuffled queue for this run. With a
+    // word goal shorter than the pool, the tail is simply never drawn — so a
+    // 15-word game out of 200 selected words repeats nothing.
+    this.packQueue = this.mergedPackWords().sort(() => Math.random() - 0.5);
+    this.packQueueIndex = 0;
     const active = this.getActivePlayers();
     this.currentPlayerId = active[0].id;
     await this.startNewRound();
@@ -318,7 +389,7 @@ export class GameSession {
     this.teamSolved = { alpha: 0, bravo: 0 };
     this.teamMic = { alpha: "", bravo: "" };
     this.coopBank = 0;
-    this.coopLives = CONFIG.COOP_LIVES;
+    this.coopLives = this.livesForMode();
     this.coopCleared = 0;
     this.coopFailed = 0;
     for (const player of this.players.values()) player.score = 0;
@@ -337,8 +408,8 @@ export class GameSession {
     }
 
     this.roundNumber++;
-    this.turnsRemaining = CONFIG.TURNS_PER_PLAYER;
-    this.timeLeft = CONFIG.SESSION_DURATION_SEC;
+    this.turnsRemaining = this.guessesPerTurn();
+    this.timeLeft = this.roundSeconds();
 
     // Draw from pack queue if active, otherwise generate
     let word: string;
@@ -382,7 +453,7 @@ export class GameSession {
     }
 
     if (this.mode === "coop") {
-      this.coopGuessesPerRound = coopGuessPool(this.getActivePlayers().length, CONFIG.COOP_GUESSES_BASE);
+      this.coopGuessesPerRound = coopGuessPool(this.getActivePlayers().length, this.coopGuessBase());
       this.coopGuessesLeft = this.coopGuessesPerRound;
       this.turnsRemaining = this.coopGuessesLeft;
       return;
@@ -484,7 +555,7 @@ export class GameSession {
       }
 
       this.progressDifficulty();
-      if (this.currentDifficulty > CONFIG.MAX_WORD_LENGTH) {
+      if (this.runIsComplete()) {
         this.endGame();
         return;
       }
@@ -675,7 +746,7 @@ export class GameSession {
     } else {
       const idx = active.findIndex((p) => p.id === this.currentPlayerId);
       this.currentPlayerId = active[(idx + 1) % active.length].id;
-      this.turnsRemaining = CONFIG.TURNS_PER_PLAYER;
+      this.turnsRemaining = this.guessesPerTurn();
     }
 
     this.broadcast({
@@ -841,11 +912,27 @@ export class GameSession {
 
   progressDifficulty(): void {
     this.wordsAtCurrentDifficulty++;
-    if (this.wordsAtCurrentDifficulty >= CONFIG.WORDS_PER_DIFFICULTY) {
-      this.currentDifficulty++;
+    if (this.wordsAtCurrentDifficulty < CONFIG.WORDS_PER_DIFFICULTY) return;
+
+    // A pinned word goal ends the run on the round count instead, so the ramp
+    // holds at the top rather than climbing past the longest word available.
+    if (this.rules.wordGoal !== undefined && this.currentDifficulty >= CONFIG.MAX_WORD_LENGTH) {
       this.wordsAtCurrentDifficulty = 0;
-      console.log(`[Session ${this.id}] Difficulty up → ${this.currentDifficulty} letters`);
+      return;
     }
+
+    this.currentDifficulty++;
+    this.wordsAtCurrentDifficulty = 0;
+    console.log(`[Session ${this.id}] Difficulty up → ${this.currentDifficulty} letters`);
+  }
+
+  /**
+   * Is the run over? A host-set word goal ends it on the round count; without
+   * one the original difficulty ramp decides, exactly as before.
+   */
+  private runIsComplete(): boolean {
+    if (this.rules.wordGoal !== undefined) return this.roundNumber >= this.rules.wordGoal;
+    return this.currentDifficulty > CONFIG.MAX_WORD_LENGTH;
   }
 
   // ─── End Game ───
@@ -878,6 +965,8 @@ export class GameSession {
       case "resume_game":  this.handleResumeGame(playerId); break;
       case "forfeit_game": this.handleForfeitGame(playerId); break;
       case "set_word_pack": this.handleSetWordPack(playerId, msg.pack); break;
+      case "set_word_packs": this.handleSetWordPacks(playerId, msg.packs); break;
+      case "set_rules":    this.handleSetRules(playerId, msg.rules); break;
       case "set_max_players": this.handleSetMaxPlayers(playerId, msg.count); break;
       case "set_mode":     this.handleSetMode(playerId, msg.mode); break;
       case "set_team":     this.handleSetTeam(playerId, msg.team); break;
@@ -920,18 +1009,23 @@ export class GameSession {
           }
         : null;
 
+    // Effective values, not raw config — the lobby and the HUD should read the
+    // rules that are actually in play.
     const config: GameConfig = {
       pointsPerCorrect: CONFIG.POINTS_PER_CORRECT,
       hintCostPoints: CONFIG.HINT_COST_POINTS,
-      turnsPerPlayer: CONFIG.TURNS_PER_PLAYER,
-      sessionDurationSec: CONFIG.SESSION_DURATION_SEC,
+      turnsPerPlayer: this.mode === "coop" ? this.coopGuessBase() : this.guessesPerTurn(),
+      sessionDurationSec: this.roundSeconds(),
       minWordLength: CONFIG.MIN_WORD_LENGTH,
       maxWordLength: CONFIG.MAX_WORD_LENGTH,
       minPlayers: this.minPlayersForMode(),
       maxPlayers: this.maxPlayers,
-      coopLives: CONFIG.COOP_LIVES,
+      coopLives: this.livesForMode(),
       stealSeconds: CONFIG.STEAL_SECONDS,
       stealPointsPct: CONFIG.STEAL_POINTS_PCT,
+      wordsPerDifficulty: CONFIG.WORDS_PER_DIFFICULTY,
+      lobbyCountdownSec: CONFIG.LOBBY_COUNTDOWN_SEC,
+      wordCount: this.wordCount(),
     };
 
     const teams: TeamState[] | undefined =
@@ -965,9 +1059,13 @@ export class GameSession {
       config,
       playerLimit: this.maxPlayers,
       countdownLeft: this.countdownLeft,
-      activePack: this.pendingPack
-        ? { name: this.pendingPack.name, wordCount: this.pendingPack.words.length }
-        : undefined,
+      activePack: this.packSummary(),
+      activePacks: this.selectedPacks.map<ActivePackInfo>((p) => ({
+        key: p.key,
+        name: p.name,
+        wordCount: p.words.length,
+      })),
+      rules: rulesAreDefault(this.rules) ? undefined : this.rules,
       teams,
       coop,
       botDifficulty: this.mode === "solo" ? this.botDifficulty : undefined,
@@ -976,56 +1074,73 @@ export class GameSession {
 
   // ─── Pack Selection ───
 
+  /** One pack, replacing whatever was selected before (the original behaviour). */
   handleSetWordPack(playerId: PlayerId, pack: PackReference): void {
-    if (this.state !== "lobby") {
-      const player = this.players.get(playerId);
-      if (player) this.sendTo(player.ws, { type: "error", message: "Cannot change pack after game starts" });
+    this.handleSetWordPacks(playerId, pack.type === "clear" ? [] : [pack]);
+  }
+
+  /**
+   * Replace the whole selection. Packs are merged into a single pool at the
+   * start of a run, so picking three 20-word packs is the same as picking one
+   * 60-word pack — only the lobby readout tells them apart.
+   */
+  handleSetWordPacks(playerId: PlayerId, packs: PackReference[]): void {
+    if (!this.requireLobbyHost(playerId, "Cannot change pack after game starts", "Only the host can set the word pack")) {
       return;
     }
-    if (this.hostId !== playerId) {
-      const player = this.players.get(playerId);
-      if (player) this.sendTo(player.ws, { type: "error", message: "Only the host can set the word pack" });
+    const player = this.players.get(playerId);
+
+    if (!Array.isArray(packs)) return;
+    if (packs.length > MAX_SELECTED_PACKS) {
+      this.sendTo(player?.ws ?? null, { type: "error", message: `At most ${MAX_SELECTED_PACKS} packs` });
       return;
     }
 
-    if (pack.type === "clear") {
-      this.pendingPack = null;
-      this.broadcastState();
-      return;
+    const resolved: SelectedPack[] = [];
+    const seen = new Set<string>();
+    let totalWords = 0;
+
+    for (const ref of packs) {
+      if (ref.type === "clear") continue;
+      const result = this.resolvePack(ref);
+      if (typeof result === "string") {
+        this.sendTo(player?.ws ?? null, { type: "error", message: result });
+        return;
+      }
+      if (seen.has(result.key)) continue;
+      totalWords += result.words.length;
+      if (totalWords > MAX_SELECTED_WORDS) {
+        this.sendTo(player?.ws ?? null, { type: "error", message: `At most ${MAX_SELECTED_WORDS} words in total` });
+        return;
+      }
+      seen.add(result.key);
+      resolved.push(result);
     }
 
-    if (pack.type === "builtin") {
-      if (!/^[a-z0-9-]+$/.test(pack.packId)) {
-        const player = this.players.get(playerId);
-        if (player) this.sendTo(player.ws, { type: "error", message: "Invalid pack ID" });
-        return;
-      }
-      const words = getBuiltinPackWords(pack.packId);
-      if (!words) {
-        const player = this.players.get(playerId);
-        if (player) this.sendTo(player.ws, { type: "error", message: "Unknown built-in pack" });
-        return;
-      }
-      this.pendingPack = { name: BUILTIN_PACKS[pack.packId]!.name, words };
-      this.broadcastState();
-      return;
+    this.selectedPacks = resolved;
+    this.broadcastState();
+  }
+
+  /** Turn a wire-level pack reference into words, or return the reason it failed. */
+  private resolvePack(ref: Exclude<PackReference, { type: "clear" }>): SelectedPack | string {
+    if (ref.type === "builtin") {
+      if (!/^[a-z0-9-]+$/.test(ref.packId)) return "Invalid pack ID";
+      const words = getBuiltinPackWords(ref.packId);
+      if (!words) return "Unknown built-in pack";
+      return { key: `builtin:${ref.packId}`, name: BUILTIN_PACKS[ref.packId]!.name, words };
     }
 
     // Custom pack — validate and sanitize
-    if (typeof pack.name !== "string" || pack.name.trim().length === 0 || pack.name.length > 50) {
-      const player = this.players.get(playerId);
-      if (player) this.sendTo(player.ws, { type: "error", message: "Invalid pack name" });
-      return;
+    if (typeof ref.name !== "string" || ref.name.trim().length === 0 || ref.name.length > 50) {
+      return "Invalid pack name";
     }
-    if (!Array.isArray(pack.words) || pack.words.length === 0 || pack.words.length > 500) {
-      const player = this.players.get(playerId);
-      if (player) this.sendTo(player.ws, { type: "error", message: "Pack must have 1–500 words" });
-      return;
+    if (!Array.isArray(ref.words) || ref.words.length === 0 || ref.words.length > 500) {
+      return "Pack must have 1–500 words";
     }
 
     const validWord = /^[a-z][a-z' -]*[a-z]$|^[a-z]$/;
     const words: GeneratedWord[] = [];
-    for (const entry of pack.words) {
+    for (const entry of ref.words) {
       if (typeof entry.word !== "string" || typeof entry.hint !== "string") continue;
       const word = entry.word.toLowerCase().replace(/[^\x20-\x7e]/g, "").trim();
       const hint = entry.hint.replace(/[^\x20-\x7e]/g, "").trim();
@@ -1035,14 +1150,42 @@ export class GameSession {
       words.push({ word, hint });
     }
 
-    if (words.length === 0) {
-      const player = this.players.get(playerId);
-      if (player) this.sendTo(player.ws, { type: "error", message: "No valid words in pack" });
+    if (words.length === 0) return "No valid words in pack";
+    const name = ref.name.trim();
+    return { key: `custom:${name}`, name, words };
+  }
+
+  /** Combined readout of the selection for the lobby and the HUD. */
+  private packSummary(): { name: string; wordCount: number } | undefined {
+    if (this.selectedPacks.length === 0) return undefined;
+    const wordCount = this.selectedWordCount();
+    if (this.selectedPacks.length === 1) {
+      return { name: this.selectedPacks[0].name, wordCount };
+    }
+    const joined = this.selectedPacks.map((p) => p.name).join(" + ");
+    return { name: joined.length > 60 ? `${this.selectedPacks.length} packs` : joined, wordCount };
+  }
+
+  // ─── Custom Rules ───
+
+  /**
+   * Apply the host's rule overrides wholesale — the lobby panel owns the
+   * state and sends what it wants in force. `null` drops back to the server
+   * defaults, which is also what an untouched lobby leaves in place.
+   */
+  handleSetRules(playerId: PlayerId, rules: CustomRules | null): void {
+    if (!this.requireLobbyHost(playerId, "Cannot change the rules after the game starts", "Only the host can change the rules")) {
       return;
     }
 
-    this.pendingPack = { name: pack.name.trim(), words };
+    this.rules = rules === null ? {} : sanitizeRules(rules);
+
+    // Coop lives are read once at run start, so keep the live counter in step
+    // while the lobby is still open.
+    this.coopLives = this.livesForMode();
+
     this.broadcastState();
+    console.log(`[Session ${this.id}] Rules set to ${JSON.stringify(this.rules)} by host.`);
   }
 
   // ─── Max Players Configuration ───

@@ -155,6 +155,7 @@
     "configWords": "Words",
     "configTurnGuesses": "Turn guesses",
     "configRoundTime": "Round time",
+    "configLength": "Game length",
     "configHintCost": "Hint cost",
     "configMaxPlayers": "Max players",
     "playersLabel": "Players",
@@ -178,7 +179,28 @@
     "packLabel": "PACK",
     "startGameBtn": "START GAME",
     "needPlayers_one": "Need at least {{count}} player",
-    "needPlayers_other": "Need at least {{count}} players"
+    "needPlayers_other": "Need at least {{count}} players",
+    "packsSelected_one": "{{count}} pack · {{words}} words",
+    "packsSelected_other": "{{count}} packs · {{words}} words",
+    "rulesLabel": "GAME LENGTH & RULES"
+  },
+
+  "rules": {
+    "customize": "Custom rules",
+    "stateDefault": "Default",
+    "stateCustom": "Custom",
+    "defaultHint": "The room plays the server defaults: words get longer every round until the range runs out.",
+    "targetLength": "Target length",
+    "bandLabel": "{{min}}–{{max}} min",
+    "wordCount": "Words in the game",
+    "roundTime": "Time per word",
+    "usePackWords": "Use all {{count}} words from the selected packs",
+    "estimate": "≈ {{time}}",
+    "estimateRange": "{{low}} if everyone is quick · {{high}} if every clock runs out",
+    "fitOk": "✓ Fits the {{min}}–{{max}} min target",
+    "fitUnder": "↑ Shorter than {{min}}–{{max}} min — try {{words}} words",
+    "fitOver": "↓ Longer than {{min}}–{{max}} min — try {{words}} words",
+    "repeatWarning": "Only {{words}} words selected — some will come round twice."
   },
 
   "game": {

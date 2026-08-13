@@ -3,8 +3,10 @@ import styles from "./LobbyScreen.module.scss";
 import { PlayerCard } from "../PlayerCard/PlayerCard";
 import { PackPicker } from "../PackPicker/PackPicker";
 import { ModePicker } from "../ModePicker/ModePicker";
+import { RulesPanel } from "../RulesPanel/RulesPanel";
 import { TeamPanel } from "../TeamPanel/TeamPanel";
 import { BOT_DIFFICULTY_ORDER, modeMeta } from "@/client/lib/modes";
+import { estimateDuration, formatDuration } from "@/shared/estimate";
 import { TEAM_IDS } from "@/shared/types";
 import type { GameMode } from "@/shared/types";
 import type { LobbyScreenProps } from "./LobbyScreen.types";
@@ -16,6 +18,8 @@ export function LobbyScreen({
   localPacks,
   onStartGame,
   onSetPack,
+  onSetPacks,
+  onSetRules,
   onOpenMyPacks,
   onSetMode,
   onSetTeam,
@@ -30,6 +34,17 @@ export function LobbyScreen({
   const humanCount = session.players.filter((p) => !p.isBot).length;
   const spectatorCount = session.players.filter((p) => p.isSpectator).length;
   const isHost = session.hostId === playerId;
+  const selectedPackKeys = (session.activePacks ?? []).map((p) => p.key);
+
+  // Everyone in the room sees how long the configured game is expected to run,
+  // not just the host holding the controls.
+  const lengthEstimate = estimateDuration({
+    words: session.config.wordCount ?? 0,
+    roundSeconds: session.config.sessionDurationSec,
+    mode,
+    countdownSeconds: session.config.lobbyCountdownSec ?? 0,
+    stealSeconds: session.config.stealSeconds ?? 0,
+  });
 
   // Team games additionally need both squads manned before they can start.
   const squadsReady =
@@ -108,6 +123,12 @@ export function LobbyScreen({
               <span>{session.config.sessionDurationSec}s</span>
             </div>
             <div className={styles["config-item"]}>
+              <span>{t("lobby.configLength")}</span>
+              <span>
+                {session.config.wordCount ?? 0} {t("common.words")} · ≈{formatDuration(lengthEstimate.expectedSec)}
+              </span>
+            </div>
+            <div className={styles["config-item"]}>
               <span>{t("lobby.configHintCost")}</span>
               <span>
                 {session.config.hintCostPoints} {t("common.pts")}
@@ -176,6 +197,9 @@ export function LobbyScreen({
               activePackName={session.activePack?.name ?? null}
               onSelect={onSetPack}
               onManagePacks={onOpenMyPacks}
+              multiSelect
+              selectedKeys={selectedPackKeys}
+              onSelectMany={onSetPacks}
             />
           ) : (
             <div className={styles["pack-info-row"]}>
@@ -186,6 +210,16 @@ export function LobbyScreen({
               </span>
             </div>
           )}
+
+          <div className={styles["section-label"]}>{t("lobby.rulesLabel")}</div>
+          <RulesPanel
+            mode={mode}
+            config={session.config}
+            rules={session.rules}
+            packWordCount={session.activePack?.wordCount ?? 0}
+            disabled={!isHost}
+            onChange={onSetRules}
+          />
         </section>
       </div>
 

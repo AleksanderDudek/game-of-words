@@ -6,6 +6,8 @@ import type { PackReference } from "@/shared/types";
 
 interface PackItem {
   key: string;
+  /** Key the server uses for this pack — "builtin:<id>" / "custom:<name>". */
+  selectionKey: string;
   name: string;
   description: string;
   wordCount: number;
@@ -33,6 +35,9 @@ export function PackPicker({
   activePackName,
   onSelect,
   onManagePacks,
+  multiSelect = false,
+  selectedKeys = [],
+  onSelectMany,
 }: PackPickerProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -44,6 +49,7 @@ export function PackPicker({
   const items = useMemo<PackItem[]>(() => {
     const builtin: PackItem[] = builtinPacks.map((p) => ({
       key: `builtin:${p.id}`,
+      selectionKey: `builtin:${p.id}`,
       name: p.name,
       description: p.description,
       wordCount: p.wordCount,
@@ -53,6 +59,9 @@ export function PackPicker({
     }));
     const local: PackItem[] = localPacks.map((p) => ({
       key: `local:${p.id}`,
+      // Custom packs are identified by name server-side — two local packs
+      // sharing a name are the same selection as far as the session is aware.
+      selectionKey: `custom:${p.name}`,
       name: p.name,
       description: p.description ?? "",
       wordCount: p.words.length,
@@ -108,13 +117,45 @@ export function PackPicker({
     else setQuery("");
   }, [open]);
 
+  const selected = useMemo(() => new Set(selectedKeys), [selectedKeys]);
+
   function choose(ref: PackReference) {
     onSelect(ref);
     setOpen(false);
   }
 
-  const isDefault = !activePackName;
-  const triggerLabel = activePackName ?? t("lobby.defaultPack");
+  /**
+   * Multi-select: flip one pack in or out and send the whole selection. The
+   * panel stays open so a host can stack several packs in one pass.
+   */
+  function toggle(item: PackItem) {
+    const next = selected.has(item.selectionKey)
+      ? items.filter((it) => selected.has(it.selectionKey) && it.selectionKey !== item.selectionKey)
+      : [...items.filter((it) => selected.has(it.selectionKey)), item];
+    onSelectMany?.(next.map((it) => it.ref));
+  }
+
+  function clearSelection() {
+    if (multiSelect) {
+      onSelectMany?.([]);
+      return;
+    }
+    choose({ type: "clear" });
+  }
+
+  const isDefault = multiSelect ? selected.size === 0 : !activePackName;
+  const selectedWordCount = items
+    .filter((it) => selected.has(it.selectionKey))
+    .reduce((sum, it) => sum + it.wordCount, 0);
+
+  let triggerLabel: string;
+  if (isDefault) {
+    triggerLabel = t("lobby.defaultPack");
+  } else if (multiSelect) {
+    triggerLabel = t("lobby.packsSelected", { count: selected.size, words: selectedWordCount });
+  } else {
+    triggerLabel = activePackName ?? t("lobby.defaultPack");
+  }
 
   function diffLabel(difficulty: number): string {
     if (difficulty === 1) return t("lobby.diffEasy");
@@ -151,7 +192,9 @@ export function PackPicker({
               aria-label={t("lobby.packSearchPlaceholder")}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && filtered.length > 0) choose(filtered[0].ref);
+                if (e.key !== "Enter" || filtered.length === 0) return;
+                if (multiSelect) toggle(filtered[0]);
+                else choose(filtered[0].ref);
               }}
             />
             <select
@@ -171,7 +214,7 @@ export function PackPicker({
               <button
                 type="button"
                 className={`${styles["row"]} ${isDefault ? styles["row-active"] : ""}`}
-                onClick={() => choose({ type: "clear" })}
+                onClick={clearSelection}
               >
                 <span className={styles["row-main"]}>
                   <span className={styles["row-name"]}>{t("lobby.defaultPack")}</span>
@@ -180,14 +223,19 @@ export function PackPicker({
             </li>
 
             {filtered.map((it) => {
-              const active = activePackName === it.name;
+              const active = multiSelect ? selected.has(it.selectionKey) : activePackName === it.name;
               return (
                 <li key={it.key} role="option" aria-selected={active}>
                   <button
                     type="button"
                     className={`${styles["row"]} ${active ? styles["row-active"] : ""}`}
-                    onClick={() => choose(it.ref)}
+                    onClick={() => (multiSelect ? toggle(it) : choose(it.ref))}
                   >
+                    {multiSelect && (
+                      <span className={styles["check"]} aria-hidden>
+                        {active ? "☑" : "☐"}
+                      </span>
+                    )}
                     <span className={styles["row-main"]}>
                       <span className={styles["row-name"]}>{it.name}</span>
                       {it.description && <span className={styles["row-desc"]}>{it.description}</span>}

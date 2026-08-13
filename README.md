@@ -187,6 +187,30 @@ Copy `.env.example` to `.env` to override:
 cp .env.example .env
 ```
 
+### Host overrides (in the lobby)
+
+The values above are the room's defaults. A host who wants a game of a
+particular *length* can override some of them per session from the lobby's
+**Game length & rules** panel — it starts switched off, and a lobby that never
+touches it plays exactly the game the server was configured for.
+
+| Control | Overrides | Range |
+|---|---|---|
+| Words in the game | the difficulty ramp's round count | 1–500 |
+| Time per word | `SESSION_DURATION_SEC` | 10–300s |
+| Turn / shared guesses | `TURNS_PER_PLAYER` (`COOP_GUESSES_BASE` in co-op) | 1–10 |
+| Lives (co-op) | `COOP_LIVES` | 1–10 |
+
+Picking a target length (5–15, 10–20, 20–30, 30–45 or 45–60 minutes) fills in
+the word count that lands mid-band; the panel then shows a live estimate
+(`≈ 24 min`, with a fast/slow range) and says whether the current selection
+still fits the target. The estimate models a round as a fraction of its clock
+rather than the whole thing — see `src/shared/estimate.ts`.
+
+Hosts can also stack **several packs** into one pool. The packs are merged and
+de-duplicated, so three 20-word packs play the same as one 60-word pack; if the
+word goal exceeds the pool, the panel warns that words will repeat.
+
 ---
 
 ## 🤖 Pluggable LLM Endpoint
@@ -289,6 +313,9 @@ All messages are JSON. Full TypeScript definitions in `server/src/types.ts`.
 | Client → Server | `start_game` | Start the game from lobby |
 | Client → Server | `guess` | Submit a word guess |
 | Client → Server | `buy_hint` | Spend points to reveal a swapped pair |
+| Client → Server | `set_word_pack` | Host picks one word pack (lobby only) |
+| Client → Server | `set_word_packs` | Host replaces the whole pack selection (lobby only) |
+| Client → Server | `set_rules` | Host overrides length/time/guesses; `null` resets (lobby only) |
 | Client → Server | `set_mode` | Host switches game mode (lobby only) |
 | Client → Server | `set_team` | Player picks a squad (team mode, lobby only) |
 | Client → Server | `set_bot_difficulty` | Host sets the solo rival's skill (lobby only) |
