@@ -154,6 +154,18 @@
   min-width: 0;
 }
 
+.check {
+  flex-shrink: 0;
+  margin-right: 8px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--text-muted);
+}
+
+.row-active .check {
+  color: var(--green);
+}
+
 .row-name {
   font-size: 12px;
   font-weight: 500;

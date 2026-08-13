@@ -123,3 +123,70 @@ describe("PackPicker", () => {
     expect(onManagePacks).toHaveBeenCalledOnce();
   });
 });
+
+describe("PackPicker — multi-select", () => {
+  function setupMulti(selectedKeys: string[] = []) {
+    const onSelectMany = vi.fn();
+    render(
+      <PackPicker
+        builtinPacks={builtinPacks}
+        localPacks={localPacks}
+        activePackName={null}
+        onSelect={vi.fn()}
+        onManagePacks={vi.fn()}
+        multiSelect
+        selectedKeys={selectedKeys}
+        onSelectMany={onSelectMany}
+      />,
+    );
+    return { onSelectMany };
+  }
+
+  it("adds a pack to the selection without dropping the others", () => {
+    const { onSelectMany } = setupMulti(["builtin:mcp-medium"]);
+    fireEvent.click(screen.getByRole("button", { name: /1 pack/i }));
+    fireEvent.click(screen.getByText("Software Development — Easy"));
+
+    expect(onSelectMany).toHaveBeenCalledWith([
+      { type: "builtin", packId: "mcp-medium" },
+      { type: "builtin", packId: "software-development-easy" },
+    ]);
+  });
+
+  it("removes a pack that is already selected", () => {
+    const { onSelectMany } = setupMulti(["builtin:mcp-medium", "builtin:software-development-easy"]);
+    fireEvent.click(screen.getByRole("button", { name: /2 packs/i }));
+    fireEvent.click(screen.getByText("Model Context Protocol (MCP) — Medium"));
+
+    expect(onSelectMany).toHaveBeenCalledWith([{ type: "builtin", packId: "software-development-easy" }]);
+  });
+
+  it("keeps the panel open so several packs can be stacked in one pass", () => {
+    setupMulti();
+    fireEvent.click(screen.getByRole("button", { name: /default/i }));
+    fireEvent.click(screen.getByText("Software Development — Easy"));
+
+    expect(screen.getByPlaceholderText(/search packs/i)).toBeInTheDocument();
+  });
+
+  it("summarises the selection and its total word count in the trigger", () => {
+    setupMulti(["builtin:mcp-medium", "builtin:software-development-easy"]);
+    expect(screen.getByRole("button", { name: /2 packs · 30 words/i })).toBeInTheDocument();
+  });
+
+  it("clears everything through the default row", () => {
+    const { onSelectMany } = setupMulti(["builtin:mcp-medium"]);
+    fireEvent.click(screen.getByRole("button", { name: /1 pack/i }));
+    fireEvent.click(screen.getByText(/server word bank/i));
+
+    expect(onSelectMany).toHaveBeenCalledWith([]);
+  });
+
+  it("matches a local pack by name, the way the server keys it", () => {
+    const { onSelectMany } = setupMulti(["custom:My Custom Pack"]);
+    fireEvent.click(screen.getByRole("button", { name: /1 pack/i }));
+    fireEvent.click(screen.getByText("My Custom Pack"));
+
+    expect(onSelectMany).toHaveBeenCalledWith([]);
+  });
+});

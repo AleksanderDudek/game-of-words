@@ -4,6 +4,7 @@ import { GameSession } from "./session";
 import { CONFIG } from "./config";
 import { buildBoard } from "../shared/board";
 import { toPlayerId } from "../shared/types";
+import { RULE_BOUNDS } from "../shared/rules";
 import type { PlayerId, ServerMessage } from "../shared/types";
 
 /** Minimal stand-in for a connected socket that records what it was sent. */
@@ -402,6 +403,260 @@ describe("GameSession — mode guards", () => {
     const id = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
     session.handleSetTeam(id, "bravo");
     expect(session.players.get(toPlayerId(id))?.team).toBeUndefined();
+    session.cleanup();
+  });
+});
+
+describe("GameSession — custom lobby rules", () => {
+  it("falls back to the server config while the host leaves the rules alone", () => {
+    const session = new GameSession("classic");
+    expect(session.rules).toEqual({});
+    expect(session.roundSeconds()).toBe(CONFIG.SESSION_DURATION_SEC);
+    expect(session.guessesPerTurn()).toBe(CONFIG.TURNS_PER_PLAYER);
+    expect(session.coopGuessBase()).toBe(CONFIG.COOP_GUESSES_BASE);
+    expect(session.livesForMode()).toBe(CONFIG.COOP_LIVES);
+    session.cleanup();
+  });
+
+  it("plays the full difficulty ramp when no word goal is set", () => {
+    const session = new GameSession("classic");
+    const ramp = (CONFIG.MAX_WORD_LENGTH - CONFIG.MIN_WORD_LENGTH + 1) * CONFIG.WORDS_PER_DIFFICULTY;
+    expect(session.wordCount()).toBe(ramp);
+    session.cleanup();
+  });
+
+  it("lets the host override the clock, the guesses and the lives", () => {
+    const session = new GameSession("coop");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetRules(host, { roundSeconds: 90, guessesPerTurn: 5, coopLives: 6, wordGoal: 12 });
+
+    expect(session.roundSeconds()).toBe(90);
+    expect(session.guessesPerTurn()).toBe(5);
+    expect(session.coopGuessBase()).toBe(5);
+    expect(session.livesForMode()).toBe(6);
+    expect(session.coopLives).toBe(6);
+    expect(session.wordCount()).toBe(12);
+    session.cleanup();
+  });
+
+  it("clamps values that arrive outside their bounds", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetRules(host, { roundSeconds: 9000, guessesPerTurn: 0 } as never);
+
+    expect(session.roundSeconds()).toBe(RULE_BOUNDS.roundSeconds.max);
+    expect(session.guessesPerTurn()).toBe(RULE_BOUNDS.guessesPerTurn.min);
+    session.cleanup();
+  });
+
+  it("resets to the server defaults when the host clears the rules", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetRules(host, { roundSeconds: 90 });
+    session.handleSetRules(host, null);
+
+    expect(session.rules).toEqual({});
+    expect(session.roundSeconds()).toBe(CONFIG.SESSION_DURATION_SEC);
+    session.cleanup();
+  });
+
+  it("only lets the host change the rules, and only in the lobby", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+    const guest = fakeSocket();
+    const guestId = session.addPlayer(guest.ws, "Bo") as PlayerId;
+
+    session.handleSetRules(guestId, { roundSeconds: 120 });
+    expect(session.roundSeconds()).toBe(CONFIG.SESSION_DURATION_SEC);
+    expect(guest.sent.at(-1)).toEqual({ type: "error", message: "Only the host can change the rules" });
+
+    session.state = "playing";
+    session.handleSetRules(host, { roundSeconds: 120 });
+    expect(session.roundSeconds()).toBe(CONFIG.SESSION_DURATION_SEC);
+    session.cleanup();
+  });
+
+  it("hands out the host's clock and guess count to a fresh round", async () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+    session.addPlayer(fakeSocket().ws, "Bo");
+    session.handleSetRules(host, { roundSeconds: 77, guessesPerTurn: 6 });
+
+    await session.startNewRound();
+
+    expect(session.timeLeft).toBe(77);
+    expect(session.turnsRemaining).toBe(6);
+    session.cleanup();
+  });
+
+  it("ends the run once the word goal is reached", () => {
+    vi.useFakeTimers();
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+    session.addPlayer(fakeSocket().ws, "Bo");
+    session.handleSetRules(host, { wordGoal: 3 });
+
+    const internals = session as unknown as { scheduleNextRound(): void };
+
+    session.state = "round_end";
+    session.roundNumber = 2;
+    internals.scheduleNextRound();
+    vi.advanceTimersByTime(3000);
+    expect(session.state).toBe("playing");
+
+    session.state = "round_end";
+    session.roundNumber = 3;
+    internals.scheduleNextRound();
+    vi.advanceTimersByTime(3000);
+    expect(session.state).toBe("game_over");
+
+    session.cleanup();
+    vi.useRealTimers();
+  });
+
+  it("holds the difficulty ramp at the ceiling while a word goal is running", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+    session.handleSetRules(host, { wordGoal: 200 });
+    session.currentDifficulty = CONFIG.MAX_WORD_LENGTH;
+
+    for (let i = 0; i < CONFIG.WORDS_PER_DIFFICULTY * 3; i++) session.progressDifficulty();
+
+    expect(session.currentDifficulty).toBe(CONFIG.MAX_WORD_LENGTH);
+    session.cleanup();
+  });
+
+  it("reports the effective rules in the snapshot, not the raw config", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+    session.handleSetRules(host, { roundSeconds: 90, guessesPerTurn: 5, wordGoal: 20 });
+
+    const snap = session.getSnapshot();
+    expect(snap.config.sessionDurationSec).toBe(90);
+    expect(snap.config.turnsPerPlayer).toBe(5);
+    expect(snap.config.wordCount).toBe(20);
+    expect(snap.rules).toEqual({ roundSeconds: 90, guessesPerTurn: 5, wordGoal: 20 });
+    session.cleanup();
+  });
+
+  it("omits the rules from the snapshot while they are untouched", () => {
+    const session = new GameSession("classic");
+    expect(session.getSnapshot().rules).toBeUndefined();
+    session.cleanup();
+  });
+});
+
+describe("GameSession — multi-pack selection", () => {
+  const pack = (name: string, words: string[]) => ({
+    type: "custom" as const,
+    name,
+    words: words.map((w) => ({ word: w, hint: `clue for ${w}` })),
+  });
+
+  it("keeps every selected pack and merges them into one pool", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetWordPacks(host, [pack("Alpha", ["signal", "decay"]), pack("Bravo", ["cipher"])]);
+
+    expect(session.selectedPacks.map((p) => p.name)).toEqual(["Alpha", "Bravo"]);
+    expect(session.selectedWordCount()).toBe(3);
+    session.cleanup();
+  });
+
+  it("counts a word shared by two packs only once", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetWordPacks(host, [pack("Alpha", ["signal"]), pack("Bravo", ["signal", "decay"])]);
+
+    expect(session.selectedWordCount()).toBe(2);
+    session.cleanup();
+  });
+
+  it("drops a pack selected twice", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetWordPacks(host, [pack("Alpha", ["signal"]), pack("Alpha", ["signal"])]);
+
+    expect(session.selectedPacks).toHaveLength(1);
+    session.cleanup();
+  });
+
+  it("summarises a multi-pack selection for the lobby", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetWordPacks(host, [pack("Alpha", ["signal"]), pack("Bravo", ["cipher"])]);
+
+    const snap = session.getSnapshot();
+    expect(snap.activePack).toEqual({ name: "Alpha + Bravo", wordCount: 2 });
+    expect(snap.activePacks).toEqual([
+      { key: "custom:Alpha", name: "Alpha", wordCount: 1 },
+      { key: "custom:Bravo", name: "Bravo", wordCount: 1 },
+    ]);
+    session.cleanup();
+  });
+
+  it("still accepts a single-pack selection and a clear", () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+
+    session.handleSetWordPack(host, pack("Alpha", ["signal"]));
+    expect(session.getSnapshot().activePack).toEqual({ name: "Alpha", wordCount: 1 });
+
+    session.handleSetWordPack(host, { type: "clear" });
+    expect(session.getSnapshot().activePack).toBeUndefined();
+    expect(session.getSnapshot().activePacks).toEqual([]);
+    session.cleanup();
+  });
+
+  it("rejects the whole selection when one pack is invalid", () => {
+    const session = new GameSession("classic");
+    const sock = fakeSocket();
+    const host = session.addPlayer(sock.ws, "Ana") as PlayerId;
+
+    session.handleSetWordPacks(host, [pack("Alpha", ["signal"])]);
+    session.handleSetWordPacks(host, [pack("Bravo", ["cipher"]), { type: "builtin", packId: "NOPE!" }]);
+
+    expect(session.selectedPacks.map((p) => p.name)).toEqual(["Alpha"]);
+    expect(sock.sent.at(-1)).toEqual({ type: "error", message: "Invalid pack ID" });
+    session.cleanup();
+  });
+
+  it("refuses a selection from anyone but the host", () => {
+    const session = new GameSession("classic");
+    session.addPlayer(fakeSocket().ws, "Ana");
+    const guest = fakeSocket();
+    const guestId = session.addPlayer(guest.ws, "Bo") as PlayerId;
+
+    session.handleSetWordPacks(guestId, [pack("Alpha", ["signal"])]);
+
+    expect(session.selectedPacks).toHaveLength(0);
+    expect(guest.sent.at(-1)).toEqual({ type: "error", message: "Only the host can set the word pack" });
+    session.cleanup();
+  });
+
+  it("draws each word once when the pool covers the word goal", async () => {
+    const session = new GameSession("classic");
+    const host = session.addPlayer(fakeSocket().ws, "Ana") as PlayerId;
+    session.handleSetWordPacks(host, [pack("Alpha", ["signal", "decay", "cipher", "vector"])]);
+    session.handleSetRules(host, { wordGoal: 3 });
+
+    session.packQueue = [...session.selectedPacks[0].words];
+    session.packQueueIndex = 0;
+
+    const drawn: string[] = [];
+    for (let i = 0; i < session.wordCount(); i++) {
+      await session.startNewRound();
+      drawn.push(session.originalWord);
+    }
+
+    expect(new Set(drawn).size).toBe(3);
     session.cleanup();
   });
 });

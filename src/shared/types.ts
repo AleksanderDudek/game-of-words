@@ -65,6 +65,36 @@ export interface BuiltinPackInfo {
   wordCount: number;
 }
 
+/** A pack currently selected for the run, as summarised back to clients. */
+export interface ActivePackInfo {
+  /** Stable key for the selection: "builtin:<id>" or "custom:<name>". */
+  key: string;
+  name: string;
+  wordCount: number;
+}
+
+// ─── Custom Lobby Rules ───
+
+/**
+ * Host overrides applied at the lobby. Every field is optional and every
+ * field is an override — an empty object means "play the server defaults",
+ * which is exactly what an untouched lobby sends.
+ *
+ * See ./rules.ts for the bounds and the resolution helpers.
+ */
+export interface CustomRules {
+  /** Words (= rounds) to play before the game ends. Unset = difficulty ramp. */
+  wordGoal?: number;
+  /** Seconds on the clock per word. */
+  roundSeconds?: number;
+  /** Guesses per turn; in coop this is the shared-pool base instead. */
+  guessesPerTurn?: number;
+  /** Coop lives before the run ends. */
+  coopLives?: number;
+  /** The length the host is aiming for — drives the lobby's fit feedback. */
+  targetBand?: string;
+}
+
 // ─── Game States ───
 export type SessionState = "lobby" | "countdown" | "playing" | "paused" | "round_end" | "game_over";
 
@@ -136,16 +166,26 @@ export interface LetterCell {
 export interface GameConfig {
   readonly pointsPerCorrect: number;
   readonly hintCostPoints: number;
+  /** Effective value — reflects the host's override when one is set. */
   readonly turnsPerPlayer: number;
+  /** Effective value — reflects the host's override when one is set. */
   readonly sessionDurationSec: number;
   readonly minWordLength: number;
   readonly maxWordLength: number;
   readonly minPlayers?: number;
   readonly maxPlayers?: number;
   // ─── Mode-specific (always sent so lobbies can preview the rules) ───
+  /** Effective value — reflects the host's override when one is set. */
   readonly coopLives?: number;
   readonly stealSeconds?: number;
   readonly stealPointsPct?: number;
+  // ─── Length (lets the lobby estimate how long a run will take) ───
+  /** Words played per difficulty step when riding the ramp. */
+  readonly wordsPerDifficulty?: number;
+  /** Countdown paid once between "start" and the first word. */
+  readonly lobbyCountdownSec?: number;
+  /** Words this run will play — the host's goal, or the ramp length. */
+  readonly wordCount?: number;
 }
 
 // ─── Round state ───
@@ -176,7 +216,12 @@ export interface SessionSnapshot {
   config: GameConfig;
   playerLimit: number;      // current per-session max players (host-configurable)
   countdownLeft?: number;
+  /** Combined summary of the selection — a single pack, or all of them merged. */
   activePack?: { name: string; wordCount: number };
+  /** Every pack the host has selected. Empty/absent = the default word bank. */
+  activePacks?: ActivePackInfo[];
+  /** Host rule overrides. Absent or empty = the server defaults are in play. */
+  rules?: CustomRules;
   teams?: TeamState[];      // team mode
   coop?: CoopState;         // coop mode
   botDifficulty?: BotDifficulty; // solo mode
@@ -197,6 +242,8 @@ export type ClientMessage =
   | { type: "resume_game" }     // resume after pause
   | { type: "forfeit_game" }    // leave the game permanently
   | { type: "set_word_pack"; pack: PackReference }
+  | { type: "set_word_packs"; packs: PackReference[] } // host replaces the whole selection (lobby only)
+  | { type: "set_rules"; rules: CustomRules | null }   // host tunes length/time/guesses; null resets (lobby only)
   | { type: "set_max_players"; count: number }  // host changes max players (lobby only)
   | { type: "set_mode"; mode: GameMode }        // host changes game mode (lobby only)
   | { type: "set_team"; team: TeamId }          // player picks a squad (team mode, lobby only)
@@ -239,8 +286,8 @@ export type ExpectedResponse<T extends ClientMessage["type"]> =
 
 const CLIENT_MESSAGE_TYPES: ReadonlySet<string> = new Set<ClientMessage["type"]>([
   "join", "start_game", "guess", "buy_hint", "pass_turn",
-  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "set_max_players",
-  "set_mode", "set_team", "set_bot_difficulty", "ping",
+  "pause_game", "resume_game", "forfeit_game", "set_word_pack", "set_word_packs",
+  "set_rules", "set_max_players", "set_mode", "set_team", "set_bot_difficulty", "ping",
 ]);
 
 /** Runtime narrowing for mode values arriving over the wire */

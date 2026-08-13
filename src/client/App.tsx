@@ -14,6 +14,7 @@ import type {
   GameServerEntry,
   BuiltinPackInfo,
   PackReference,
+  CustomRules,
   GameMode,
   TeamId,
   BotDifficulty,
@@ -99,6 +100,16 @@ export default function App() {
 
   const handleSetPack = useCallback(
     (ref: PackReference) => send({ type: "set_word_pack", pack: ref }),
+    [send],
+  );
+
+  const handleSetPacks = useCallback(
+    (refs: PackReference[]) => send({ type: "set_word_packs", packs: refs }),
+    [send],
+  );
+
+  const handleSetRules = useCallback(
+    (rules: CustomRules | null) => send({ type: "set_rules", rules }),
     [send],
   );
 
@@ -196,6 +207,8 @@ export default function App() {
             localPacks={localPacks}
             onStartGame={() => send({ type: "start_game" })}
             onSetPack={handleSetPack}
+            onSetPacks={handleSetPacks}
+            onSetRules={handleSetRules}
             onOpenMyPacks={() => setView("packs")}
             onSetMode={handleSetMode}
             onSetTeam={handleSetTeam}

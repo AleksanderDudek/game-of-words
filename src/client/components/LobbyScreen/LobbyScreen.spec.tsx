@@ -30,6 +30,8 @@ const lobbyProps = {
   localPacks: [],
   onStartGame: vi.fn(),
   onSetPack: vi.fn(),
+  onSetPacks: vi.fn(),
+  onSetRules: vi.fn(),
   onOpenMyPacks: vi.fn(),
   onSetMode: vi.fn(),
   onSetTeam: vi.fn(),
@@ -183,5 +185,28 @@ describe("LobbyScreen — solo mode", () => {
   it("can start with just the player and the bot", () => {
     render(<LobbyScreen {...lobbyProps} session={soloSession} />);
     expect(screen.getByRole("button", { name: /start game/i })).toBeInTheDocument();
+  });
+});
+
+describe("LobbyScreen — game length", () => {
+  it("shows the configured length and an estimate to everyone in the room", () => {
+    const session = {
+      ...baseSession,
+      config: { ...baseSession.config, wordCount: 20, lobbyCountdownSec: 5 },
+    };
+    render(<LobbyScreen {...lobbyProps} session={session} />);
+
+    expect(screen.getByText(/20 words · ≈\d+ min/)).toBeInTheDocument();
+  });
+
+  it("offers the rules panel switched off, so the room keeps the server defaults", () => {
+    render(<LobbyScreen {...lobbyProps} />);
+    expect(screen.getByRole("button", { name: /custom rules/i })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("locks the rules panel for a player who is not the host", () => {
+    const session = { ...baseSession, hostId: "p2" as PlayerId };
+    render(<LobbyScreen {...lobbyProps} session={session} />);
+    expect(screen.getByRole("button", { name: /custom rules/i })).toBeDisabled();
   });
 });

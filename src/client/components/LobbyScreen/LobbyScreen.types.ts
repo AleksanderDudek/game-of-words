@@ -2,6 +2,7 @@ import type {
   SessionSnapshot,
   PackReference,
   BuiltinPackInfo,
+  CustomRules,
   GameMode,
   TeamId,
   BotDifficulty,
@@ -15,6 +16,10 @@ export interface LobbyScreenProps {
   localPacks: WordPack[];
   onStartGame: () => void;
   onSetPack: (ref: PackReference) => void;
+  /** Replace the whole pack selection (host, lobby only). */
+  onSetPacks: (refs: PackReference[]) => void;
+  /** Push custom rules; null hands the room back to the server defaults. */
+  onSetRules: (rules: CustomRules | null) => void;
   onOpenMyPacks: () => void;
   onSetMode: (mode: GameMode) => void;
   onSetTeam: (team: TeamId) => void;

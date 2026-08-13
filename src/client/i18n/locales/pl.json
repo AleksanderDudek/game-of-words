@@ -155,6 +155,7 @@
     "configWords": "Słowa",
     "configTurnGuesses": "Próby na turę",
     "configRoundTime": "Czas rundy",
+    "configLength": "Długość gry",
     "configHintCost": "Koszt podpowiedzi",
     "configMaxPlayers": "Maks. graczy",
     "playersLabel": "Gracze",
@@ -178,7 +179,30 @@
     "packLabel": "PACZKA",
     "startGameBtn": "ROZPOCZNIJ GRĘ",
     "needPlayers_one": "Potrzeba co najmniej {{count}} gracza",
-    "needPlayers_other": "Potrzeba co najmniej {{count}} graczy"
+    "needPlayers_other": "Potrzeba co najmniej {{count}} graczy",
+    "packsSelected_one": "{{count}} paczka · {{words}} słów",
+    "packsSelected_few": "{{count}} paczki · {{words}} słów",
+    "packsSelected_many": "{{count}} paczek · {{words}} słów",
+    "packsSelected_other": "{{count}} paczek · {{words}} słów",
+    "rulesLabel": "DŁUGOŚĆ GRY I ZASADY"
+  },
+
+  "rules": {
+    "customize": "Własne zasady",
+    "stateDefault": "Domyślne",
+    "stateCustom": "Własne",
+    "defaultHint": "Pokój gra na ustawieniach serwera: słowa wydłużają się z każdą rundą aż do końca zakresu.",
+    "targetLength": "Docelowa długość",
+    "bandLabel": "{{min}}–{{max}} min",
+    "wordCount": "Słowa w grze",
+    "roundTime": "Czas na słowo",
+    "usePackWords": "Użyj wszystkich {{count}} słów z wybranych paczek",
+    "estimate": "≈ {{time}}",
+    "estimateRange": "{{low}} przy szybkim tempie · {{high}} gdy każdy zegar dobiegnie końca",
+    "fitOk": "✓ Mieści się w {{min}}–{{max}} min",
+    "fitUnder": "↑ Krócej niż {{min}}–{{max}} min — spróbuj {{words}} słów",
+    "fitOver": "↓ Dłużej niż {{min}}–{{max}} min — spróbuj {{words}} słów",
+    "repeatWarning": "Wybrano tylko {{words}} słów — część powtórzy się drugi raz."
   },
 
   "game": {
