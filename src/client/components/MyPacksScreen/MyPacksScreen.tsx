@@ -18,6 +18,7 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
 
   const {
     packs,
+    driveEnabled,
     driveConnected,
     driveAvailable,
     loading,
@@ -111,36 +112,38 @@ export function MyPacksScreen({ onClose, onSelectPack, selectedPackId }: MyPacks
         <h2 className={styles["title"]}>{t("myPacks.title")}</h2>
       </div>
 
-      {/* Google Drive section */}
-      <div className={styles["drive-section"]}>
-        <div className={styles["drive-icon"]}>☁</div>
-        <div className={styles["drive-info"]}>
-          <div className={styles["drive-title"]}>{t("myPacks.driveTitle")}</div>
-          <div className={styles["drive-subtitle"]}>
-            {driveConnected
-              ? t("myPacks.driveConnected")
-              : driveAvailable
-              ? t("myPacks.driveAvailable")
-              : t("myPacks.driveUnconfigured")}
+      {/* Google Drive section — hidden entirely when the feature flag is off */}
+      {driveEnabled && (
+        <div className={styles["drive-section"]}>
+          <div className={styles["drive-icon"]}>☁</div>
+          <div className={styles["drive-info"]}>
+            <div className={styles["drive-title"]}>{t("myPacks.driveTitle")}</div>
+            <div className={styles["drive-subtitle"]}>
+              {driveConnected
+                ? t("myPacks.driveConnected")
+                : driveAvailable
+                ? t("myPacks.driveAvailable")
+                : t("myPacks.driveUnconfigured")}
+            </div>
           </div>
+          {driveConnected ? (
+            <div className={`${styles["drive-badge"]} ${styles["connected"]}`}>{t("myPacks.connectedBadge")}</div>
+          ) : driveAvailable ? (
+            <button className="btn" onClick={connectDrive}>
+              {t("myPacks.connectBtn")}
+            </button>
+          ) : (
+            <button className="btn" disabled>
+              {t("myPacks.notConfiguredBtn")}
+            </button>
+          )}
+          {driveConnected && (
+            <button className="btn" onClick={disconnectDrive} style={{ marginLeft: 4 }}>
+              {t("myPacks.disconnectBtn")}
+            </button>
+          )}
         </div>
-        {driveConnected ? (
-          <div className={`${styles["drive-badge"]} ${styles["connected"]}`}>{t("myPacks.connectedBadge")}</div>
-        ) : driveAvailable ? (
-          <button className="btn" onClick={connectDrive}>
-            {t("myPacks.connectBtn")}
-          </button>
-        ) : (
-          <button className="btn" disabled>
-            {t("myPacks.notConfiguredBtn")}
-          </button>
-        )}
-        {driveConnected && (
-          <button className="btn" onClick={disconnectDrive} style={{ marginLeft: 4 }}>
-            {t("myPacks.disconnectBtn")}
-          </button>
-        )}
-      </div>
+      )}
 
       {/* Error banner */}
       {error && <div className={styles["error-banner"]}>{error}</div>}
