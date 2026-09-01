@@ -126,6 +126,23 @@ is messy and it can afford to.
 **Adaptive** is the recommended setting for practice — it keeps the match close
 without ever being unbeatable.
 
+#### Turn pacing
+
+The round clock is shared, and its time bonus is the player's to win, so the bot
+is held to a budget for its **whole turn** rather than a pause per guess — every
+guess it takes comes out of the same `BOT_TURN_BUDGET_MS` envelope. Difficulty
+sets how much of that envelope it spends, so a slower rival reads as slower
+*pacing* instead of a longer wait:
+
+| Difficulty | Turn length |
+|---|---|
+| `easy` | ~3.0 s |
+| `normal` / `adaptive` | ~2.4 s |
+| `hard` | ~1.5 s |
+
+Raising `guessesPerTurn` in the lobby packs more guesses into the same budget
+rather than stretching the turn.
+
 ---
 
 ## 🚀 Quick Start
@@ -178,8 +195,7 @@ All game parameters are configurable via environment variables (or by editing `s
 | `COOP_LIVES` | `3` | Co-op mode: lives per run |
 | `COOP_GUESSES_BASE` | `3` | Co-op mode: shared pool = base + player count |
 | `BOT_NAME` | `CIPHER` | Solo mode: rival's display name |
-| `BOT_MIN_THINK_MS` | `1800` | Solo mode: fastest bot thinking pause |
-| `BOT_MAX_THINK_MS` | `7000` | Solo mode: slowest bot thinking pause |
+| `BOT_TURN_BUDGET_MS` | `3000` | Solo mode: ceiling on a whole bot turn, all its guesses included |
 
 Copy `.env.example` to `.env` to override:
 

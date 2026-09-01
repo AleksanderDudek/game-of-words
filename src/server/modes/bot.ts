@@ -12,6 +12,10 @@
 //
 // "adaptive" is the recommended default: it rubber-bands toward the player's
 // score, which keeps a practice session close without ever feeling unbeatable.
+//
+// Pacing is budgeted per *turn*, not per guess. The rival shares the player's
+// round clock and the time bonus scored off it, so however many guesses a turn
+// holds, they all come out of one envelope — see botTurnBudgetMs below.
 
 import type { BotDifficulty, LetterCell } from "../../shared/types";
 
@@ -20,23 +24,30 @@ export interface BotProfile {
   readonly baseAccuracy: number;
   /** Chance to spend points on revealing a pair when it can afford to */
   readonly hintChance: number;
-  /** Thinking pause before answering, in milliseconds */
-  readonly minThinkMs: number;
-  readonly maxThinkMs: number;
+  /** Share of the turn budget this difficulty spends thinking (0..1) */
+  readonly pace: number;
 }
 
 const PROFILES: Record<Exclude<BotDifficulty, "adaptive">, BotProfile> = {
-  easy:   { baseAccuracy: 0.16, hintChance: 0.05, minThinkMs: 4200, maxThinkMs: 7000 },
-  normal: { baseAccuracy: 0.32, hintChance: 0.15, minThinkMs: 3000, maxThinkMs: 5500 },
-  hard:   { baseAccuracy: 0.55, hintChance: 0.28, minThinkMs: 1800, maxThinkMs: 3400 },
+  easy:   { baseAccuracy: 0.16, hintChance: 0.05, pace: 1.0 },
+  normal: { baseAccuracy: 0.32, hintChance: 0.15, pace: 0.8 },
+  hard:   { baseAccuracy: 0.55, hintChance: 0.28, pace: 0.5 },
 };
 
 const ADAPTIVE_PROFILE: BotProfile = {
   baseAccuracy: 0.30,
   hintChance: 0.18,
-  minThinkMs: 2400,
-  maxThinkMs: 5000,
+  pace: 0.8,
 };
+
+/**
+ * Shortest pause worth showing. Anything quicker and the guess lands under the
+ * client's 500ms miss animation, so the round reads as a glitch rather than a move.
+ */
+const MIN_STEP_MS = 400;
+
+/** How wide the per-guess pause may wander around its share of the budget. */
+const STEP_JITTER = 0.25;
 
 export function botProfile(difficulty: BotDifficulty): BotProfile {
   return difficulty === "adaptive" ? ADAPTIVE_PROFILE : PROFILES[difficulty];
@@ -79,10 +90,36 @@ export function botSolveProbability(input: BotSolveInput): number {
   return clamp(base * lengthPenalty * pairsPenalty, 0.03, 0.92);
 }
 
-/** How long the bot pauses before answering, so its turn feels deliberate. */
-export function botThinkDelayMs(difficulty: BotDifficulty, rng: () => number = Math.random): number {
-  const { minThinkMs, maxThinkMs } = botProfile(difficulty);
-  return Math.round(minThinkMs + rng() * (maxThinkMs - minThinkMs));
+/**
+ * Wall-clock the bot may spend on one *whole* turn, however many guesses that
+ * turn holds. Budgeting the turn rather than the guess is what keeps the rival
+ * off the shared round clock — a slower profile now reads as slower pacing
+ * inside the same envelope instead of a longer wait for the player.
+ */
+export function botTurnBudgetMs(difficulty: BotDifficulty, budgetMs: number): number {
+  return Math.round(Math.max(0, budgetMs) * botProfile(difficulty).pace);
+}
+
+/**
+ * Pause before the bot's next guess: an even share of whatever budget the turn
+ * has left, nudged by a little jitter so the rhythm is not metronomic.
+ *
+ * The share is taken from the *remaining* budget, so a long first guess is paid
+ * for by the ones after it and the turn total can never overrun. `MIN_STEP_MS`
+ * is the one thing that may push past the budget, and only when a host has set
+ * an unusually deep guess pool — a readable move beats a strict envelope.
+ */
+export function botStepDelayMs(
+  budgetLeftMs: number,
+  guessesLeft: number,
+  rng: () => number = Math.random,
+): number {
+  const left = Math.max(0, budgetLeftMs);
+  if (left === 0) return 0;
+
+  const share = left / Math.max(1, guessesLeft);
+  const jittered = share * (1 - STEP_JITTER + rng() * STEP_JITTER * 2);
+  return Math.round(clamp(jittered, Math.min(MIN_STEP_MS, left), left));
 }
 
 export interface BotHintInput {

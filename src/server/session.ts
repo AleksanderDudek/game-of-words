@@ -54,7 +54,8 @@ import {
 import { coopGuessPool } from "./modes/coopRules";
 import {
   botSolveProbability,
-  botThinkDelayMs,
+  botTurnBudgetMs,
+  botStepDelayMs,
   shouldBotBuyHint,
   makeDecoyGuess,
 } from "./modes/bot";
@@ -122,6 +123,10 @@ export class GameSession {
   botId: PlayerId | "" = "";
   botTimer: ReturnType<typeof setTimeout> | null = null;
   botThinking: boolean = false;
+  /** Thinking time the current bot turn has left to spend, in milliseconds. */
+  botBudgetLeftMs: number = 0;
+  /** True from the moment the mic reaches the bot until it hands it back. */
+  botTurnActive: boolean = false;
 
   constructor(mode: GameMode = "classic") {
     this.id = toSessionId(uuid().slice(0, 8));
@@ -438,8 +443,8 @@ export class GameSession {
 
     // Start timer
     this.startTimer();
-    this.broadcastState();
     this.maybeScheduleBot();
+    this.broadcastState();
   }
 
   /** Per-mode round bootstrapping: squad ownership, shared pools, mic handover. */
@@ -589,7 +594,6 @@ export class GameSession {
     }
 
     this.consumeGuess();
-    this.maybeScheduleBot();
   }
 
   private handleCorrectGuess(playerId: PlayerId): void {
@@ -672,6 +676,7 @@ export class GameSession {
     if (this.turnsRemaining <= 0) {
       this.advanceTurn();
     }
+    this.maybeScheduleBot();
     this.broadcastState();
   }
 
@@ -754,8 +759,8 @@ export class GameSession {
       newPlayerId: this.currentPlayerId,
       turnsRemaining: this.turnsRemaining,
     });
-    this.broadcastState();
     this.maybeScheduleBot();
+    this.broadcastState();
   }
 
   // Called between rounds to silently advance to the next player.
@@ -774,34 +779,70 @@ export class GameSession {
 
   // ─── Solo Bot ───
 
+  /** Tear down everything the bot's turn is holding. Never broadcasts. */
   private clearBotTimer(): void {
     if (this.botTimer) {
       clearTimeout(this.botTimer);
       this.botTimer = null;
     }
     this.botThinking = false;
+    this.botTurnActive = false;
+    this.botBudgetLeftMs = 0;
   }
 
-  /** Put the bot on the clock whenever the mic lands on it during play. */
+  /**
+   * Single authority over the bot's turn: it arms the next guess while the bot
+   * holds the mic, and tears the turn down the moment the mic moves on.
+   *
+   * The pause is drawn from a budget for the *whole* turn rather than a fresh
+   * pause per guess. The round clock is shared with the player and its time
+   * bonus is theirs to win, so a rival that thinks three separate times must
+   * still cost them no more than one turn's worth of it.
+   *
+   * Mutates only — every call site broadcasts once it returns.
+   */
   private maybeScheduleBot(): void {
     if (this.mode !== "solo" || !this.botId) return;
+
+    // Mic moved on, or play stopped: drop any thinking state left behind.
+    if (this.state !== "playing" || this.currentPlayerId !== this.botId) {
+      this.clearBotTimer();
+      return;
+    }
     if (this.botTimer) return; // already thinking
-    if (this.state !== "playing" || this.currentPlayerId !== this.botId) return;
+
+    if (!this.botTurnActive) {
+      this.botTurnActive = true;
+      this.botBudgetLeftMs = botTurnBudgetMs(this.botDifficulty, CONFIG.BOT_TURN_BUDGET_MS);
+    }
+
+    const delay = botStepDelayMs(this.botBudgetLeftMs, this.turnsRemaining);
+    this.botBudgetLeftMs = Math.max(0, this.botBudgetLeftMs - delay);
 
     this.botThinking = true;
-    this.botTimer = setTimeout(() => this.performBotMove(), botThinkDelayMs(this.botDifficulty));
-    this.broadcastState();
+    this.botTimer = setTimeout(() => this.performBotMove(), delay);
   }
 
   private performBotMove(): void {
     this.botTimer = null;
-    this.botThinking = false;
-    if (this.mode !== "solo" || this.state !== "playing") return;
-    if (!this.botId || this.currentPlayerId !== this.botId) return;
+    // `botThinking` deliberately stays lit here: the bot may still have guesses
+    // left in this turn, and blinking the indicator off between them would
+    // strobe now that the guesses land barely a second apart.
+    if (this.mode !== "solo" || this.state !== "playing") {
+      this.clearBotTimer();
+      return;
+    }
+    if (!this.botId || this.currentPlayerId !== this.botId) {
+      this.clearBotTimer();
+      return;
+    }
 
     const bot = this.players.get(this.botId);
     const human = this.connectedHumans()[0];
-    if (!bot) return;
+    if (!bot) {
+      this.clearBotTimer();
+      return;
+    }
 
     if (
       shouldBotBuyHint({
@@ -865,8 +906,8 @@ export class GameSession {
     this.state = "playing";
     this.startTimer();
     this.broadcast({ type: "game_resumed", byPlayerId: playerId });
-    this.broadcastState();
     this.maybeScheduleBot();
+    this.broadcastState();
     console.log(`[Session ${this.id}] Game resumed by "${playerId}".`);
   }
 
