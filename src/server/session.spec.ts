@@ -27,7 +27,23 @@ function primeRound(session: GameSession, word: string): void {
   session.timeLeft = CONFIG.SESSION_DURATION_SEC;
 }
 
+/**
+ * Pin every roll the bot makes high. Its solve chance is capped at 0.92, so a
+ * 0.99 roll always misses and always declines a hint — the bot then burns its
+ * full guess allowance and the whole turn is deterministic.
+ */
+function botAlwaysMisses(): void {
+  vi.spyOn(Math, "random").mockReturnValue(0.99);
+}
+
 describe("GameSession — solo mode", () => {
+  afterEach(() => {
+    // botAlwaysMisses() patches a global; leaving it in place would silently
+    // rig every later test in the file.
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   it("seats a bot rival the moment the room is created", () => {
     const session = new GameSession("solo");
     const bots = [...session.players.values()].filter((p) => p.isBot);
@@ -73,12 +89,103 @@ describe("GameSession — solo mode", () => {
     expect(session.currentPlayerId).toBe(botId);
 
     seat.sent.length = 0;
-    vi.advanceTimersByTime(CONFIG.BOT_MAX_THINK_MS + 1000);
+    vi.advanceTimersByTime(CONFIG.BOT_TURN_BUDGET_MS + 1000);
 
     const botGuesses = seat.sent.filter(
       (m) => m.type === "guess_result" && m.playerId === botId,
     );
     expect(botGuesses.length).toBeGreaterThan(0);
+
+    session.cleanup();
+    vi.useRealTimers();
+  });
+
+  it("finishes its whole turn inside the configured budget", () => {
+    botAlwaysMisses();
+    vi.useFakeTimers();
+    const session = new GameSession("solo");
+    const seat = fakeSocket();
+    const human = session.addPlayer(seat.ws, "Alice") as PlayerId;
+    const botId = session.botId as PlayerId;
+
+    primeRound(session, "blaze");
+    session.currentPlayerId = human;
+    session.turnsRemaining = 1;
+    session.handleGuess(human, "wrong"); // hands the mic to the bot
+
+    seat.sent.length = 0;
+    // By the time the budget is up the bot is done thinking, whether it solved
+    // the word or burned every guess — nothing is left pending on its clock.
+    vi.advanceTimersByTime(CONFIG.BOT_TURN_BUDGET_MS);
+
+    expect(session.botThinking).toBe(false);
+    expect(session.botTimer).toBeNull();
+    expect(session.currentPlayerId).toBe(human);
+    expect(
+      seat.sent.filter((m) => m.type === "guess_result" && m.playerId === botId),
+    ).toHaveLength(CONFIG.TURNS_PER_PLAYER);
+
+    session.cleanup();
+    vi.useRealTimers();
+  });
+
+  it("holds the thinking flag steady across every guess of the bot's turn", () => {
+    botAlwaysMisses();
+    vi.useFakeTimers();
+    const session = new GameSession("solo");
+    const seat = fakeSocket();
+    const human = session.addPlayer(seat.ws, "Alice") as PlayerId;
+    const botId = session.botId as PlayerId;
+
+    primeRound(session, "blaze");
+    session.currentPlayerId = human;
+    session.turnsRemaining = 1;
+    session.handleGuess(human, "wrong");
+
+    seat.sent.length = 0;
+    // Step through the turn and watch what the client is actually told: while
+    // the bot still holds the mic the indicator must never blink back off.
+    vi.advanceTimersByTime(CONFIG.BOT_TURN_BUDGET_MS);
+
+    const botTurnFrames = seat.sent.filter(
+      (m) =>
+        m.type === "session_update" &&
+        m.session.state === "playing" &&
+        m.session.round?.currentPlayerId === botId,
+    );
+    expect(botTurnFrames.length).toBeGreaterThan(0);
+    for (const frame of botTurnFrames) {
+      if (frame.type !== "session_update") continue;
+      expect(frame.session.round?.botThinking).toBe(true);
+    }
+
+    session.cleanup();
+    vi.useRealTimers();
+  });
+
+  it("clears the thinking flag in the frame that hands the mic back", () => {
+    botAlwaysMisses();
+    vi.useFakeTimers();
+    const session = new GameSession("solo");
+    const seat = fakeSocket();
+    const human = session.addPlayer(seat.ws, "Alice") as PlayerId;
+
+    primeRound(session, "blaze");
+    session.currentPlayerId = human;
+    session.turnsRemaining = 1;
+    session.handleGuess(human, "wrong");
+
+    seat.sent.length = 0;
+    vi.advanceTimersByTime(CONFIG.BOT_TURN_BUDGET_MS + 1000);
+
+    const humanTurnFrames = seat.sent.filter(
+      (m) => m.type === "session_update" && m.session.round?.currentPlayerId === human,
+    );
+    expect(humanTurnFrames.length).toBeGreaterThan(0);
+    for (const frame of humanTurnFrames) {
+      if (frame.type !== "session_update") continue;
+      expect(frame.session.round?.botThinking).toBe(false);
+    }
 
     session.cleanup();
     vi.useRealTimers();
@@ -98,7 +205,7 @@ describe("GameSession — solo mode", () => {
 
     session.handlePauseGame(human);
     seat.sent.length = 0;
-    vi.advanceTimersByTime(CONFIG.BOT_MAX_THINK_MS + 5000);
+    vi.advanceTimersByTime(CONFIG.BOT_TURN_BUDGET_MS + 5000);
 
     expect(seat.sent.some((m) => m.type === "guess_result" && m.playerId === botId)).toBe(false);
 

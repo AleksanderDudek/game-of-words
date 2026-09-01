@@ -3,7 +3,8 @@ import {
   botProfile,
   botBaseAccuracy,
   botSolveProbability,
-  botThinkDelayMs,
+  botTurnBudgetMs,
+  botStepDelayMs,
   shouldBotBuyHint,
   makeDecoyGuess,
 } from "./bot";
@@ -23,7 +24,7 @@ describe("botProfile", () => {
   it("gets sharper and faster as difficulty rises", () => {
     expect(botProfile("easy").baseAccuracy).toBeLessThan(botProfile("normal").baseAccuracy);
     expect(botProfile("normal").baseAccuracy).toBeLessThan(botProfile("hard").baseAccuracy);
-    expect(botProfile("hard").maxThinkMs).toBeLessThan(botProfile("easy").minThinkMs);
+    expect(botProfile("hard").pace).toBeLessThan(botProfile("easy").pace);
   });
 });
 
@@ -86,11 +87,45 @@ describe("botSolveProbability", () => {
   });
 });
 
-describe("botThinkDelayMs", () => {
-  it("stays inside the profile's window", () => {
-    const profile = botProfile("normal");
-    expect(botThinkDelayMs("normal", () => 0)).toBe(profile.minThinkMs);
-    expect(botThinkDelayMs("normal", () => 1)).toBe(profile.maxThinkMs);
+describe("botTurnBudgetMs", () => {
+  it("never hands a difficulty more than the configured turn budget", () => {
+    for (const difficulty of ["easy", "normal", "hard", "adaptive"] as const) {
+      expect(botTurnBudgetMs(difficulty, 3000)).toBeLessThanOrEqual(3000);
+      expect(botTurnBudgetMs(difficulty, 3000)).toBeGreaterThan(0);
+    }
+  });
+
+  it("gives a sharper rival a shorter turn", () => {
+    expect(botTurnBudgetMs("hard", 3000)).toBeLessThan(botTurnBudgetMs("easy", 3000));
+  });
+});
+
+describe("botStepDelayMs", () => {
+  it("splits the remaining budget across the guesses still to come", () => {
+    expect(botStepDelayMs(3000, 3, () => 0.5)).toBe(1000);
+    expect(botStepDelayMs(2000, 2, () => 0.5)).toBe(1000);
+  });
+
+  it("spends the whole budget on the last guess of the turn", () => {
+    expect(botStepDelayMs(900, 1, () => 0.5)).toBe(900);
+  });
+
+  it("keeps a full turn inside its budget however the jitter falls", () => {
+    for (const roll of [0, 0.25, 0.5, 0.75, 1]) {
+      let left = 3000;
+      for (let guessesLeft = 3; guessesLeft > 0; guessesLeft--) {
+        left -= botStepDelayMs(left, guessesLeft, () => roll);
+      }
+      expect(left).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("holds a readable floor so a guess never flashes past", () => {
+    expect(botStepDelayMs(3000, 40, () => 0)).toBeGreaterThanOrEqual(400);
+  });
+
+  it("answers instantly once the budget is spent", () => {
+    expect(botStepDelayMs(0, 2, () => 0.5)).toBe(0);
   });
 });
 

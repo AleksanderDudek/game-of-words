@@ -50,8 +50,9 @@ export const CONFIG = {
 
   // ─── Solo Mode ───
   BOT_NAME:                envStr("BOT_NAME", "CIPHER"),
-  BOT_MIN_THINK_MS:        envInt("BOT_MIN_THINK_MS", 1800),
-  BOT_MAX_THINK_MS:        envInt("BOT_MAX_THINK_MS", 7000),
+  // Wall-clock ceiling for a whole bot turn, not a single guess — the rival
+  // shares the round clock with the player, so its thinking is capped.
+  BOT_TURN_BUDGET_MS:      envInt("BOT_TURN_BUDGET_MS", 2000),
 
   // ─── LLM Endpoint (pluggable) ───
   LLM_ENDPOINT:            envStr("LLM_ENDPOINT", ""),
